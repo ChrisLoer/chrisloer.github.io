@@ -51,11 +51,13 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252O
 
 var map = window.map = new mapboxgl.Map({
     container: 'map',
-    zoom: 12.5,
-    center: [-77.01866, 38.888],
+    zoom: 11.8,
+    center: [-77.094, 38.8839],
     style: 'mapbox://styles/mapbox/streets-v9',
     hash: true,
-    minZoom: 8
+    minZoom: 8,
+    pitch: 60,
+    bearing: 40
 });
 
 map.showTileBoundaries = true;
