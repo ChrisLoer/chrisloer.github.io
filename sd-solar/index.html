@@ -150,6 +150,13 @@ var toggleSatellite = function() {
     }
 }
 
+map.on('style.load', function() {
+    if (map.getLayer('satellite')) {
+        map.setPaintProperty('satellite', 'raster-brightness-max', 0.5);
+    }
+    updateFilters();
+});
+
 var genFilters = function(hiddenLayer) {
     var filters = [];
     if (hiddenLayer) {
