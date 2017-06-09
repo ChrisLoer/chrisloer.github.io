@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>San Diego Solar Contagion</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        html, body { height: 100%; margin: 0 }
+
+        .box {
+          display: flex;
+          flex-flow: column;
+          height: 100%;
+        }
+
+        .box .row {
+          border: 1px dotted grey;
+        }
+
+        .box .row.header {
+          flex: 0 1 auto;
+          /* The above is shorthand for:
+          flex-grow: 0,
+          flex-shrink: 1,
+          flex-basis: auto
+          */
+        }
+
+        .box .row.content {
+          flex: 1 1 auto;
+        }
+    </style>
+</head>
+
+<body>
+<div class='box'>
+    <div class='row header'>
+        <div style="width: 80%; margin: auto">
+            <p>Slide to see solar permits issued from Jan 1 2015 to Feb 25 2017. Yellow: Installed; Red: Cancelled; White: In Progress</p>
+            <button onclick="toggleSatellite()">Toggle Sattelite View</button>
+            Filter by biggest installers:
+            <select id="installer">
+                <option value="all installers" selected>All Installers (19548)</option>
+                <option value="small installers">"Individual" (< 5 installations): (4985)</option>
+                <option value="solarcity">solarcity (776)</option>
+                <option value="russell clapton">russell clapton (633)</option>
+                <option value="daniel altman">daniel altman (609)</option>
+                <option value="lis domaratzky">lis domaratzky (567)</option>
+                <option value="miranda gibbons">miranda gibbons (406)</option>
+                <option value="jose montano">jose montano (380)</option>
+                <option value="dean jaqueline">dean jaqueline (354)</option>
+                <option value="semper solaris">semper solaris (340)</option>
+                <option value="eric wilson">eric wilson (320)</option>
+                <option value="amanda strout">amanda strout (298)</option>
+                <option value="solar vivint">solar vivint (277)</option>
+                <option value="jesse ober">jesse ober (267)</option>
+                <option value="sunrun installation services">sunrun installation services (261)</option>
+                <option value="lynne landers">lynne landers (258)</option>
+                <option value="electric inc milholland">electric inc milholland (257)</option>
+                <option value="krista stemmerman">krista stemmerman (250)</option>
+                <option value="sara calsadillas">sara calsadillas (247)</option>
+                <option value="jessica hahn">jessica hahn (221)</option>
+                <option value="daniel blessing">daniel blessing (199)</option>
+                <option value="theresa johnson">theresa johnson (199)</option>
+                <option value="khoi nguyen">khoi nguyen (191)</option>
+                <option value="sullivan solar power">sullivan solar power (182)</option>
+                <option value="debbie teter">debbie teter (175)</option>
+                <option value="generation 819">generation 819 (167)</option>
+                <option value="jasmin penn">jasmin penn (162)</option>
+                <option value="terese diaz">terese diaz (160)</option>
+                <option value="suncrest solar">suncrest solar (156)</option>
+                <option value="anthony zelaya">anthony zelaya (140)</option>
+                <option value="stellar solar">stellar solar (140)</option>
+                <option value="energy solare">energy solare (139)</option>
+                <option value="solar city">solar city (139)</option>
+                <option value="gustavo arellano">gustavo arellano (125)</option>
+                <option value="smart energy solar">smart energy solar (109)</option>
+                <option value="erica  tanner">erica  tanner (105)</option>
+            </select>
+            <input id="day" type="range" min="1" max="790" style="width: 100%" value="366"/><br>
+            <p><strong>Showing Permits as of:</strong> <span id="day-text">Fri Jan 01 2016</span></p>
+        </div>
+    </div>
+    <div class='row content' id='map'></div>
+</div>
+
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
+
+var map = window.map = new mapboxgl.Map({
+    container: 'map',
+    zoom: 12,
+    center: [-117.1231, 32.7375],
+    style: 'mapbox://styles/mapbox/dark-v9',
+    hash: true,
+    minZoom: 8
+});
+
+
+map.addControl(new mapboxgl.NavigationControl());
+map.addControl(new mapboxgl.ScaleControl());
+
+var firstDate = new Date();
+firstDate.setYear(2015);
+firstDate.setMonth(0);
+var filterDate = firstDate;
+
+var dayInput = document.getElementById('day');
+var dayText = document.getElementById('day-text');
+var installerSelect = document.getElementById('installer');
+
+var circleColorProperty = function(cutoffDate) {
+    return {
+        "property": "status",
+        "type": "categorical",
+        "stops": [
+            ["Pending", "white"],
+            ["Completed", "yellow"],
+            ["Cancelled", "red"]
+        ]
+    }
+}
+
+var circleOpacityProperty = function(cutoffDate) {
+    var cutoffSeconds = cutoffDate.getTime() / 1000;
+    var beginRange = cutoffSeconds - 30 * 24 * 60 * 60;
+    var endRange = cutoffSeconds + 30 * 24 * 60 * 60;
+    return {
+        "property": "last_date",
+        "type": "exponential",
+        "stops": [
+            [0, 1],
+            [cutoffSeconds, 1],
+            [endRange, 0]
+        ]
+    }
+}
+
+var showingSatellite = false;
+var toggleSatellite = function() {
+    if (!showingSatellite) {
+        showingSatellite = true;
+        map.setStyle("mapbox://styles/mapbox/satellite-v9");
+    } else {
+        showingSatellite = false;
+        map.setStyle("mapbox://styles/mapbox/dark-v9")
+    }
+}
+
+var genFilters = function(hiddenLayer) {
+    var filters = [];
+    if (hiddenLayer) {
+        filters.push(["has", "some nonsense"]);
+    }
+    if (installerSelect.value != "all installers") {
+        filters.push(["==", 'installer', installerSelect.value]);
+    }
+    if (filters.length === 0) {
+        return null;
+    }
+    return ["all"].concat(filters);
+}
+
+var updateFilters = function() {
+    filterDate = new Date(firstDate);
+    filterDate.setDate(dayInput.value);
+    dayText.innerHTML = filterDate.toDateString();
+    var monthsSinceStart = (filterDate.getYear() - 115) * 12 + filterDate.getMonth();
+    for (var i = 0; i < 26; i++) {
+        var month = i % 12;
+        var yearsSinceStart = (i - month) / 12;
+        var layerID = `permits-${115+yearsSinceStart}-${month}`;
+        if (i > monthsSinceStart) {
+            if (map.getLayer(layerID)) {
+                map.setFilter(layerID, genFilters(true)); // Just filter the whole layer out, but leave it loaded
+            }
+        } else if (map.getLayer(layerID)) {
+            map.setFilter(layerID, genFilters(false));
+
+            map.setPaintProperty(layerID, 'circle-opacity', circleOpacityProperty(filterDate));
+        } else {
+            map.addLayer({
+                "id": layerID,
+                "type": "circle",
+                "source": {
+                    "type": "geojson",
+                    "data": `./${layerID}.geojson`
+                },
+                "paint": {
+                    'circle-radius': {
+                        'base': 1.75,
+                        'stops': [[8, 1], [12, 2], [22, 180]]
+                    },
+                    "circle-color": circleColorProperty(filterDate),
+                    "circle-opacity": circleOpacityProperty(filterDate)
+                }
+            });
+            map.setFilter(layerID, genFilters(false));
+        }
+    }
+}
+
+dayInput.oninput = function() {
+    updateFilters();
+}
+
+installerSelect.oninput = function() {
+    updateFilters();
+}
+
+map.on('load', function() {
+    updateFilters();
+});
+
+</script>
+</body>
+</html>
