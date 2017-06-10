@@ -70,7 +70,7 @@
                 <option value="energy solare">energy solare (139)</option>
                 <option value="gustavo arellano">gustavo arellano (125)</option>
                 <option value="smart energy solar">smart energy solar (109)</option>
-                </select>
+            </select>
             <input id="day" type="range" min="1" max="790" style="width: 100%" value="366"/><br>
             <p><strong>Showing Permits as of:</strong> <span id="day-text">Fri Jan 01 2016</span></p>
         </div>
@@ -146,6 +146,26 @@ map.on('style.load', function() {
     if (map.getLayer('satellite')) {
         map.setPaintProperty('satellite', 'raster-brightness-max', 0.5);
     }
+    if (map.getLayer('san diego')) {
+        map.removeLayer('san diego');
+    }
+    map.addLayer({
+        'id': 'san diego',
+        'type': 'line',
+        'source': {
+            'type': 'geojson',
+            'data': './sd_city_limits.geojson'
+        },
+        'layout': {},
+        'paint': {
+            'line-color': '#088',
+            'line-opacity': .8,
+            'line-width': {
+                'base': 1.75,
+                'stops': [[8, 2], [12, 6], [22, 50]]
+            },
+        }
+    });
     updateFilters();
 });
 
