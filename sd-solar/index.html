@@ -192,6 +192,7 @@ var updateFilters = function() {
         var month = i % 12;
         var yearsSinceStart = (i - month) / 12;
         var layerID = `permits-${115+yearsSinceStart}-${month}`;
+        var lastThreeMonths = (monthsSinceStart <= i) && (i > (monthsSinceStart - 3));
         if (i > monthsSinceStart) {
             if (map.getLayer(layerID)) {
                 map.setFilter(layerID, genFilters(true)); // Just filter the whole layer out, but leave it loaded
@@ -199,7 +200,7 @@ var updateFilters = function() {
         } else if (map.getLayer(layerID)) {
             map.setFilter(layerID, genFilters(false));
 
-            map.setPaintProperty(layerID, 'circle-opacity', circleOpacityProperty(filterDate));
+            map.setPaintProperty(layerID, 'circle-opacity', lastThreeMonths? circleOpacityProperty(filterDate) : 1);
         } else {
             map.addLayer({
                 "id": layerID,
@@ -214,7 +215,7 @@ var updateFilters = function() {
                         'stops': [[8, 1], [12, 2], [22, 180]]
                     },
                     "circle-color": circleColorProperty(filterDate),
-                    "circle-opacity": circleOpacityProperty(filterDate)
+                    "circle-opacity": circleOpacityProperty(filterDate, lastThreeMonths? circleOpacityProperty(filterDate) : 1)
                 }
             });
             map.setFilter(layerID, genFilters(false));
