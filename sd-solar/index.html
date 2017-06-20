@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <script src='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <style>
         html, body { height: 100%; margin: 0 }
 
@@ -13,10 +14,6 @@
           display: flex;
           flex-flow: column;
           height: 100%;
-        }
-
-        .box .row {
-          border: 1px dotted grey;
         }
 
         .box .row.header {
@@ -31,6 +28,96 @@
         .box .row.content {
           flex: 1 1 auto;
         }
+
+        /* from http://danielstern.ca/range.css/?ref=css-tricks#/ */
+        input[type=range] {
+          -webkit-appearance: none;
+          width: 100%;
+          margin: 13.8px 0;
+        }
+        input[type=range]:focus {
+          outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+          width: 100%;
+          height: 8.4px;
+          cursor: pointer;
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+          background: #3071a9;
+          border-radius: 1.3px;
+          border: 0.2px solid #010101;
+        }
+        input[type=range]::-webkit-slider-thumb {
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+          border: 1px solid #000000;
+          height: 36px;
+          width: 16px;
+          border-radius: 3px;
+          background: #faffff;
+          cursor: pointer;
+          -webkit-appearance: none;
+          margin-top: -14px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+          background: #367ebd;
+        }
+        input[type=range]::-moz-range-track {
+          width: 100%;
+          height: 8.4px;
+          cursor: pointer;
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+          background: #3071a9;
+          border-radius: 1.3px;
+          border: 0.2px solid #010101;
+        }
+        input[type=range]::-moz-range-thumb {
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+          border: 1px solid #000000;
+          height: 36px;
+          width: 16px;
+          border-radius: 3px;
+          background: #faffff;
+          cursor: pointer;
+        }
+        input[type=range]::-ms-track {
+          width: 100%;
+          height: 8.4px;
+          cursor: pointer;
+          background: transparent;
+          border-color: transparent;
+          color: transparent;
+        }
+        input[type=range]::-ms-fill-lower {
+          background: #2a6495;
+          border: 0.2px solid #010101;
+          border-radius: 2.6px;
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+        }
+        input[type=range]::-ms-fill-upper {
+          background: #3071a9;
+          border: 0.2px solid #010101;
+          border-radius: 2.6px;
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+        }
+        input[type=range]::-ms-thumb {
+          box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+          border: 1px solid #000000;
+          height: 36px;
+          width: 16px;
+          border-radius: 3px;
+          background: #faffff;
+          cursor: pointer;
+          height: 8.4px;
+        }
+        input[type=range]:focus::-ms-fill-lower {
+          background: #3071a9;
+        }
+        input[type=range]:focus::-ms-fill-upper {
+          background: #367ebd;
+        }
+
+
+
     </style>
 </head>
 
@@ -38,42 +125,56 @@
 <div class='box'>
     <div class='row header'>
         <div style="width: 80%; margin: auto">
-            <p>Slide to see solar permits issued from Jan 1 2015 to Feb 25 2017. Yellow: Installed; Red: Cancelled; White: In Progress</p>
-            <button onclick="toggleSatellite()">Toggle Sattelite View</button>
-            Filter by biggest installers:
-            <select id="installer">
-                <option value="all installers" selected>All Installers (19548)</option>
-                <option value="small installers">small installers (4953)</option>
-                <option value="vivint solar">vivint solar (1212)</option>
-                <option value="solarcity">solarcity (1114)</option>
-                <option value="baker electric">baker electric (737)</option>
-                <option value="sunrun solar">sunrun solar (667)</option>
-                <option value="daniel altman">daniel altman (609)</option>
-                <option value="lis domaratzky">lis domaratzky (567)</option>
-                <option value="jose montano">jose montano (380)</option>
-                <option value="dean jaqueline">dean jaqueline (354)</option>
-                <option value="semper solaris">semper solaris (340)</option>
-                <option value="eric wilson">eric wilson (320)</option>
-                <option value="asi hastings">asi hastings (271)</option>
-                <option value="electric inc milholland">electric inc milholland (257)</option>
-                <option value="bennion deville homes">bennion deville homes (250)</option>
-                <option value="sara calsadillas">sara calsadillas (247)</option>
-                <option value="verengo solar">verengo solar (222)</option>
-                <option value="jessica hahn">jessica hahn (221)</option>
-                <option value="sullivan solar power">sullivan solar power (182)</option>
-                <option value="generation 819">generation 819 (167)</option>
-                <option value="jasmin penn">jasmin penn (162)</option>
-                <option value="terese diaz">terese diaz (160)</option>
-                <option value="suncrest solar">suncrest solar (156)</option>
-                <option value="stellar solar">stellar solar (140)</option>
-                <option value="anthony zelaya">anthony zelaya (140)</option>
-                <option value="energy solare">energy solare (139)</option>
-                <option value="gustavo arellano">gustavo arellano (125)</option>
-                <option value="smart energy solar">smart energy solar (109)</option>
-            </select>
-            <input id="day" type="range" min="1" max="790" style="width: 100%" value="366"/><br>
-            <p><strong>Showing Permits as of:</strong> <span id="day-text">Fri Jan 01 2016</span></p>
+        <div class='row'>
+            <div class='col-xs-8'>
+                <h4>Solar permits issued in San Diego from Jan 1 2015 to Feb 25 2017</h4>
+                <p>Source: <a href="https://data.sandiego.gov/">Data SD</a>. Inspiration: <a href="http://blog.solarcity.com/most-contagious-solar-cities/">SolarCity Contagion</a>.<br>Yellow: Installed; Red: Cancelled; White: In Progress</p>
+                <p><strong>Showing Permits as of:</strong> <span id="day-text">Fri Jan 01 2016</span></p>
+            </div>
+            <div class='col-xs-4'>
+                <div class='row' style='padding: 10px'>
+                <select id="installer" class="pull-right">
+                    <option value="all installers" selected>All Installers (19548)</option>
+                    <option value="small installers">Small Installers (<5 permits) (4953)</option>
+                    <optgroup label="Largest Installers">
+                        <option value="vivint solar">Vivint Solar (1212)</option>
+                        <option value="solarcity">SolarCity (1114)</option>
+                        <option value="baker electric">Baker Electric (737)</option>
+                        <option value="sunrun solar">SunRun Solar (667)</option>
+                        <option value="daniel altman">D. Altman (609)</option>
+                        <option value="lis domaratzky">L. Domaratzky (567)</option>
+                        <option value="jose montano">J. Montano (380)</option>
+                        <option value="dean jaqueline">D. Jaqueline (354)</option>
+                        <option value="semper solaris">Semper Solaris (340)</option>
+                        <option value="eric wilson">E. Wilson (320)</option>
+                        <option value="asi hastings">ASI Hastings (271)</option>
+                        <option value="electric inc milholland">Milholland Electric Inc (257)</option>
+                        <option value="bennion deville homes">Bennion Deville Homes (250)</option>
+                        <option value="sara calsadillas">S. Calsadillas (247)</option>
+                        <option value="verengo solar">Verengo Solar (222)</option>
+                        <option value="jessica hahn">J. Hahn (221)</option>
+                        <option value="sullivan solar power">Sullivan Solar Power (182)</option>
+                        <option value="generation 819">Generation 819 (167)</option>
+                        <option value="jasmin penn">J. Penn (162)</option>
+                        <option value="terese diaz">T. Diaz (160)</option>
+                        <option value="suncrest solar">Suncrest Solar (156)</option>
+                        <option value="stellar solar">Stellar Solar (140)</option>
+                        <option value="anthony zelaya">A. Zelaya (140)</option>
+                        <option value="energy solare">Energy Solare (139)</option>
+                        <option value="gustavo arellano">G. Arellano (125)</option>
+                        <option value="smart energy solar">Smart Energy Solar (109)</option>
+                    </optgroup>
+                </select>
+                </div>
+                <div class='row' style='padding: 10px'>
+                    <button class="btn btn-default pull-right" onclick="toggleSatellite()">Toggle Sattelite View</button>
+                </div>
+            </div>
         </div>
+        <div class='row'>
+            <input id="day" type="range" min="1" max="790" style="width: 100%" value="366"/><br>
+        </div>
+    </div>
     </div>
     <div class='row content' id='map'></div>
 </div>
