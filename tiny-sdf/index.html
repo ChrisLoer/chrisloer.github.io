@@ -26,6 +26,14 @@
             padding:10px;
         }
 
+        #checkboxes {
+            position: absolute;
+            background: #fff;
+            bottom:35px;
+            left:0;
+            padding:10px;
+        }
+
     </style>
 </head>
 
@@ -35,6 +43,9 @@
 <div id='newMap' style="float: right"></div>
 <label id='originalLabel'>Original Map</label>
 <label id='newLabel'>New Map</label>
+<div id='checkboxes'>
+    <label><input id='show-overdraw-checkbox' type='checkbox'> overdraw debug</label><br />
+</div>
 
 <script src='./mapbox-gl.js'></script>
 <script>
@@ -126,6 +137,11 @@ var newMap = window.newMap = new mapboxgl.Map({
 });
 
 syncMaps(originalMap, newMap);
+
+document.getElementById('show-overdraw-checkbox').onclick = function() {
+    originalMap.showOverdrawInspector = !!this.checked;
+    newMap.showOverdrawInspector = !!this.checked;
+};
 
 </script>
 </body>
