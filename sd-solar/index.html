@@ -216,7 +216,7 @@ var dayInput = document.getElementById('day');
 var dayText = document.getElementById('day-text');
 var installerSelect = document.getElementById('installer');
 
-var circleColorProperty = function(cutoffDate) {
+var circleColorProperty = function() {
     return {
         "property": "status",
         "type": "categorical",
@@ -295,6 +295,30 @@ var genFilters = function(hiddenLayer) {
     return ["all"].concat(filters);
 }
 
+var loadLayers = function() {
+    for (var i = 0; i < 26; i++) {
+        var month = i % 12;
+        var yearsSinceStart = (i - month) / 12;
+        var layerID = `permits-${115+yearsSinceStart}-${month}`;
+        map.addLayer({
+            "id": layerID,
+            "type": "circle",
+            "source": {
+                "type": "geojson",
+                "data": `./${layerID}.geojson`
+            },
+            "paint": {
+                'circle-radius': {
+                    'base': 1.75,
+                    'stops': [[8, 1], [12, 2], [22, 180]]
+                },
+                "circle-color": circleColorProperty(),
+                "circle-opacity": 1
+            }
+        });
+    }
+}
+
 var updateFilters = function() {
     filterDate = new Date(firstDate);
     filterDate.setDate(dayInput.value);
@@ -313,24 +337,6 @@ var updateFilters = function() {
             map.setFilter(layerID, genFilters(false));
 
             map.setPaintProperty(layerID, 'circle-opacity', lastThreeMonths? circleOpacityProperty(filterDate) : 1);
-        } else {
-            map.addLayer({
-                "id": layerID,
-                "type": "circle",
-                "source": {
-                    "type": "geojson",
-                    "data": `./${layerID}.geojson`
-                },
-                "paint": {
-                    'circle-radius': {
-                        'base': 1.75,
-                        'stops': [[8, 1], [12, 2], [22, 180]]
-                    },
-                    "circle-color": circleColorProperty(filterDate),
-                    "circle-opacity": circleOpacityProperty(filterDate, lastThreeMonths? circleOpacityProperty(filterDate) : 1)
-                }
-            });
-            map.setFilter(layerID, genFilters(false));
         }
     }
 }
@@ -344,6 +350,7 @@ installerSelect.oninput = function() {
 }
 
 map.on('load', function() {
+    loadLayers();
     updateFilters();
 });
 
