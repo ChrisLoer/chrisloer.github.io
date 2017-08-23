@@ -211,6 +211,9 @@ var firstDate = new Date();
 firstDate.setYear(2015);
 firstDate.setMonth(0);
 var filterDate = firstDate;
+var endDate = new Date();
+endDate.setYear(2018);
+endDate.setMonth(0);
 
 var dayInput = document.getElementById('day');
 var dayText = document.getElementById('day-text');
@@ -313,7 +316,10 @@ var loadLayers = function() {
                     'stops': [[8, 1], [12, 2], [22, 180]]
                 },
                 "circle-color": circleColorProperty(),
-                "circle-opacity": 1
+                "circle-opacity": 0,
+                "circle-opacity-transition": {
+                    "duration": 0
+                }
             }
         });
     }
@@ -328,15 +334,17 @@ var updateFilters = function() {
         var month = i % 12;
         var yearsSinceStart = (i - month) / 12;
         var layerID = `permits-${115+yearsSinceStart}-${month}`;
-        var lastThreeMonths = (monthsSinceStart <= i) && (i > (monthsSinceStart - 3));
-        if (i > monthsSinceStart) {
-            if (map.getLayer(layerID)) {
-                map.setFilter(layerID, genFilters(true)); // Just filter the whole layer out, but leave it loaded
+        if (map.getLayer(layerID)) {
+            if (i > monthsSinceStart + 1) {
+                // See https://github.com/mapbox/mapbox-gl-js/issues/3949
+                // We use a property function that will always return "0" or "1"
+                // because switching to a constant property can cause flashes
+                map.setPaintProperty(layerID, 'circle-opacity', circleOpacityProperty(firstDate));
+            } else if (i > monthsSinceStart - 2) {
+                map.setPaintProperty(layerID, 'circle-opacity', circleOpacityProperty(filterDate));
+            } else {
+                map.setPaintProperty(layerID, 'circle-opacity', circleOpacityProperty(endDate));
             }
-        } else if (map.getLayer(layerID)) {
-            map.setFilter(layerID, genFilters(false));
-
-            map.setPaintProperty(layerID, 'circle-opacity', lastThreeMonths? circleOpacityProperty(filterDate) : 1);
         }
     }
 }
