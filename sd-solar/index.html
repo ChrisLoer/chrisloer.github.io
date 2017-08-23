@@ -281,6 +281,7 @@ map.on('style.load', function() {
             },
         }
     }, map.getLayer('satellite') ? null : 'place-city-lg-n');
+    loadLayers();
     updateFilters();
 });
 
@@ -356,11 +357,6 @@ dayInput.oninput = function() {
 installerSelect.oninput = function() {
     updateFilters();
 }
-
-map.on('load', function() {
-    loadLayers();
-    updateFilters();
-});
 
 </script>
 </body>
