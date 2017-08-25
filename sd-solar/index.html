@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>San Diego Solar Contagion</title>
+    <title>San Diego Rooftop Solar Installations</title>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src='https://api.mapbox.com/mapbox-gl-js/v0.38.0/mapbox-gl.js'></script>
@@ -140,7 +140,7 @@
             <div class='container'>
                 <div class='row'>
                     <div class='col-sm-8'>
-                        <h4>San Diego solar permits from 1/1/2015 to 1/25/2017</h4>
+                        <h4>San Diego solar permits from Jan 2015 to Feb 2017</h4>
                         <p><strong>Showing:</strong> <span id="day-text">Fri Jan 01 2016</span></p>
                         <p>Source: <a href="https://data.sandiego.gov/">Data SD</a>. Inspiration: <a href="http://blog.solarcity.com/most-contagious-solar-cities/">SolarCity Contagion</a>.</p>
                         <span style="background-color:darkgrey; border-radius: 3px; padding: 3px"><span style='color:yellow'>Installed</span> / <span style='color:red'>Cancelled</span> / <span style='color:white'>In Progress</span></span>
@@ -219,29 +219,16 @@ var dayInput = document.getElementById('day');
 var dayText = document.getElementById('day-text');
 var installerSelect = document.getElementById('installer');
 
-var circleColorProperty = function() {
-    return {
-        "property": "status",
-        "type": "categorical",
-        "stops": [
-            ["Pending", "white"],
-            ["Completed", "yellow"],
-            ["Cancelled", "red"]
-        ]
-    }
-}
-
-var circleOpacityProperty = function(cutoffDate) {
-    var cutoffSeconds = cutoffDate.getTime() / 1000;
-    var beginRange = cutoffSeconds - 30 * 24 * 60 * 60;
-    var endRange = cutoffSeconds + 30 * 24 * 60 * 60;
+var circleOpacityProperty = function(currentDate) {
+    var currentSeconds = currentDate.getTime() / 1000;
+    var fadeEndSeconds = currentSeconds + 30 * 24 * 60 * 60;
     return {
         "property": "last_date",
         "type": "exponential",
         "stops": [
             [0, 1],
-            [cutoffSeconds, 1],
-            [endRange, 0]
+            [currentSeconds, 1],
+            [fadeEndSeconds, 0]
         ]
     }
 }
@@ -283,21 +270,8 @@ map.on('style.load', function() {
     }, map.getLayer('satellite') ? null : 'place-city-lg-n');
     loadLayers();
     updateFilters();
+    updateOpacities();
 });
-
-var genFilters = function(hiddenLayer) {
-    var filters = [];
-    if (hiddenLayer) {
-        filters.push(["has", "some nonsense"]);
-    }
-    if (installerSelect.value != "all installers") {
-        filters.push(["==", 'installer', installerSelect.value]);
-    }
-    if (filters.length === 0) {
-        return null;
-    }
-    return ["all"].concat(filters);
-}
 
 var loadLayers = function() {
     for (var i = 0; i < 26; i++) {
@@ -316,8 +290,16 @@ var loadLayers = function() {
                     'base': 1.75,
                     'stops': [[8, 1], [12, 2], [22, 180]]
                 },
-                "circle-color": circleColorProperty(),
-                "circle-opacity": 0,
+                "circle-color": {
+                        "property": "status",
+                        "type": "categorical",
+                        "stops": [
+                            ["Pending", "white"],
+                            ["Completed", "yellow"],
+                            ["Cancelled", "red"]
+                        ]
+                },
+                "circle-opacity": circleOpacityProperty(firstDate),
                 "circle-opacity-transition": {
                     "duration": 0
                 }
@@ -326,7 +308,7 @@ var loadLayers = function() {
     }
 }
 
-var updateFilters = function() {
+var updateOpacities = function() {
     filterDate = new Date(firstDate);
     filterDate.setDate(dayInput.value);
     dayText.innerHTML = filterDate.toDateString();
@@ -350,8 +332,21 @@ var updateFilters = function() {
     }
 }
 
+var updateFilters = function() {
+    var filter = null;
+    if (installerSelect.value != "all installers") {
+        filter = ["==", 'installer', installerSelect.value];
+    }
+    for (var i = 0; i < 26; i++) {
+        var month = i % 12;
+        var yearsSinceStart = (i - month) / 12;
+        var layerID = `permits-${115+yearsSinceStart}-${month}`;
+        map.setFilter(layerID, filter);
+    }
+}
+
 dayInput.oninput = function() {
-    updateFilters();
+    updateOpacities();
 }
 
 installerSelect.oninput = function() {
