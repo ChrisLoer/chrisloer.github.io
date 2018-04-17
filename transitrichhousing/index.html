@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>transitrichhousing -> mapbox</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+    body { margin: 0; padding: 0; }
+    html, body, #map { height: 100%; }
+
+    #checkboxes {
+        position: absolute;
+        background: #fff;
+        top:0;
+        left:0;
+        padding:10px;
+    }
+</style>
+</head>
+
+<body>
+<div id='map'></div>
+
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
+
+var map = window.map = new mapboxgl.Map({
+    container: 'map',
+    zoom: 11,
+    center: [-122.4388, 37.7347],
+    style: 'mapbox://styles/mapbox/dark-v9',
+    hash: true
+});
+
+map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+var showingSatellite = false;
+var toggleSatellite = function() {
+    if (!showingSatellite) {
+        showingSatellite = true;
+        map.setStyle("mapbox://styles/mapbox/satellite-v9");
+    } else {
+        showingSatellite = false;
+        map.setStyle("mapbox://styles/mapbox/dark-v9")
+    }
+}
+
+map.on('style.load', function() {
+    map.addLayer({
+        'id': 'no rise',
+        'type': 'fill',
+        'source': {
+            'type': 'geojson',
+            'data': './no_rise_shape.geojson'
+        },
+        'layout': {},
+        'paint': {
+            'fill-color': 'yellow',
+            'fill-opacity': 0.4,
+            'fill-outline-color': 'black'
+        }
+    });
+    map.addLayer({
+        'id': 'low rise',
+        'type': 'fill',
+        'source': {
+            'type': 'geojson',
+            'data': './low_rise_shape.geojson'
+        },
+        'layout': {},
+        'paint': {
+            'fill-color': 'blue',
+            'fill-opacity': 0.4,
+            'fill-outline-color': 'black'
+        }
+    });
+    map.addLayer({
+        'id': 'high rise',
+        'type': 'fill',
+        'source': {
+            'type': 'geojson',
+            'data': './high_rise_shape.geojson'
+        },
+        'layout': {},
+        'paint': {
+            'fill-color': 'green',
+            'fill-opacity': 0.4,
+            'fill-outline-color': 'black'
+        }
+    });
+});
+
+</script>
+</body>
+</html>

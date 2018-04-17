@@ -1,0 +1,11 @@
+{
+    "dependencies": {
+        "async": "^2.4.1",
+        "geojson": "^0.4.1",
+        "jsonfile": "^3.0.0",
+        "st": "^1.2.0"
+    },
+    "scripts": {
+        "start-server": "st --no-cache --localhost --port 9966 --index index.html ."
+    }
+}
