@@ -132,7 +132,7 @@
     <div class="panel-heading" role="tab" id="headingOne">
         <a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></a>
         <div style="margin-left: 0px; margin-right: 40px">
-            <input id="month" type="range" min="0" max="11" value="0"/>
+            <input id="month" type="range" min="0" max="11" value="0" step="0.1"/>
         </div>
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
@@ -270,9 +270,15 @@ var updateMonth = function() {
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  monthText.innerHTML = monthNames[monthInput.value] + " 2017";
+  const baseMonth = Math.floor(monthInput.value);
+  const nextMonth = baseMonth < 11 ? baseMonth + 1 : 0;
+  const nextMix = baseMonth < 11 ? monthInput.value % 1  : 0;
+  const baseMix = 1 - nextMix;
+  monthText.innerHTML = monthNames[baseMonth] + " 2017";
 
-  map.setPaintProperty('plant-generation', 'heatmap-weight', ["/", ["to-number", ["get", "netgen_" + monthInput.value]], 2000000]);
+  map.setPaintProperty('plant-generation', 'heatmap-weight', ["/", ["+",
+    ["*", ["to-number", ["get", "netgen_" + baseMonth]], baseMix],
+    ["*", ["to-number", ["get", "netgen_" + nextMonth]], nextMix]], 4000000]);
 }
 
 const fuelTypeWeighting = {"WAT":288726325,"NG":1215510400,"BIT":427029417,"DFO":5107782,"SUB":464401105,"NUC":804949635,"LIG":62122071,"PG":12883,"RC":235290081,"AB":739476,"WDS":16807094,"WND":243025123,"RFO":6115448,"LFG":10512801,"PC":7940894,"SUN":49986180,"OBG":1131905,"GEO":14852820,"MWH":-13969,"OG":8057550,"WO":740873,"JF":35008,"KER":101123,"ANT":0,"OTH":650506,"WC":6044585,"SGC":3748518,"OBS":600035,"TDF":865502,"BFG":2926293,"MSB":6887095,"MSN":6616978,"SC":0,"BLQ":16525367,"WH":3672451,"OBL":62190,"SLW":62680,"PUR":1149103,"SGP":0};
