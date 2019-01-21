@@ -132,7 +132,7 @@
     <div class="panel-heading" role="tab" id="headingOne">
         <a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></a>
         <div style="margin-left: 0px; margin-right: 40px">
-            <input id="month" type="range" min="0" max="11" value="0" step="0.1"/>
+            <input id="month" type="range" min="0" max="203" value="0" step=".25"/>
         </div>
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
@@ -141,7 +141,7 @@
                 <div class='row'>
                     <div class='col-sm-8'>
                         <h4>US Electric Generation Over Time (Form EIA-923)</h4>
-                        <p><strong>Showing:</strong> <span id="month-text">January 2017</span></p>
+                        <p><strong>Showing:</strong> <span id="month-text">January 2001</span></p>
                         <p>Weighted relative to average 2017 generation for fuel type</p>
                     </div>
                     <div class='col-sm-4'>
@@ -159,9 +159,6 @@
                             <option value="8">Geothermal (16 TWh)</option>
                             <option value="9">Petroleum (14 TWh)</option>
                         </select>
-                        </div>
-                        <div class='row' style='padding: 10px'>
-                            <button class="btn btn-default pull-right" onclick="toggleSatellite()">Toggle Satellite View</button>
                         </div>
                     </div>
                 </div>
@@ -195,30 +192,41 @@ var monthInput = document.getElementById('month');
 var monthText = document.getElementById('month-text');
 var fuelSelect = document.getElementById('fuel');
 
-
-var showingSatellite = false;
-var toggleSatellite = function() {
-    if (!showingSatellite) {
-        showingSatellite = true;
-        map.setStyle("mapbox://styles/mapbox/satellite-v9");
-    } else {
-        showingSatellite = false;
-        map.setStyle("mapbox://styles/mapbox/dark-v9")
-    }
-}
-
 const baseIntensity = 2;
 const baseRadius = 16;
 
 map.on('style.load', function() {
-    if (map.getLayer('satellite')) {
-        map.setPaintProperty('satellite', 'raster-brightness-max', 0.5);
-    }
+    map.addSource('satellite', {
+        "type": "raster",
+         "url": "mapbox://mapbox.satellite",
+        "tileSize": 256
+    });
 
     map.addSource('plant-generation', {
         "type": "geojson",
         "data": "plant_generation.geojson"
     });
+
+    map.addLayer({
+        "id": "satellite",
+        "source": "satellite",
+        "type": "raster",
+        "paint": {
+            "raster-brightness-max": 0.5,
+            "raster-opacity": [
+              "interpolate",
+              ["linear"],
+              [ "zoom" ],
+              0,
+              0,
+              8,
+              0,
+              12,
+              1
+            ]
+        }
+    });
+
     map.addLayer({
         "id": "plant-generation",
         "type": "heatmap",
@@ -258,7 +266,7 @@ map.on('style.load', function() {
               12,
               0
             ],
-            'heatmap-weight': ["/", ["to-number", ["get", "netgen_0"]], 2000000]
+            'heatmap-weight': ["/", ["to-number", ["get", "netgen_2001_0"]], 2000000]
         }
     });
 
@@ -273,7 +281,7 @@ map.on('style.load', function() {
                 10,
                 0,
                 16,
-                ["/", ["sqrt", ["to-number", ["get", "netgen_0"]]], 5]
+                ["/", ["sqrt", ["to-number", ["get", "netgen_2001_0"]]], 5]
             ],
             'circle-color': ["match", ["get", "fuel_type"],
                 0, "orange",
@@ -302,7 +310,7 @@ map.on('style.load', function() {
             "text-field": ["format",
                 ["get", "name"], {},
                 "\n", {},
-                ["concat", ["round", ["/", ["get", "netgen_0"], 1000]], " GWh        "],
+                ["concat", ["round", ["/", ["get", "netgen_2001_0"], 1000]], " GWh        "],
                 {
                     "text-font": ["literal", ["DIN Offc Pro Bold", "Noto Sans CJK SC Medium", "Arial Unicode MS Regular"]],
                     "font-scale": 0.8
@@ -337,20 +345,31 @@ map.on('style.load', function() {
     updateFuelType();
 });
 
+toYearMonth = function(month) {
+    const year = Math.floor(month / 12);
+    return {
+        year: 2001 + year,
+        month: month - (year * 12)
+    }
+}
 
 var updateMonth = function() {
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
   const baseMonth = Math.floor(monthInput.value);
-  const nextMonth = baseMonth < 11 ? baseMonth + 1 : 0;
-  const nextMix = baseMonth < 11 ? monthInput.value % 1  : 0;
+  const nextMonth = baseMonth < 203 ? baseMonth + 1 : 0;
+  const nextMix = baseMonth < 203 ? monthInput.value % 1 : 0;
   const baseMix = 1 - nextMix;
-  monthText.innerHTML = monthNames[baseMonth] + " 2017";
+
+  const base = toYearMonth(baseMonth);
+  const next = toYearMonth(nextMonth);
+
+  monthText.innerHTML = monthNames[base.month] + " " + base.year;
 
   map.setPaintProperty('plant-generation', 'heatmap-weight', ["/", ["+",
-    ["*", ["to-number", ["get", "netgen_" + baseMonth]], baseMix],
-    ["*", ["to-number", ["get", "netgen_" + nextMonth]], nextMix]], 2000000]);
+    ["*", ["to-number", ["get", `netgen_${base.year}_${base.month}`]], baseMix],
+    ["*", ["to-number", ["get", `netgen_${next.year}_${next.month}`]], nextMix]], 2000000]);
 }
 
 const fuelTypeWeighting = {0:1304,1:1202,2:805,3:292,4:252,5:56,6:52,7:19,8:16,9:14};

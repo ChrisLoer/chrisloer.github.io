@@ -10,8 +10,73 @@ const plants = {};
 const balancingAuthorities = {};
 const byFuelType = {};
 const byMonthFuelType = {};
-for (let i = 0; i < 12; i++) {
-  byMonthFuelType[i] = {};
+
+for (var year = 2001; year <= 2017; year++) {
+    for (let month = 0; month < 12; month++) {
+        byMonthFuelType[`netgen_${year}_${month}`] = {};
+    }
+}
+
+
+/*
+From "energy source prime movers" by EIA
+
+0: Gas
+1: Coal
+2: Nuclear
+3: Hydro
+4: Wind
+5: Solar
+6: Renewable Hydrocarbon
+7: Other
+8: Geothermal
+9: Petroleum
+
+*/
+
+let fuelTypeMap = {
+    'NG': 0,
+    'SUB': 1,
+    'NUC': 2,
+    'WAT': 3,
+    'WND': 4,
+    'RC': 1,
+    'LIG': 1,
+    'SUN': 5,
+    'WDS': 6,
+    'BLQ': 6,
+    'GEO': 8,
+    'OG': 0,
+    'MSB': 7,
+    'MSN': 7,
+    'WC': 1,
+    'SGC': 1,
+    'WH': 7,
+    'DFO': 6,
+    'BFG': 0,
+    'PUR': 7,
+    'OBG': 6,
+    'ANT': 1,
+    'BIT': 1,
+    'DFO': 9,
+    'JF': 9,
+    'KER': 9,
+    'PC': 9,
+    'PG': 9,
+    'RFO': 9,
+    'SGP': 9,
+    'WO': 9,
+    'AB': 6,
+    'MSW': 6,
+    'OBS': 6,
+    'OBL': 6,
+    'SLW': 6,
+    'WDL': 6,
+    'LFG': 6,
+    'MWH': 7,
+    'TDF': 7,
+    'OTH': 7,
+    'SC': 7
 }
 
 let totalGeneration = 0;
@@ -33,33 +98,49 @@ locationRecords.forEach(function(record) {
   }
 });
 
-var generationRecords = parse(fs.readFileSync('net_gen_and_fuel.csv'), {columns: true});
-generationRecords.forEach(function(record) {
-  const plant = plants[record.plant_code]
-  if (!plant) {
-    // Only use plants we have in both data sets.
-    // It looks like the net_gen data set has a lot of placeholder entries that aren't actually plants
-    return;
-  }
-  plant.fuel_type = record.fuel_type;
-  if (!plant.fuel_type) {
-    console.log(`No plant fuel type for ${plant.plant_code}`);
-  }
-  const netgen = parseInt(record.net_gen.replace(/,/g, ''));
-  plant.net_gen = netgen ? netgen : 0;
-  for (let i = 0; i < 12; i++) {
-    const index = "netgen_" + i;
-    const netgen_month = parseInt(record[index].replace(/,/g, ''));
-    plant[index] = netgen_month ? netgen_month : 0;
-    byMonthFuelType[i][plant.fuel_type] = (byMonthFuelType[i][plant.fuel_type] || 0) + plant[index];
-  }
-  balancingAuthorities[plant.ba_code].totalGeneration += plant.net_gen;
-  byFuelType[plant.fuel_type] = (byFuelType[plant.fuel_type] || 0) + plant.net_gen;
-  totalGeneration += plant.net_gen;
-});
+for (var year = 2001; year <= 2017; year++) {
+    console.log(`Parsing records for year ${year}`);
+    var generationRecords = parse(fs.readFileSync(`CSV/${year}/netgen.csv`), {columns: true});
+    generationRecords.forEach(function(record) {
+      const plant = plants[record.plant_code]
+      if (!plant) {
+        // Only use plants we have in both data sets.
+        // It looks like the net_gen data set has a lot of placeholder entries that aren't actually plants
+        console.log(`Discarding plant ${record.plant_code} because we don't have a location for it.`);
+        return;
+      }
 
+      if (!record.fuel_type) {
+        console.log(`No plant fuel type for ${plant.plant_code}`);
+      }
+      plant.fuel_type = fuelTypeMap[record.fuel_type];
+      if (typeof plant.fuel_type === 'undefined') {
+          console.log(`${record.fuel_type} not recognized`);
+          plant.fuel_type = 7;
+      }
+      plant.name = record.plant_name;
+      for (let month = 0; month < 12; month++) {
+        const monthIndex = `netgen_${month}`; // Input CSV is indexed by month
+        const netgen_month = parseInt(record[monthIndex].replace(/,/g, ''));
 
-const geojson = GeoJSON.parse(Object.values(plants), { Point: ['latitude', 'longitude']});
+        const yearMonthIndex = `netgen_${year}_${month}`; // Output GeoJSON stores generation by year/month
+        plant[yearMonthIndex] = (plant[yearMonthIndex] || 0) + netgen_month ? netgen_month : 0;
+
+        // Collect statistics
+        if (netgen_month > 0) {
+            plant.hasNetGen = true;
+            byMonthFuelType[yearMonthIndex][plant.fuel_type] = (byMonthFuelType[yearMonthIndex][plant.fuel_type] || 0) + plant[yearMonthIndex];
+            balancingAuthorities[plant.ba_code].totalGeneration += netgen_month;
+            byFuelType[plant.fuel_type] = (byFuelType[plant.fuel_type] || 0) + netgen_month;
+            totalGeneration += netgen_month;
+        }
+      }
+    });
+}
+
+const plantsWithNetgen = Object.values(plants).filter(plant => plant.hasNetGen);
+
+const geojson = GeoJSON.parse(plantsWithNetgen, { Point: ['latitude', 'longitude']});
 jsonfile.writeFile('plant_generation.geojson', geojson, function (err) {
     if (err) throw err;
 });
