@@ -203,8 +203,8 @@ map.on('style.load', function() {
     });
 
     map.addSource('plant-generation', {
-        "type": "geojson",
-        "data": "plant_generation.geojson"
+        "type": "vector",
+        "url": "mapbox://chrisloer.2b5hqak0"
     });
 
     map.addLayer({
@@ -231,6 +231,7 @@ map.on('style.load', function() {
         "id": "plant-generation",
         "type": "heatmap",
         "source": "plant-generation",
+        "source-layer": "plant_generation",
         "maxzoom": 12,
         "paint": {
             'heatmap-radius': [
@@ -274,6 +275,7 @@ map.on('style.load', function() {
         "id": "plant-circles",
         "type": "circle",
         "source": "plant-generation",
+        "source-layer": "plant_generation",
         "paint": {
             'circle-radius': ["interpolate",
                 ["linear"],
@@ -304,6 +306,7 @@ map.on('style.load', function() {
     map.addLayer({
         "id": "plant-labels",
         "source": "plant-generation",
+        "source-layer": "plant_generation",
         "type": "symbol",
         "minzoom": 12,
         "layout": {
