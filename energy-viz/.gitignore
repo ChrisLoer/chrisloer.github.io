@@ -3,6 +3,7 @@
 /_site
 /dist/mapbox-gl-dev.js
 /dist/mapbox-gl.js
+/CSV
 *.js.map
 node_modules
 npm-debug.log
@@ -16,3 +17,4 @@ test/integration/**/index.html
 test/integration/**/actual.png
 test/integration/**/diff.png
 .eslintcache
+tmp.csv
