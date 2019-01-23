@@ -176,7 +176,7 @@ var map = window.map = new mapboxgl.Map({
     container: 'map',
     zoom: 5,
     center: [-117.1231, 32.7375],
-    style: 'mapbox://styles/mapbox/dark-v9',
+    style: 'mapbox://styles/mapbox/dark-v10',
     hash: true,
     maxBounds: [
         [-140, 5], // Southwest coordinates
@@ -195,7 +195,7 @@ var fuelSelect = document.getElementById('fuel');
 const baseIntensity = 2;
 const baseRadius = 16;
 
-map.on('style.load', function() {
+map.on('load', function() {
     map.addSource('satellite', {
         "type": "raster",
          "url": "mapbox://mapbox.satellite",
@@ -225,7 +225,7 @@ map.on('style.load', function() {
               1
             ]
         }
-    });
+    }, 'road-label');
 
     map.addLayer({
         "id": "plant-generation",
@@ -269,7 +269,7 @@ map.on('style.load', function() {
             ],
             'heatmap-weight': ["/", ["to-number", ["get", "netgen_2001_0"]], 2000000]
         }
-    });
+    }, 'satellite');
 
     map.addLayer({
         "id": "plant-circles",
