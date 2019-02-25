@@ -10,8 +10,30 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <style>
-        html, body { height: 100%; margin: 0 }
-        #map { position: absolute; top:0; bottom: 0; width: 100%; }
+        html, body { padding: 0; margin: 0 }
+        #map { position: fixed; top:0; bottom: 0; width: 70%; }
+
+        #features {
+            width: 30%;
+            position: absolute;
+            margin-left: 70%;
+            font-family: sans-serif;
+            overflow-y: scroll;
+            background-color: #fafafa;
+        }
+        section {
+            padding:  25px 50px;
+            line-height: 25px;
+            border-bottom: 1px solid #ddd;
+            opacity: 0.75;
+            font-size: 13px;
+        }
+        section.active {
+            opacity: 1;
+        }
+        section:last-child {
+            border-bottom: none;
+        }
 
         .panel {
             background-color: rgba(255,255,255,0.9);
@@ -119,53 +141,82 @@
           background: #367ebd;
         }
 
-
-
     </style>
 </head>
 
 <body>
 <div id='map'></div>
-
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="position: relative; margin: 0px 10px">
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="position: fixed; margin: 0px 10px; width: 68%">
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="headingOne">
-        <a class="accordion-toggle" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne"></a>
+        <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne"></a>
         <div style="margin-left: 0px; margin-right: 40px">
             <input id="month" type="range" min="0" max="203" value="0" step=".25"/>
         </div>
     </div>
-    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-        <div class="panel-body" style="padding: 5px">
-            <div class='container'>
-                <div class='row'>
-                    <div class='col-sm-8'>
-                        <h4>US Electric Generation Over Time (Form EIA-923)</h4>
-                        <p><strong>Showing:</strong> <span id="month-text">January 2001</span></p>
-                        <p>Weighted relative to average 2017 generation for fuel type</p>
-                    </div>
-                    <div class='col-sm-4'>
-                        <div class='row' style='padding: 10px'>
-                            <select id="fuel" class="pull-right">
-                            <option value="all fuels" selected>All Fuel Types (4012 TWh in 2017)</option>
-                            <option value="0">Natural Gas (1304 TWh)</option>
-                            <option value="1">Coal (1202 TWh)</option>
-                            <option value="2">Nuclear (805 TWh)</option>
-                            <option value="3">Hydro (292 TWh)</option>
-                            <option value="4">Wind (252 TWh)</option>
-                            <option value="6">Renewable Hydrocarbon (56 TWh)</option>
-                            <option value="5">Solar (52 TWh)</option>
-                            <option value="7">Other (19 TWh)</option>
-                            <option value="8">Geothermal (16 TWh)</option>
-                            <option value="9">Petroleum (14 TWh)</option>
-                        </select>
-                        </div>
-                    </div>
+    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body" style="padding: 10px; display: table; width: 100%">
+            <h4 style="display: table-cell">US Electric Generation &mdash; <span id="month-text">January 2001</span></h4>
+            <div style="display: table-cell">
+                <div style="float: right">
+                    <select id="fuel">
+                        <option value="all fuels" selected>All Fuels (4012 TWh)</option>
+                        <option value="0">Natural Gas (1304 TWh)</option>
+                        <option value="1">Coal (1202 TWh)</option>
+                        <option value="2">Nuclear (805 TWh)</option>
+                        <option value="3">Hydro (292 TWh)</option>
+                        <option value="4">Wind (252 TWh)</option>
+                        <option value="6">Renewable Hydrocarbon (56 TWh)</option>
+                        <option value="5">Solar (52 TWh)</option>
+                        <option value="7">Other (19 TWh)</option>
+                        <option value="8">Geothermal (16 TWh)</option>
+                        <option value="9">Petroleum (14 TWh)</option>
+                    </select>
+                    &nbsp;<em>(weighted by 2017 generation)</em>
                 </div>
             </div>
         </div>
     </div>
   </div>
+</div>
+
+<div id='features'>
+    <section id='intro' class='active'>
+        <h3>68 Terrawatt Hours</h3>
+        <p>Over the last 17 years, overall US electricity generation has been relatively stable at around 4 TWh/year, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.</p>
+    </section>
+    <section id='coal'>
+        <h3>The Decline of Coal</h3>
+        <p>The rapidly eroding economic competitiveness of coal has been the biggest constraint on US carbon dioxide emissions. Coal has dropped from around half of total electricity generation to just over a quarter.</p>
+    </section>
+    <section id='gas'>
+        <h3>The Rise of Gas</h3>
+        <p>The decline of coal was driven by the rise of cheap natural gas. Relative to coal power stations, natural gas power stations are somewhat cheaper and somewhat more flexible. As a result, it has been relatively "easy" to accomplish this massive rebuilding of our energy infrastructure &mdash; but in any serious proposal to fight climate change, we'll need to shut these plants down well before they've reached the end of their lives.</p>
+    </section>
+    <section id='solar'>
+        <h3>The Rise of Solar</h3>
+        <p>After spending decades as a "speculative" energy source dependendent on subsidies, solar power has exploded in the last decade, and is now the cheapest source of power in some situations. However, solar is still a relatively small fraction of overall electricity generation, and its intermittent nature will make it harder to continue integrating greater amounts of solar power. While people across the country install solar panels on their roofs, the utility-scale industry is centered in the desert southwest, with its near-perfect conditions.</p>
+    </section>
+    <section id='wind'>
+        <h3>The Rise of Wind</h3>
+        <p>In parallel to the rise of solar, wind generation has skyrocketed, dominated by the states of the windswept Great Plains, where wind generation is now one of the larger electricity sources. Wind also suffers from intermittency, but luckily for us sunshine and wind are not highly correlated &mdash; so wind can balance out some of the intermittency of solar.</p>
+    </section>
+    <section id='hydro'>
+        <h3>Hydroelectric's Changing Role</h3>
+        <p>Large hydroelectric plants are still a major source of carbon-free electricity, especially in the Pacific Northwest. With many of the best dam sites already "taken", there is less scope for growth, but hydroelectic plants are starting to find a new role as "batteries" which can soak up excess wind and solar generation by pumping water up-hill. Unfortunately, operating these "batteries" requires reliable precipitation, and throughout the West snow and rainfall are becoming more erratic.</p>
+    </section>
+    <section id='nuclear-solar'>
+        <h3>Neglected Nuclear</h3>
+        <p>Over this entire time period, nuclear generating stations have generated roughly 20% of our electricity &mdash; making up the majority of our carbon-free electricity, even after the rapid growth of renewables. They are safe, they are compact, and they do not suffer from intermittency. Disastrously, the US has stalled building new nuclear plants and has even started to retire some plants early. California is slated to close its last nuclear power plant by 2024. New nuclear plants have failed due to economic constraints (especially competition against cheap-but-polluting gas), but we know that countries such as France and Sweden have switched almost entirely to nuclear power at reasonable cost. If we're going to have a chance against climate change, we need policies (such as a price on carbon) to support a massive build-out of new nuclear plants.</p>
+    </section>
+    <section id='explore' style="height: 100vh">
+        <h3>Explore</h3>
+        <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants, along with satellite imagery. What interesting patterns do you see?</p>
+        <p><em>See <a>"How I built it"</a></em></p>
+        <small id="citation">
+            Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>.
+        </small>
+    </section>
 </div>
 
 <script>
@@ -202,9 +253,20 @@ map.on('load', function() {
         "tileSize": 256
     });
 
+    // map.addSource('plant-generation', {
+    //     "type": "vector",
+    //     //"url": "mapbox://chrisloer.96sairuh"
+    //     "url": "mapbox://chrisloer.2b5hqak0"
+    // });
+
     map.addSource('plant-generation', {
         "type": "geojson",
-        "data": "plant_generation.geojson"
+        "data": "plant_generation.geojson"//,
+        // "cluster": true,
+        // "clusterRadius": 2,
+        // "clusterProperties": {
+        //     "netgen_2001_0": ["+", ["to-number", ["get", "netgen_2001_0"]]]
+        // }
     });
 
     // map.addSource('plant-generation', {
@@ -274,6 +336,7 @@ map.on('load', function() {
               0
             ],
             'heatmap-weight': ["/", ["to-number", ["get", "netgen_2001_0"]], 2000000]
+            //'heatmap-weight': ["min", ["to-number", ["get", "netgen_2001_0"]], 1]
         }
     }, 'satellite');
 
@@ -286,7 +349,7 @@ map.on('load', function() {
             'circle-radius': ["interpolate",
                 ["linear"],
                 ["zoom"],
-                10,
+                8,
                 0,
                 16,
                 ["/", ["sqrt", ["to-number", ["get", "netgen_2001_0"]]], 5]
@@ -321,7 +384,7 @@ map.on('load', function() {
                 "\n", {},
                 ["concat", ["round", ["/", ["get", "netgen_2001_0"], 1000]], " GWh        "],
                 {
-                    "text-font": ["literal", ["DIN Offc Pro Bold", "Noto Sans CJK SC Medium", "Arial Unicode MS Regular"]],
+                    "text-font": ["literal", ["DIN Offc Pro Bold", "Arial Unicode MS Regular"]],
                     "font-scale": 0.8
                 },
                 ["match", ["get", "fuel_type"],
@@ -338,11 +401,11 @@ map.on('load', function() {
                     "(Other))"
                 ],
                 {
-                    "text-font": ["literal", ["DIN Offc Pro Italic", "Noto Sans CJK SC Medium", "Arial Unicode MS Regular"]],
+                    "text-font": ["literal", ["DIN Offc Pro Italic", "Arial Unicode MS Regular"]],
                     "font-scale": 0.8
                 },
             ],
-            "text-font": [ "DIN Offc Pro Medium", "Noto Sans CJK SC Medium", "Arial Unicode MS Regular" ]
+            "text-font": [ "DIN Offc Pro Medium", "Arial Unicode MS Regular" ]
         },
         "paint": {
           "text-color": "white",
@@ -363,8 +426,8 @@ toYearMonth = function(month) {
 }
 
 var updateMonth = function() {
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
   const baseMonth = Math.floor(monthInput.value);
   const nextMonth = baseMonth < 203 ? baseMonth + 1 : 0;
@@ -417,12 +480,146 @@ var updateFuelType = function() {
 
 }
 
+var timerAnimation;
+
 monthInput.oninput = function() {
+    clearTimeout(timerAnimation);
     updateMonth();
 }
 
 fuelSelect.oninput = function() {
     updateFuelType();
+}
+
+function animationStep() {
+    var currentMonth = Math.floor(monthInput.value);
+    if (currentMonth == 203)
+        return;
+
+    monthInput.value = Math.min(currentMonth + 1, 203);
+    updateMonth();
+    timerAnimation = setTimeout(animationStep, 100);
+}
+
+function animateSlider() {
+    monthInput.value = 0;
+    updateMonth();
+    timerAnimation = setTimeout(animationStep, 300);
+}
+
+var chapters = {
+    'intro': (map) => {
+        fuelSelect.value = "all fuels";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'coal': (map) => {
+        fuelSelect.value = "1";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'gas': (map) => {
+        fuelSelect.value = "0";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'solar': (map) => {
+        fuelSelect.value = "5";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'wind': (map) => {
+        fuelSelect.value = "4";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'hydro': (map) => {
+        fuelSelect.value = "3";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        animateSlider();
+    },
+    'nuclear-solar': (map) => {
+        clearTimeout(timerAnimation);
+        fuelSelect.value = "all fuels";
+        updateFuelType();
+        map.flyTo({
+            zoom: 12.5,
+            center: [-112.88301, 33.36317],
+            bearing: -40
+        });
+    },
+    'explore': (map) => {
+        clearTimeout(timerAnimation);
+        fuelSelect.value = "all fuels";
+        updateFuelType();
+        map.flyTo({
+            zoom: 4,
+            center: [-99.79, 38.92],
+            bearing: 0
+        });
+        $(".collapse").collapse('show');
+    }
+};
+
+// On every scroll event, check which element is on screen
+window.onscroll = function() {
+    var chapterNames = Object.keys(chapters);
+    for (var i = 0; i < chapterNames.length; i++) {
+        var chapterName = chapterNames[i];
+        if (isElementOnScreen(chapterName)) {
+            setActiveChapter(chapterName);
+            break;
+        }
+    }
+};
+
+var activeChapterName = 'intro';
+function setActiveChapter(chapterName) {
+    if (!map.isStyleLoaded() || chapterName === activeChapterName)
+        return;
+
+    chapters[chapterName](map);
+
+    document.getElementById(chapterName).setAttribute('class', 'active');
+    document.getElementById(activeChapterName).setAttribute('class', '');
+
+    activeChapterName = chapterName;
+}
+
+function isElementOnScreen(id) {
+    var element = document.getElementById(id);
+    var bounds = element.getBoundingClientRect();
+    return bounds.top < window.innerHeight && bounds.bottom > 0;
 }
 
 </script>
