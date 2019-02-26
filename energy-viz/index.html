@@ -25,7 +25,7 @@
             padding:  25px 50px;
             line-height: 25px;
             border-bottom: 1px solid #ddd;
-            opacity: 0.75;
+            opacity: 0.5;
             font-size: 13px;
         }
         section.active {
@@ -382,7 +382,7 @@ map.on('load', function() {
             "text-field": ["format",
                 ["get", "name"], {},
                 "\n", {},
-                ["concat", ["round", ["/", ["get", "netgen_2001_0"], 1000]], " GWh        "],
+                ["concat", ["number-format", ["round", ["/", ["get", "netgen"], 1000]], {}], " GWh   "],
                 {
                     "text-font": ["literal", ["DIN Offc Pro Bold", "Arial Unicode MS Regular"]],
                     "font-scale": 0.8
@@ -442,6 +442,15 @@ var updateMonth = function() {
   map.setPaintProperty('plant-generation', 'heatmap-weight', ["/", ["+",
     ["*", ["to-number", ["get", `netgen_${base.year}_${base.month}`]], baseMix],
     ["*", ["to-number", ["get", `netgen_${next.year}_${next.month}`]], nextMix]], 2000000]);
+
+  map.setPaintProperty('plant-circles', 'circle-radius', ["interpolate",
+           ["linear"],
+           ["zoom"],
+           8,
+           0,
+           16,
+           ["/", ["sqrt", ["to-number", ["get", `netgen_${base.year}_${base.month}`]]], 5]
+       ]);
 }
 
 const fuelTypeWeighting = {0:1304,1:1202,2:805,3:292,4:252,5:56,6:52,7:19,8:16,9:14};
@@ -577,6 +586,7 @@ var chapters = {
             center: [-112.88301, 33.36317],
             bearing: -40
         });
+        animateSlider();
     },
     'explore': (map) => {
         clearTimeout(timerAnimation);
@@ -604,8 +614,18 @@ window.onscroll = function() {
 };
 
 var activeChapterName = 'intro';
+var initialStyleLoaded = false;
 function setActiveChapter(chapterName) {
-    if (!map.isStyleLoaded() || chapterName === activeChapterName)
+    if (!initialStyleLoaded) {
+        // Wait for the style to load once before starting animations, but then allow animations
+        // to change while style is in the middle of reloading.
+        if (map.isStyleLoaded()) {
+            initialStyleLoaded = true;
+        } else {
+            return;
+        }
+    }
+    if (chapterName === activeChapterName)
         return;
 
     chapters[chapterName](map);
@@ -619,7 +639,7 @@ function setActiveChapter(chapterName) {
 function isElementOnScreen(id) {
     var element = document.getElementById(id);
     var bounds = element.getBoundingClientRect();
-    return bounds.top < window.innerHeight && bounds.bottom > 0;
+    return bounds.top < window.innerHeight && bounds.bottom > 45;
 }
 
 </script>
