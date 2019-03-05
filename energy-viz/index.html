@@ -221,6 +221,7 @@
 
 <script>
 
+
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
 
 var map = window.map = new mapboxgl.Map({
@@ -236,6 +237,20 @@ var map = window.map = new mapboxgl.Map({
 
 });
 
+// From https://www.npmjs.com/package/mapbox-gl-utils
+function setLayerSource (layerId, source, sourceLayer) {
+    const oldLayers = map.getStyle().layers;
+    const layerIndex = oldLayers.findIndex(l => l.id === layerId);
+    const layerDef = oldLayers[layerIndex];
+    const before = oldLayers[layerIndex + 1] && oldLayers[layerIndex + 1].id;
+    layerDef.source = source;
+    if (sourceLayer) {
+        layerDef['source-layer'] = sourceLayer;
+    }
+    map.removeLayer(layerId);
+    map.addLayer(layerDef, before);
+}
+
 map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
@@ -243,7 +258,7 @@ var monthInput = document.getElementById('month');
 var monthText = document.getElementById('month-text');
 var fuelSelect = document.getElementById('fuel');
 
-const baseIntensity = 2;
+const baseIntensity = 1;
 const baseRadius = 16;
 
 map.on('load', function() {
@@ -253,26 +268,55 @@ map.on('load', function() {
         "tileSize": 256
     });
 
-    // map.addSource('plant-generation', {
-    //     "type": "vector",
-    //     //"url": "mapbox://chrisloer.96sairuh"
-    //     "url": "mapbox://chrisloer.2b5hqak0"
-    // });
-
     map.addSource('plant-generation', {
-        "type": "geojson",
-        "data": "plant_generation.geojson"//,
-        // "cluster": true,
-        // "clusterRadius": 2,
-        // "clusterProperties": {
-        //     "netgen_2001_0": ["+", ["to-number", ["get", "netgen_2001_0"]]]
-        // }
+        "type": "vector",
+        "url": "mapbox://chrisloer.5yh8m2ka"
     });
 
-    // map.addSource('plant-generation', {
-    //     "type": "vector",
-    //     "url": "mapbox://chrisloer.2b5hqak0"
-    // });
+    map.addSource('quarterly-generation-all', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.9v4ety4d"
+    });
+    map.addSource('quarterly-generation-gas', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.5vva62hd"
+    });
+    map.addSource('quarterly-generation-coal', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.3goocsnw"
+    });
+    map.addSource('quarterly-generation-nuclear', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.aa153gkx"
+    });
+    map.addSource('quarterly-generation-hydro', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.9bb3s0f0"
+    });
+    map.addSource('quarterly-generation-wind', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.3o674uex"
+    });
+    map.addSource('quarterly-generation-solar', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.8k295r49"
+    });
+    map.addSource('quarterly-generation-renewable', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.1p4pqjk0"
+    });
+    map.addSource('quarterly-generation-other', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.8ffwhxz3"
+    });
+    map.addSource('quarterly-generation-geothermal', {
+        "type": "vector",
+        "url": "chrisloer.8w5wg42y"
+    });
+    map.addSource('quarterly-generation-petroleum', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.6z5qna0c"
+    });
 
     map.addLayer({
         "id": "satellite",
@@ -296,11 +340,11 @@ map.on('load', function() {
     }, 'road-label');
 
     map.addLayer({
-        "id": "plant-generation",
+        "id": "generation-heatmap",
         "type": "heatmap",
-        "source": "plant-generation",
-        //"source-layer": "plant_generation",
-        "maxzoom": 12,
+        "source": "quarterly-generation-all",
+        "source-layer": "geojsonLayer",
+        "maxzoom": 10,
         "paint": {
             'heatmap-radius': [
               "interpolate",
@@ -330,13 +374,12 @@ map.on('load', function() {
               [ "zoom" ],
               0,
               1,
-              10,
+              8,
               1,
-              12,
+              10,
               0
             ],
             'heatmap-weight': ["/", ["to-number", ["get", "netgen_2001_0"]], 2000000]
-            //'heatmap-weight': ["min", ["to-number", ["get", "netgen_2001_0"]], 1]
         }
     }, 'satellite');
 
@@ -344,7 +387,7 @@ map.on('load', function() {
         "id": "plant-circles",
         "type": "circle",
         "source": "plant-generation",
-        //"source-layer": "plant_generation",
+        "source-layer": "plant_generation-a4s0r8",
         "paint": {
             'circle-radius': ["interpolate",
                 ["linear"],
@@ -375,9 +418,9 @@ map.on('load', function() {
     map.addLayer({
         "id": "plant-labels",
         "source": "plant-generation",
-        //"source-layer": "plant_generation",
+        "source-layer": "plant_generation-a4s0r8",
         "type": "symbol",
-        "minzoom": 12,
+        "minzoom": 10,
         "layout": {
             "text-field": ["format",
                 ["get", "name"], {},
@@ -425,23 +468,35 @@ toYearMonth = function(month) {
     }
 }
 
+toYearQuarter = function(quarter) {
+    const year = Math.floor(quarter / 4);
+    return {
+        year: 2001 + year,
+        quarter: quarter - (year * 4)
+    }
+}
+
 var updateMonth = function() {
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
   const baseMonth = Math.floor(monthInput.value);
-  const nextMonth = baseMonth < 203 ? baseMonth + 1 : 0;
-  const nextMix = baseMonth < 203 ? monthInput.value % 1 : 0;
+  const baseYearMonth = toYearMonth(baseMonth);
+
+  const baseQuarter = Math.floor(baseMonth / 3);
+  const nextQuarter = baseQuarter < 67 ? baseQuarter + 1 : 0;
+  // Input is months but data is in quarters, so interpolate at 0, 1/3, 2/3.
+  const nextMix = baseQuarter < 67 ? (baseMonth - (baseQuarter * 3)) / 3 : 0;
   const baseMix = 1 - nextMix;
 
-  const base = toYearMonth(baseMonth);
-  const next = toYearMonth(nextMonth);
+  const baseYearQuarter = toYearQuarter(baseQuarter);
+  const nextYearQuarter = toYearQuarter(nextQuarter);
 
-  monthText.innerHTML = monthNames[base.month] + " " + base.year;
+  monthText.innerHTML = monthNames[baseYearMonth.month] + " " + baseYearMonth.year;
 
-  map.setPaintProperty('plant-generation', 'heatmap-weight', ["/", ["+",
-    ["*", ["to-number", ["get", `netgen_${base.year}_${base.month}`]], baseMix],
-    ["*", ["to-number", ["get", `netgen_${next.year}_${next.month}`]], nextMix]], 2000000]);
+  map.setPaintProperty('generation-heatmap', 'heatmap-weight', ["/", ["+",
+    ["*", ["to-number", ["get", `netgen_${baseYearQuarter.year}_${baseYearQuarter.quarter}`]], baseMix],
+    ["*", ["to-number", ["get", `netgen_${nextYearQuarter.year}_${nextYearQuarter.quarter}`]], nextMix]], 2000000]);
 
   map.setPaintProperty('plant-circles', 'circle-radius', ["interpolate",
            ["linear"],
@@ -449,7 +504,7 @@ var updateMonth = function() {
            8,
            0,
            16,
-           ["/", ["sqrt", ["to-number", ["get", `netgen_${base.year}_${base.month}`]]], 5]
+           ["/", ["sqrt", ["to-number", ["get", `netgen_${baseYearMonth.year}_${baseYearMonth.month}`]]], 5]
        ]);
 }
 
@@ -457,7 +512,7 @@ const fuelTypeWeighting = {0:1304,1:1202,2:805,3:292,4:252,5:56,6:52,7:19,8:16,9
 const totalGeneration = 4012;
 
 var updateFuelType = function() {
-    map.setPaintProperty('plant-generation', 'heatmap-intensity',
+    map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
       [
         "interpolate",
         [ "exponential", 2 ],
@@ -470,12 +525,47 @@ var updateFuelType = function() {
     setTimeout(() => {
         let filter = null;
         let intensityRatio = 1;
+        let source = "quarterly-generation-all";
         if (fuelSelect.value != "all fuels") {
-            filter = ["==", 'fuel_type', +fuelSelect.value];
+            switch(+fuelSelect.value) {
+                case 0:
+                    source = "quarterly-generation-gas";
+                    break;
+                case 1:
+                    source = "quarterly-generation-coal";
+                    break;
+                case 2:
+                    source = "quarterly-generation-nuclear";
+                    break;
+                case 3:
+                    source = "quarterly-generation-hydro";
+                    break;
+                case 4:
+                    source = "quarterly-generation-wind";
+                    break;
+                case 5:
+                    source = "quarterly-generation-solar";
+                    break;
+                case 6:
+                    source = "quarterly-generation-renewable";
+                    break;
+                case 7:
+                    source = "quarterly-generation-other";
+                    break;
+                case 8:
+                    source = "quarterly-generation-geothermal";
+                    break;
+                case 9:
+                    source = "quarterly-generation-petroleum";
+                    break;
+                default:
+                    source = "quarterly-generation-all";
+
+            }
             intensityRatio = 0.5 * totalGeneration / fuelTypeWeighting[fuelSelect.value];
         }
-        map.setFilter('plant-generation', filter);
-        map.setPaintProperty('plant-generation', 'heatmap-intensity',
+        setLayerSource('generation-heatmap', source, 'geojsonLayer');
+        map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
           [
             "interpolate",
             [ "exponential", 2 ],

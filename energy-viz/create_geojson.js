@@ -129,6 +129,7 @@ for (var year = 2001; year <= 2017; year++) {
         // Collect statistics
         if (netgen_month > 0) {
             plant.hasNetGen = true;
+            plant.netgen = (plant.netgen || 0) + netgen_month;
             byMonthFuelType[yearMonthIndex][plant.fuel_type] = (byMonthFuelType[yearMonthIndex][plant.fuel_type] || 0) + plant[yearMonthIndex];
             balancingAuthorities[plant.ba_code].totalGeneration += netgen_month;
             byFuelType[plant.fuel_type] = (byFuelType[plant.fuel_type] || 0) + netgen_month;
@@ -139,9 +140,35 @@ for (var year = 2001; year <= 2017; year++) {
 }
 
 const plantsWithNetgen = Object.values(plants).filter(plant => plant.hasNetGen);
+plantsWithNetgen.sort((a, b) => b.netgen - a.netgen);
+
+// We're splitting into two data sources. For high zoom, we'll include monthly data, along with plant names and other metadata
+// For lower zooms (where plants will be clustered anyway), we cut down to just location and quarterly generation.
+const quarterlyPlants = [];
+for (const plant of plantsWithNetgen) {
+    const copiedPlant = {
+        latitude: plant.latitude,
+        longitude: plant.longitude,
+        fuel_type: plant.fuel_type
+    };
+    for (var year = 2001; year <= 2017; year++) {
+        for (let month = 0; month < 12; month++) {
+            const yearMonthIndex = `netgen_${year}_${month}`;
+            const yearQuarterIndex = `netgen_${year}_${Math.floor(month / 3)}`;
+
+            copiedPlant[yearQuarterIndex] = (copiedPlant[yearQuarterIndex] || 0) + (plant[yearMonthIndex] || 0);
+        }
+    }
+    quarterlyPlants.push(copiedPlant);
+}
 
 const geojson = GeoJSON.parse(plantsWithNetgen, { Point: ['latitude', 'longitude']});
 jsonfile.writeFile('plant_generation.geojson', geojson, function (err) {
+    if (err) throw err;
+});
+
+const quarterlyGeojson = GeoJSON.parse(quarterlyPlants, { Point: ['latitude', 'longitude']});
+jsonfile.writeFile('quarterly_generation.geojson', quarterlyGeojson, function (err) {
     if (err) throw err;
 });
 
