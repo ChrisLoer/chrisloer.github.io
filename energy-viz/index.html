@@ -618,83 +618,51 @@ var chapters = {
     'intro': (map) => {
         fuelSelect.value = "all fuels";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'coal': (map) => {
         fuelSelect.value = "1";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'gas': (map) => {
         fuelSelect.value = "0";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'solar': (map) => {
         fuelSelect.value = "5";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'wind': (map) => {
         fuelSelect.value = "4";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'hydro': (map) => {
         fuelSelect.value = "3";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider();
     },
     'nuclear-solar': (map) => {
         clearTimeout(timerAnimation);
         fuelSelect.value = "all fuels";
         updateFuelType();
-        map.flyTo({
-            zoom: 12.5,
-            center: [-112.88301, 33.36317],
-            bearing: -40
-        });
+        map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]);
         animateSlider();
     },
     'explore': (map) => {
         clearTimeout(timerAnimation);
         fuelSelect.value = "all fuels";
         updateFuelType();
-        map.flyTo({
-            zoom: 4,
-            center: [-99.79, 38.92],
-            bearing: 0
-        });
+        map.fitBounds([[-128, 55], [-65, 25]]);
         $(".collapse").collapse('show');
     }
 };
