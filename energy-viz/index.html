@@ -12,6 +12,7 @@
     <style>
         html, body { padding: 0; margin: 0 }
         #map { position: fixed; top:0; bottom: 0; width: 70%; }
+        #year-text { position: fixed; bottom: 20px; left: 10px; color: white; }
 
         #features {
             width: 30%;
@@ -37,6 +38,10 @@
 
         .panel {
             background-color: rgba(255,255,255,0.9);
+        }
+
+        .date {
+            font-family: monospace;
         }
 
         /* from https://stackoverflow.com/questions/18325779/bootstrap-3-collapse-show-state-with-chevron-icon*/
@@ -146,6 +151,7 @@
 
 <body>
 <div id='map'></div>
+<h1 id="year-text" class="date">2001</h1>
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="position: fixed; margin: 0px 10px; width: 68%">
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="headingOne">
@@ -156,7 +162,7 @@
     </div>
     <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
         <div class="panel-body" style="padding: 10px; display: table; width: 100%">
-            <h4 style="display: table-cell">US Electric Generation &mdash; <span id="month-text">January 2001</span></h4>
+            <h4 style="display: table-cell">US Electric Generation &mdash; <span id="month-text" class="date">Jan 2001</span></h4>
             <div style="display: table-cell">
                 <div style="float: right">
                     <select id="fuel">
@@ -256,6 +262,7 @@ map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 var monthInput = document.getElementById('month');
 var monthText = document.getElementById('month-text');
+var yearText = document.getElementById('year-text');
 var fuelSelect = document.getElementById('fuel');
 
 const baseIntensity = 1;
@@ -493,6 +500,7 @@ var updateMonth = function() {
   const nextYearQuarter = toYearQuarter(nextQuarter);
 
   monthText.innerHTML = monthNames[baseYearMonth.month] + " " + baseYearMonth.year;
+  yearText.innerHTML = baseYearMonth.year;
 
   map.setPaintProperty('generation-heatmap', 'heatmap-weight', ["/", ["+",
     ["*", ["to-number", ["get", `netgen_${baseYearQuarter.year}_${baseYearQuarter.quarter}`]], baseMix],
