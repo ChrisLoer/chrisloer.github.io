@@ -6,37 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
         html, body { padding: 0; margin: 0 }
-        #map { position: fixed; top:0; bottom: 0; width: 70%; }
-        #year-text { position: fixed; bottom: 20px; left: 10px; color: white; }
+        #map { position: fixed; top:0; bottom: 0; width: 100%; }
+        #year-text { left: 10px; color: white; }
+        #slider { position: fixed; margin: 10px 10px; left: 0px; right: 0px; }
 
         #features {
-            width: 30%;
-            position: absolute;
-            margin-left: 70%;
-            font-family: sans-serif;
-            overflow-y: scroll;
-            background-color: #fafafa;
-        }
-        section {
-            padding:  25px 50px;
-            line-height: 25px;
-            border-bottom: 1px solid #ddd;
-            opacity: 0.5;
-            font-size: 13px;
-        }
-        section.active {
-            opacity: 1;
-        }
-        section:last-child {
-            border-bottom: none;
+            display: none;
         }
 
-        .panel {
+        .pagination {
+            justify-content: center;
+        }
+
+        .card {
             background-color: rgba(255,255,255,0.9);
         }
 
@@ -44,18 +32,19 @@
             font-family: monospace;
         }
 
-        /* from https://stackoverflow.com/questions/18325779/bootstrap-3-collapse-show-state-with-chevron-icon*/
-        .panel-heading .accordion-toggle:after {
-            /* symbol for "opening" panels */
-            font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
-            content: "\e114";    /* adjust as needed, taken from bootstrap.css */
-            float: right;        /* adjust as needed */
-            color: grey;         /* adjust as needed */
-            font-size: 25px;
+        .card-heading {
+            padding: 10px;
         }
-        .panel-heading .accordion-toggle.collapsed:after {
-            /* symbol for "collapsed" panels */
-            content: "\e080";    /* adjust as needed, taken from bootstrap.css */
+        .card-heading .accordion-toggle:after {
+            font-family: 'Font Awesome 5 Free';
+            content: "\f078";
+            float: right;
+            color: grey;
+            font-size: 25px;
+            font-weight: 900;
+        }
+        .card-heading .accordion-toggle.collapsed:after {
+            content: "\f054";
             font-size: 25px;
         }
 
@@ -151,37 +140,72 @@
 
 <body>
 <div id='map'></div>
-<h1 id="year-text" class="date">2001</h1>
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="position: fixed; margin: 0px 10px; width: 68%">
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingOne">
-        <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne"></a>
-        <div style="margin-left: 0px; margin-right: 40px">
-            <input id="month" type="range" min="0" max="203" value="0" step=".25"/>
+<div id="slider">
+    <div id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="card">
+        <div class="card-heading" role="tab" id="headingOne">
+            <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne"></a>
+            <div style="margin-left: 0px; margin-right: 40px">
+                <input id="month" type="range" min="0" max="203" value="0" step=".25"/>
+            </div>
         </div>
-    </div>
-    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-        <div class="panel-body" style="padding: 10px; display: table; width: 100%">
-            <h4 style="display: table-cell">US Electric Generation &mdash; <span id="month-text" class="date">Jan 2001</span></h4>
-            <div style="display: table-cell">
-                <div style="float: right">
-                    <select id="fuel">
-                        <option value="all fuels" selected>All Fuels (4012 TWh)</option>
-                        <option value="0">Natural Gas (1304 TWh)</option>
-                        <option value="1">Coal (1202 TWh)</option>
-                        <option value="2">Nuclear (805 TWh)</option>
-                        <option value="3">Hydro (292 TWh)</option>
-                        <option value="4">Wind (252 TWh)</option>
-                        <option value="6">Renewable Hydrocarbon (56 TWh)</option>
-                        <option value="5">Solar (52 TWh)</option>
-                        <option value="7">Other (19 TWh)</option>
-                        <option value="8">Geothermal (16 TWh)</option>
-                        <option value="9">Petroleum (14 TWh)</option>
-                    </select>
-                    &nbsp;<em>(weighted by 2017 generation)</em>
+        <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="card-body" style="padding: 10px; display: table; width: 100%">
+                <div style="display: table-cell">
+                    <div style="float:left">
+                        <strong>US Electricity Generation</strong>
+                        <br>
+                        <span id="month-text" class="date">Jan 2001</span>
+                    </div>
+                </div>
+                <div style="display: table-cell">
+                    <div style="float: right">
+                        <select id="fuel">
+                            <option value="all fuels" selected>All Fuels (4012 TWh)</option>
+                            <option value="0">Natural Gas (1304 TWh)</option>
+                            <option value="1">Coal (1202 TWh)</option>
+                            <option value="2">Nuclear (805 TWh)</option>
+                            <option value="3">Hydro (292 TWh)</option>
+                            <option value="4">Wind (252 TWh)</option>
+                            <option value="6">Renewable Carbon (56 TWh)</option>
+                            <option value="5">Solar (52 TWh)</option>
+                            <option value="7">Other (19 TWh)</option>
+                            <option value="8">Geothermal (16 TWh)</option>
+                            <option value="9">Petroleum (14 TWh)</option>
+                        </select>
+                        <br><em>(weighted by 2017 generation)</em>
+                    </div>
                 </div>
             </div>
         </div>
+      </div>
+    </div>
+    <h1 id="year-text" class="date collapseGroup">2001</h1>
+</div>
+
+<nav aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡</a></li>
+    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️</a></li>
+    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️</a></li>
+    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear-solar">☢️</a></li>
+    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎</a></li>
+  </ul>
+</nav>
+
+
+<div class="modal fade" id="intro" tabindex="-1" role="dialog" aria-labelledby="introLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="introLabel">68 Petawatt Hours</h5>
+      </div>
+      <div class="modal-body">
+        Over the last 17 years, overall US electricity generation has been relatively stable at around 4 PWh/year, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">✨</button>
+      </div>
     </div>
   </div>
 </div>
@@ -230,6 +254,14 @@
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
 
+$('#collapseOne').on('hidden.bs.collapse', function () {
+  $('#year-text').show();
+})
+$('#collapseOne').on('show.bs.collapse', function () {
+  $('#year-text').hide();
+})
+$('#intro').modal();
+
 var map = window.map = new mapboxgl.Map({
     container: 'map',
     zoom: 4,
@@ -237,8 +269,8 @@ var map = window.map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/dark-v10',
     hash: true,
     maxBounds: [
-        [-140, 5], // Southwest coordinates
-        [-50, 65]  // Northeast coordinates
+        [-140, -10], // Southwest coordinates
+        [-50, 70]  // Northeast coordinates
     ]
 
 });
@@ -257,7 +289,6 @@ function setLayerSource (layerId, source, sourceLayer) {
     map.addLayer(layerDef, before);
 }
 
-map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 var monthInput = document.getElementById('month');
@@ -667,46 +698,6 @@ var chapters = {
     }
 };
 
-// On every scroll event, check which element is on screen
-window.onscroll = function() {
-    var chapterNames = Object.keys(chapters);
-    for (var i = 0; i < chapterNames.length; i++) {
-        var chapterName = chapterNames[i];
-        if (isElementOnScreen(chapterName)) {
-            setActiveChapter(chapterName);
-            break;
-        }
-    }
-};
-
-var activeChapterName = 'intro';
-var initialStyleLoaded = false;
-function setActiveChapter(chapterName) {
-    if (!initialStyleLoaded) {
-        // Wait for the style to load once before starting animations, but then allow animations
-        // to change while style is in the middle of reloading.
-        if (map.isStyleLoaded()) {
-            initialStyleLoaded = true;
-        } else {
-            return;
-        }
-    }
-    if (chapterName === activeChapterName)
-        return;
-
-    chapters[chapterName](map);
-
-    document.getElementById(chapterName).setAttribute('class', 'active');
-    document.getElementById(activeChapterName).setAttribute('class', '');
-
-    activeChapterName = chapterName;
-}
-
-function isElementOnScreen(id) {
-    var element = document.getElementById(id);
-    var bounds = element.getBoundingClientRect();
-    return bounds.top < window.innerHeight && bounds.bottom > 45;
-}
 
 </script>
 </body>
