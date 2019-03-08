@@ -204,7 +204,74 @@
         Over the last 17 years, overall US electricity generation has been relatively stable at around 4 PWh/year, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['intro'](map);">✨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="solar" tabindex="-1" role="dialog" aria-labelledby="solarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="solarLabel">The Rise of Solar</h5>
+      </div>
+      <div class="modal-body">
+After spending decades as a "speculative" energy source dependendent on subsidies, solar power has exploded in the last decade, and is now the cheapest source of power in some situations. However, solar is still a relatively small fraction of overall electricity generation, and its intermittent nature will make it harder to continue integrating greater amounts of solar power. While people across the country install solar panels on their roofs, the utility-scale industry is centered in the desert southwest, with its near-perfect conditions.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['solar'](map);">✨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="wind" tabindex="-1" role="dialog" aria-labelledby="windLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="windLabel">The Rise of Wind</h5>
+      </div>
+      <div class="modal-body">
+        In parallel to the rise of solar, wind generation has skyrocketed, dominated by the states of the windswept Great Plains, where wind generation is now one of the larger electricity sources. Wind also suffers from intermittency, but luckily for us sunshine and wind are not highly correlated &mdash; so wind can balance out some of the intermittency of solar.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['wind'](map);">✨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="nuclear-solar" tabindex="-1" role="dialog" aria-labelledby="nuclearLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuclearLabel">Neglected Nuclear</h5>
+      </div>
+      <div class="modal-body">
+        Over this entire time period, nuclear generating stations have generated roughly 20% of our electricity &mdash; making up the majority of our carbon-free electricity, even after the rapid growth of renewables. They are safe, they are compact, and they do not suffer from intermittency. Disastrously, the US has stalled building new nuclear plants and has even started to retire some plants early. California is slated to close its last nuclear power plant by 2024. New nuclear plants have failed due to economic constraints (especially competition against cheap-but-polluting gas), but we know that countries such as France and Sweden have switched almost entirely to nuclear power at reasonable cost. If we're going to have a chance against climate change, we need policies (such as a price on carbon) to support a massive build-out of new nuclear plants.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['nuclear-solar'](map);">✨</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="explore" tabindex="-1" role="dialog" aria-labelledby="exploreLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exploreLabel">Explore</h5>
+      </div>
+      <div class="modal-body">
+          <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants, along with satellite imagery. What interesting patterns do you see?</p>
+          <p><em>See <a>"How I built it"</a></em></p>
+          <small id="citation">
+              Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>.
+          </small>      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['explore'](map);">✨</button>
       </div>
     </div>
   </div>
@@ -629,20 +696,25 @@ fuelSelect.oninput = function() {
     updateFuelType();
 }
 
-function animationStep() {
-    var currentMonth = Math.floor(monthInput.value);
-    if (currentMonth == 203)
-        return;
+function animationStep(completion) {
+    return () => {
+        var currentMonth = Math.floor(monthInput.value);
+        if (currentMonth == 203) {
+            if (completion)
+                completion();
+            return;
+        }
 
-    monthInput.value = Math.min(currentMonth + 1, 203);
-    updateMonth();
-    timerAnimation = setTimeout(animationStep, 100);
+        monthInput.value = Math.min(currentMonth + 1, 203);
+        updateMonth();
+        timerAnimation = setTimeout(animationStep(completion), 100);
+    };
 }
 
-function animateSlider() {
+function animateSlider(completion) {
     monthInput.value = 0;
     updateMonth();
-    timerAnimation = setTimeout(animationStep, 300);
+    timerAnimation = setTimeout(animationStep(completion), 300);
 }
 
 var chapters = {
@@ -650,7 +722,8 @@ var chapters = {
         fuelSelect.value = "all fuels";
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
+        animateSlider(() => $('#solar').modal());
+
     },
     'coal': (map) => {
         fuelSelect.value = "1";
@@ -668,13 +741,13 @@ var chapters = {
         fuelSelect.value = "5";
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
+        animateSlider(() => $('#wind').modal());
     },
     'wind': (map) => {
         fuelSelect.value = "4";
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
+        animateSlider(() => $('#nuclear-solar').modal());
     },
     'hydro': (map) => {
         fuelSelect.value = "3";
@@ -687,7 +760,7 @@ var chapters = {
         fuelSelect.value = "all fuels";
         updateFuelType();
         map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]);
-        animateSlider();
+        animateSlider(() => $('#explore').modal());
     },
     'explore': (map) => {
         clearTimeout(timerAnimation);
