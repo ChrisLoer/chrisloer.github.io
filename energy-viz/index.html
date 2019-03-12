@@ -7,7 +7,7 @@
     <script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
@@ -184,11 +184,11 @@
 </div>
 
 <nav aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
-  <ul class="pagination">
+  <ul id="pagination" class="pagination">
     <li id="introPage" class="page-item active"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡</a></li>
     <li id="solarPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️</a></li>
     <li id="windPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️</a></li>
-    <li id="nuclearPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear-solar">☢️</a></li>
+    <li id="nuclearPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear">☢️</a></li>
     <li id="explorePage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎</a></li>
   </ul>
 </nav>
@@ -242,7 +242,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="nuclear-solar" tabindex="-1" role="dialog" aria-labelledby="nuclearLabel" aria-hidden="true">
+<div class="modal fade" id="nuclear" tabindex="-1" role="dialog" aria-labelledby="nuclearLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -252,7 +252,7 @@
         Nuclear plants easily remain our largest and most reliable source of safe, carbon-free power &mdash; but instead of expanding, we are starting to retire plants early. Any serious decarbonization plan must address the regulatory, economic, and cultural hurdles that hold nuclear back.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['nuclear-solar'](map);">Compare the Scale 🤔</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['nuclear'](map);">Compare the Scale 🤔</button>
       </div>
     </div>
   </div>
@@ -266,10 +266,13 @@
       </div>
       <div class="modal-body">
           <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants. What interesting patterns do you see?</p>
-          <p><em><a href="https://medium.com/@chrisloer/how-i-built-it-us-electric-generation-map-ed8b2b682eed">How I built it</a></em></p>
+          <p>Read <a href="https://medium.com/@chrisloer/how-i-built-it-us-electric-generation-map-ed8b2b682eed">how I built this map</a>.</p>
           <small id="citation">
-              Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>. Inspired by <a href="https://www.nytimes.com/interactive/2018/12/24/climate/how-electricity-generation-changed-in-your-state.html">"How electricity generation changed in your state"</a> and <a href="https://www.carbonbrief.org/mapped-how-the-us-generates-electricity">"How the US generates electricity"</a>.
-          </small>      </div>
+              Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>.
+              <br>
+              Inspired by "<a href="https://www.nytimes.com/interactive/2018/12/24/climate/how-electricity-generation-changed-in-your-state.html">How electricity generation changed in your state</a>" and "<a href="https://www.carbonbrief.org/mapped-how-the-us-generates-electricity">How the US generates electricity</a>"".
+          </small>
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['explore'](map);">Start Looking 🕵️‍♀️</button>
       </div>
@@ -322,7 +325,7 @@ var monthText = document.getElementById('month-text');
 var yearText = document.getElementById('year-text');
 var fuelSelect = document.getElementById('fuel');
 
-const baseIntensity = 1;
+const baseIntensity = .75;
 const baseRadius = 16;
 
 map.on('load', function() {
@@ -491,7 +494,7 @@ map.on('load', function() {
                 "\n", {},
                 ["concat", ["number-format", ["round", ["/", ["get", "netgen"], 1000]], {}], " GWh   "],
                 {
-                    "text-font": ["literal", ["DIN Offc Pro Bold", "Arial Unicode MS Regular"]],
+                    "text-font": ["literal", ["DIN Offc Pro Bold", "Arial Unicode MS Bold"]],
                     "font-scale": 0.8
                 },
                 ["match", ["get", "fuel_type"],
@@ -561,7 +564,8 @@ var updateMonth = function() {
 
   map.setPaintProperty('generation-heatmap', 'heatmap-weight', ["/", ["+",
     ["*", ["to-number", ["get", `netgen_${baseYearQuarter.year}_${baseYearQuarter.quarter}`]], baseMix],
-    ["*", ["to-number", ["get", `netgen_${nextYearQuarter.year}_${nextYearQuarter.quarter}`]], nextMix]], 2000000]);
+    ["*", ["to-number", ["get", `netgen_${nextYearQuarter.year}_${nextYearQuarter.quarter}`]], nextMix]], 2000000],
+  { validate: false });
 
   map.setPaintProperty('plant-circles', 'circle-radius', ["interpolate",
            ["linear"],
@@ -570,7 +574,8 @@ var updateMonth = function() {
            0,
            16,
            ["/", ["sqrt", ["to-number", ["get", `netgen_${baseYearMonth.year}_${baseYearMonth.month}`]]], 5]
-       ]);
+       ],
+       { validate: false });
 }
 
 const fuelTypeWeighting = {0:1304,1:1202,2:805,3:292,4:252,5:56,6:52,7:19,8:16,9:14};
@@ -647,10 +652,19 @@ var updateFuelType = function() {
 var timerAnimation;
 var navigationTimers = [];
 
-monthInput.oninput = function() {
+function resetTimers() {
     clearTimeout(timerAnimation);
+    timerAnimation = null;
     navigationTimers.forEach(timer => clearTimeout(timer));
     navigationTimers = [];
+}
+
+monthInput.oninput = function() {
+    if (timerAnimation) {
+        $('#pagination').popover('show');
+        setTimeout(() => $('#pagination').popover('hide'), 3000);
+    }
+    resetTimers();
     updateMonth();
 }
 
@@ -663,7 +677,12 @@ function animationStep(completion) {
         var currentMonth = Math.floor(monthInput.value);
         if (currentMonth == 203) {
             if (completion) {
-                timerAnimation = setTimeout(completion, 500);
+                timerAnimation = setTimeout(() => {
+                    completion();
+                    resetTimers();
+                }, 500);
+            } else {
+                resetTimers();
             }
             return;
         }
@@ -677,9 +696,7 @@ function animationStep(completion) {
 function animateSlider(completion) {
     monthInput.value = 0;
     updateMonth();
-    clearTimeout(timerAnimation);
-    navigationTimers.forEach(timer => clearTimeout(timer));
-    navigationTimers = [];
+    resetTimers();
     timerAnimation = setTimeout(animationStep(completion), 300);
 }
 
@@ -724,7 +741,7 @@ var chapters = {
     'wind': (map) => {
         fuelSelect.value = "4";
         updateFuelType();
-        animateSlider(() => $('#nuclear-solar').modal());
+        animateSlider(() => $('#nuclear').modal());
         // Fly fast to early Minnesota wind farms at #9.5/44.267/-96.2652
         map.flyTo({
             center: [-96.2652, 44.267],
@@ -735,24 +752,50 @@ var chapters = {
             map.fitBounds([[-128, 55], [-65, 25]], { duration: 10000 }),
             3000));
     },
-    'nuclear-solar': (map) => {
-        clearTimeout(timerAnimation);
+    'nuclear': (map) => {
         fuelSelect.value = "2";
         updateFuelType();
         animateSlider(() => $('#explore').modal());
         // Start showing whole country
         map.fitBounds([[-128, 55], [-65, 25]]);
         // Then zoom to Palo Verde to showing relative scale
-        navigationTimers.push(setTimeout(() => map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]), 8000));
+        navigationTimers.push(setTimeout(() => map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]), 5000));
     },
     'explore': (map) => {
-        clearTimeout(timerAnimation);
+        resetTimers();
         fuelSelect.value = "all fuels";
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
         $(".collapse").collapse('show');
     }
 };
+
+function popoverFunction(id) {
+    return (e) => {
+        if (!timerAnimation) {
+            $(id).popover('show');
+            setTimeout(() => $(id).popover('hide'), 3000);
+        }
+    };
+}
+
+$('.page-item').popover({
+    placement: 'top',
+    content: 'Resume tour here',
+    trigger: 'manual'
+});
+$('#pagination').popover({
+    placement: 'top',
+    content: 'Resume tour',
+    trigger: 'manual'
+});
+
+
+$('#intro').on('hide.bs.modal', popoverFunction('#introPage'));
+$('#solar').on('hide.bs.modal', popoverFunction('#solarPage'));
+$('#wind').on('hide.bs.modal', popoverFunction('#windPage'));
+$('#nuclear').on('hide.bs.modal', popoverFunction('#nuclearPage'));
+$('#explore').on('hide.bs.modal', popoverFunction('#explorePage'));
 
 $('#intro').on('show.bs.modal', function (e) {
     $('#introPage').addClass('active');
@@ -778,7 +821,7 @@ $('#wind').on('show.bs.modal', function (e) {
     $('#explorePage').removeClass('active');
 });
 
-$('#nuclear-solar').on('show.bs.modal', function (e) {
+$('#nuclear').on('show.bs.modal', function (e) {
     $('#introPage').removeClass('active');
     $('#solarPage').removeClass('active');
     $('#windPage').removeClass('active');
