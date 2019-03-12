@@ -153,7 +153,7 @@
             <div class="card-body" style="padding: 10px; display: table; width: 100%">
                 <div style="display: table-cell">
                     <div style="float:left">
-                        <strong>US Electricity Generation</strong>
+                        <strong>Electric Generation</strong>
                         <br>
                         <span id="month-text" class="date">Jan 2001</span>
                     </div>
@@ -185,11 +185,11 @@
 
 <nav aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
   <ul class="pagination">
-    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡</a></li>
-    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️</a></li>
-    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️</a></li>
-    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear-solar">☢️</a></li>
-    <li class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎</a></li>
+    <li id="introPage" class="page-item active"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡</a></li>
+    <li id="solarPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️</a></li>
+    <li id="windPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️</a></li>
+    <li id="nuclearPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear-solar">☢️</a></li>
+    <li id="explorePage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎</a></li>
   </ul>
 </nav>
 
@@ -198,13 +198,13 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="introLabel">68 Petawatt Hours</h5>
+        <h5 class="modal-title" id="introLabel">⚡ Mapping 68 Petawatt Hours</h5>
       </div>
       <div class="modal-body">
-        Over the last 17 years, overall US electricity generation has been relatively stable at around 4 PWh/year, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.
+        Overall US electricity generation has been relatively stable at around 4 PWh/year for the last 17 years, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['intro'](map);">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['intro'](map);">Show Me ✨</button>
       </div>
     </div>
   </div>
@@ -214,13 +214,13 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="solarLabel">The Rise of Solar</h5>
+        <h5 class="modal-title" id="solarLabel">☀️ Solar Explosion</h5>
       </div>
       <div class="modal-body">
-After spending decades as a "speculative" energy source dependendent on subsidies, solar power has exploded in the last decade, and is now the cheapest source of power in some situations. However, solar is still a relatively small fraction of overall electricity generation, and its intermittent nature will make it harder to continue integrating greater amounts of solar power. While people across the country install solar panels on their roofs, the utility-scale industry is centered in the desert southwest, with its near-perfect conditions.
+          In the last decade, solar power has transformed from an experimental niche to one of the cheapest sources of power in the near-perfect conditions of the desert Southwest &mdash; although its intermittent nature will make further growth more difficult.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['solar'](map);">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['solar'](map);">Watch it Grow 🌞</button>
       </div>
     </div>
   </div>
@@ -230,13 +230,13 @@ After spending decades as a "speculative" energy source dependendent on subsidie
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="windLabel">The Rise of Wind</h5>
+        <h5 class="modal-title" id="windLabel">🌬️ The Rise of Wind</h5>
       </div>
       <div class="modal-body">
-        In parallel to the rise of solar, wind generation has skyrocketed, dominated by the states of the windswept Great Plains, where wind generation is now one of the larger electricity sources. Wind also suffers from intermittency, but luckily for us sunshine and wind are not highly correlated &mdash; so wind can balance out some of the intermittency of solar.
+        Wind generation has skyrocketed to become a major electricity source for the states of the windswept Great Plains. Our great offshore wind potential remains untapped for now.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['wind'](map);">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['wind'](map);">Look for Turbines 💨</button>
       </div>
     </div>
   </div>
@@ -246,13 +246,13 @@ After spending decades as a "speculative" energy source dependendent on subsidie
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="nuclearLabel">Neglected Nuclear</h5>
+        <h5 class="modal-title" id="nuclearLabel">☢️ Neglected Nuclear</h5>
       </div>
       <div class="modal-body">
-        Over this entire time period, nuclear generating stations have generated roughly 20% of our electricity &mdash; making up the majority of our carbon-free electricity, even after the rapid growth of renewables. They are safe, they are compact, and they do not suffer from intermittency. Disastrously, the US has stalled building new nuclear plants and has even started to retire some plants early. California is slated to close its last nuclear power plant by 2024. New nuclear plants have failed due to economic constraints (especially competition against cheap-but-polluting gas), but we know that countries such as France and Sweden have switched almost entirely to nuclear power at reasonable cost. If we're going to have a chance against climate change, we need policies (such as a price on carbon) to support a massive build-out of new nuclear plants.
+        Nuclear plants easily remain our largest and most reliable source of safe, carbon-free power &mdash; but instead of expanding, we are starting to retire plants early. Any serious decarbonization plan must address the regulatory, economic, and cultural hurdles that hold nuclear back.
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['nuclear-solar'](map);">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['nuclear-solar'](map);">Compare the Scale 🤔</button>
       </div>
     </div>
   </div>
@@ -262,58 +262,19 @@ After spending decades as a "speculative" energy source dependendent on subsidie
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exploreLabel">Explore</h5>
+        <h5 class="modal-title" id="exploreLabel">🔎 Explore</h5>
       </div>
       <div class="modal-body">
-          <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants, along with satellite imagery. What interesting patterns do you see?</p>
-          <p><em>See <a>"How I built it"</a></em></p>
+          <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants. What interesting patterns do you see?</p>
+          <p><em><a href="https://medium.com/@chrisloer/how-i-built-it-us-electric-generation-map-ed8b2b682eed">How I built it</a></em></p>
           <small id="citation">
-              Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>.
+              Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>. Inspired by <a href="https://www.nytimes.com/interactive/2018/12/24/climate/how-electricity-generation-changed-in-your-state.html">"How electricity generation changed in your state"</a> and <a href="https://www.carbonbrief.org/mapped-how-the-us-generates-electricity">"How the US generates electricity"</a>.
           </small>      </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['explore'](map);">✨</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['explore'](map);">Start Looking 🕵️‍♀️</button>
       </div>
     </div>
   </div>
-</div>
-
-<div id='features'>
-    <section id='intro' class='active'>
-        <h3>68 Petawatt Hours</h3>
-        <p>Over the last 17 years, overall US electricity generation has been relatively stable at around 4 PWh/year, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.</p>
-    </section>
-    <section id='coal'>
-        <h3>The Decline of Coal</h3>
-        <p>The rapidly eroding economic competitiveness of coal has been the biggest constraint on US carbon dioxide emissions. Coal has dropped from around half of total electricity generation to just over a quarter.</p>
-    </section>
-    <section id='gas'>
-        <h3>The Rise of Gas</h3>
-        <p>The decline of coal was driven by the rise of cheap natural gas. Relative to coal power stations, natural gas power stations are somewhat cheaper and somewhat more flexible. As a result, it has been relatively "easy" to accomplish this massive rebuilding of our energy infrastructure &mdash; but in any serious proposal to fight climate change, we'll need to shut these plants down well before they've reached the end of their lives.</p>
-    </section>
-    <section id='solar'>
-        <h3>The Rise of Solar</h3>
-        <p>After spending decades as a "speculative" energy source dependendent on subsidies, solar power has exploded in the last decade, and is now the cheapest source of power in some situations. However, solar is still a relatively small fraction of overall electricity generation, and its intermittent nature will make it harder to continue integrating greater amounts of solar power. While people across the country install solar panels on their roofs, the utility-scale industry is centered in the desert southwest, with its near-perfect conditions.</p>
-    </section>
-    <section id='wind'>
-        <h3>The Rise of Wind</h3>
-        <p>In parallel to the rise of solar, wind generation has skyrocketed, dominated by the states of the windswept Great Plains, where wind generation is now one of the larger electricity sources. Wind also suffers from intermittency, but luckily for us sunshine and wind are not highly correlated &mdash; so wind can balance out some of the intermittency of solar.</p>
-    </section>
-    <section id='hydro'>
-        <h3>Hydroelectric's Changing Role</h3>
-        <p>Large hydroelectric plants are still a major source of carbon-free electricity, especially in the Pacific Northwest. With many of the best dam sites already "taken", there is less scope for growth, but hydroelectic plants are starting to find a new role as "batteries" which can soak up excess wind and solar generation by pumping water up-hill. Unfortunately, operating these "batteries" requires reliable precipitation, and throughout the West snow and rainfall are becoming more erratic.</p>
-    </section>
-    <section id='nuclear-solar'>
-        <h3>Neglected Nuclear</h3>
-        <p>Over this entire time period, nuclear generating stations have generated roughly 20% of our electricity &mdash; making up the majority of our carbon-free electricity, even after the rapid growth of renewables. They are safe, they are compact, and they do not suffer from intermittency. Disastrously, the US has stalled building new nuclear plants and has even started to retire some plants early. California is slated to close its last nuclear power plant by 2024. New nuclear plants have failed due to economic constraints (especially competition against cheap-but-polluting gas), but we know that countries such as France and Sweden have switched almost entirely to nuclear power at reasonable cost. If we're going to have a chance against climate change, we need policies (such as a price on carbon) to support a massive build-out of new nuclear plants.</p>
-    </section>
-    <section id='explore' style="height: 100vh">
-        <h3>Explore</h3>
-        <p>Use the controls to filter by fuel source and move through time. Zoom in to see data on individual plants, along with satellite imagery. What interesting patterns do you see?</p>
-        <p><em>See <a>"How I built it"</a></em></p>
-        <small id="citation">
-            Data sourced from <a href='https://www.eia.gov/electricity/data/eia923/'>US Energy Information Administration</a>.
-        </small>
-    </section>
 </div>
 
 <script>
@@ -355,8 +316,6 @@ function setLayerSource (layerId, source, sourceLayer) {
     map.removeLayer(layerId);
     map.addLayer(layerDef, before);
 }
-
-map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
 var monthInput = document.getElementById('month');
 var monthText = document.getElementById('month-text');
@@ -686,9 +645,12 @@ var updateFuelType = function() {
 }
 
 var timerAnimation;
+var navigationTimers = [];
 
 monthInput.oninput = function() {
     clearTimeout(timerAnimation);
+    navigationTimers.forEach(timer => clearTimeout(timer));
+    navigationTimers = [];
     updateMonth();
 }
 
@@ -700,8 +662,9 @@ function animationStep(completion) {
     return () => {
         var currentMonth = Math.floor(monthInput.value);
         if (currentMonth == 203) {
-            if (completion)
-                completion();
+            if (completion) {
+                timerAnimation = setTimeout(completion, 500);
+            }
             return;
         }
 
@@ -714,6 +677,9 @@ function animationStep(completion) {
 function animateSlider(completion) {
     monthInput.value = 0;
     updateMonth();
+    clearTimeout(timerAnimation);
+    navigationTimers.forEach(timer => clearTimeout(timer));
+    navigationTimers = [];
     timerAnimation = setTimeout(animationStep(completion), 300);
 }
 
@@ -721,46 +687,63 @@ var chapters = {
     'intro': (map) => {
         fuelSelect.value = "all fuels";
         updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider(() => $('#solar').modal());
+        // Fly fast to Boston at #6/42.807/-71.098
+        // Or #5.02/44.05/-72.14
+        map.flyTo({
+            //center: [-71.098, 42.807],
+            center: [-72.14, 44.05],
+            zoom: 5
+        });
+        // Slowly ease across to Houston at #6/29.692/-96.124
+        // or #5.02/34.55/-118.9
+        navigationTimers.push(setTimeout(() =>
+            map.easeTo({
+                //center: [-96.124, 29.692],
+                center: [-118.9, 34.55],
+                duration: 15000
+            }),
+            5000));
 
-    },
-    'coal': (map) => {
-        fuelSelect.value = "1";
-        updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
-    },
-    'gas': (map) => {
-        fuelSelect.value = "0";
-        updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
+        //map.fitBounds([[-128, 55], [-65, 25]]);
     },
     'solar': (map) => {
         fuelSelect.value = "5";
         updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider(() => $('#wind').modal());
+        // Fly fast to early California solar installations at #9.77/35.0106/-117.4476
+        map.flyTo({
+            center: [-117.4476, 35.0106],
+            zoom: 9.8
+        });
+        // Then slowly zoom out to fit country
+        navigationTimers.push(setTimeout(() =>
+            map.fitBounds([[-128, 55], [-65, 25]], { duration: 10000 }),
+            5000));
     },
     'wind': (map) => {
         fuelSelect.value = "4";
         updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider(() => $('#nuclear-solar').modal());
-    },
-    'hydro': (map) => {
-        fuelSelect.value = "3";
-        updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
-        animateSlider();
+        // Fly fast to early Minnesota wind farms at #9.5/44.267/-96.2652
+        map.flyTo({
+            center: [-96.2652, 44.267],
+            zoom: 9.5
+        });
+        // Then slowly zoom out to fit country
+        navigationTimers.push(setTimeout(() =>
+            map.fitBounds([[-128, 55], [-65, 25]], { duration: 10000 }),
+            3000));
     },
     'nuclear-solar': (map) => {
         clearTimeout(timerAnimation);
-        fuelSelect.value = "all fuels";
+        fuelSelect.value = "2";
         updateFuelType();
-        map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]);
         animateSlider(() => $('#explore').modal());
+        // Start showing whole country
+        map.fitBounds([[-128, 55], [-65, 25]]);
+        // Then zoom to Palo Verde to showing relative scale
+        navigationTimers.push(setTimeout(() => map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]), 8000));
     },
     'explore': (map) => {
         clearTimeout(timerAnimation);
@@ -770,6 +753,47 @@ var chapters = {
         $(".collapse").collapse('show');
     }
 };
+
+$('#intro').on('show.bs.modal', function (e) {
+    $('#introPage').addClass('active');
+    $('#solarPage').removeClass('active');
+    $('#windPage').removeClass('active');
+    $('#nuclearPage').removeClass('active');
+    $('#explorePage').removeClass('active');
+});
+
+$('#solar').on('show.bs.modal', function (e) {
+    $('#introPage').removeClass('active');
+    $('#solarPage').addClass('active');
+    $('#windPage').removeClass('active');
+    $('#nuclearPage').removeClass('active');
+    $('#explorePage').removeClass('active');
+});
+
+$('#wind').on('show.bs.modal', function (e) {
+    $('#introPage').removeClass('active');
+    $('#solarPage').removeClass('active');
+    $('#windPage').addClass('active');
+    $('#nuclearPage').removeClass('active');
+    $('#explorePage').removeClass('active');
+});
+
+$('#nuclear-solar').on('show.bs.modal', function (e) {
+    $('#introPage').removeClass('active');
+    $('#solarPage').removeClass('active');
+    $('#windPage').removeClass('active');
+    $('#nuclearPage').addClass('active');
+    $('#explorePage').removeClass('active');
+});
+
+$('#explore').on('show.bs.modal', function (e) {
+    $('#introPage').removeClass('active');
+    $('#solarPage').removeClass('active');
+    $('#windPage').removeClass('active');
+    $('#nuclearPage').removeClass('active');
+    $('#explorePage').addClass('active');
+});
+
 
 
 </script>
