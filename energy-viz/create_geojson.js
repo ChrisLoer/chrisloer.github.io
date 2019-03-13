@@ -162,6 +162,25 @@ for (const plant of plantsWithNetgen) {
     quarterlyPlants.push(copiedPlant);
 }
 
+// Splitting plant labels into a different source from plant-generation duplicates some data
+// but allows us to avoid expensive label re-generation on every date change.
+const plantLabels = [];
+for (const plant of plantsWithNetgen) {
+    plantLabels.push({
+        latitude: plant.latitude,
+        longitude: plant.longitude,
+        fuel_type: plant.fuel_type,
+        netgen: plant.netgen,
+        name: plant.name
+    });
+}
+
+plantsWithNetgen.forEach(plant => {
+    // No longer necessary since it's been split out to plantLabels data
+    delete plant.name;
+    delete plant.netgen;
+});
+
 const geojson = GeoJSON.parse(plantsWithNetgen, { Point: ['latitude', 'longitude']});
 jsonfile.writeFile('plant_generation.geojson', geojson, function (err) {
     if (err) throw err;
@@ -169,6 +188,11 @@ jsonfile.writeFile('plant_generation.geojson', geojson, function (err) {
 
 const quarterlyGeojson = GeoJSON.parse(quarterlyPlants, { Point: ['latitude', 'longitude']});
 jsonfile.writeFile('quarterly_generation.geojson', quarterlyGeojson, function (err) {
+    if (err) throw err;
+});
+
+const labelGeojson = GeoJSON.parse(plantLabels, { Point: ['latitude', 'longitude']});
+jsonfile.writeFile('plant_labels.geojson', labelGeojson, function (err) {
     if (err) throw err;
 });
 

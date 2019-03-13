@@ -337,7 +337,13 @@ map.on('load', function() {
 
     map.addSource('plant-generation', {
         "type": "vector",
-        "url": "mapbox://chrisloer.5yh8m2ka"
+        "url": "mapbox://chrisloer.ac4xyki8"
+    });
+    // Splitting plant labels into a different source from plant-generation duplicates some data
+    // but allows us to avoid expensive label re-generation on every date change.
+    map.addSource('plant-labels', {
+        "type": "vector",
+        "url": "mapbox://chrisloer.ao6jmeje"
     });
 
     map.addSource('quarterly-generation-all', {
@@ -454,7 +460,7 @@ map.on('load', function() {
         "id": "plant-circles",
         "type": "circle",
         "source": "plant-generation",
-        "source-layer": "plant_generation-a4s0r8",
+        "source-layer": "plant_generation-4ibjvx",
         "paint": {
             'circle-radius': ["interpolate",
                 ["linear"],
@@ -484,8 +490,8 @@ map.on('load', function() {
 
     map.addLayer({
         "id": "plant-labels",
-        "source": "plant-generation",
-        "source-layer": "plant_generation-a4s0r8",
+        "source": "plant-labels",
+        "source-layer": "plant_labels-93wi0s",
         "type": "symbol",
         "minzoom": 10,
         "layout": {
