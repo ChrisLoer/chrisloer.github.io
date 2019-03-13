@@ -201,7 +201,7 @@
         <h5 class="modal-title" id="introLabel">⚡ Mapping 68 Petawatt Hours</h5>
       </div>
       <div class="modal-body">
-        Overall US electricity generation has been relatively stable at around 4 PWh/year for the last 17 years, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies massive changes in our energy infrastructure.
+        Overall US electricity generation has been relatively stable at around 4 PWh/year for the last 17 years, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies a massive shift away from coal and towards gas, wind, and solar.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['intro'](map);">Show Me ✨</button>
@@ -795,7 +795,7 @@ $('#intro').on('hide.bs.modal', popoverFunction('#introPage'));
 $('#solar').on('hide.bs.modal', popoverFunction('#solarPage'));
 $('#wind').on('hide.bs.modal', popoverFunction('#windPage'));
 $('#nuclear').on('hide.bs.modal', popoverFunction('#nuclearPage'));
-$('#explore').on('hide.bs.modal', popoverFunction('#explorePage'));
+$('#explore').on('hide.bs.modal', (e) => chapters['explore'](map));
 
 $('#intro').on('show.bs.modal', function (e) {
     $('#introPage').addClass('active');
