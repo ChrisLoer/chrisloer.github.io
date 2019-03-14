@@ -721,12 +721,14 @@ function animateSlider(completion, increment) {
 
 var chapters = {
     'intro': (map) => {
+        setActive('#introPage');
         fuelSelect.value = "10";
         updateFuelType();
         animateSlider(() => $('#solar').modal(), 9);
         map.fitBounds([[-128, 55], [-65, 25]]);
     },
     'solar': (map) => {
+        setActive('#solarPage');
         fuelSelect.value = "5";
         updateFuelType();
         animateSlider(() => $('#wind').modal());
@@ -741,6 +743,7 @@ var chapters = {
             5000));
     },
     'wind': (map) => {
+        setActive('#windPage');
         fuelSelect.value = "4";
         updateFuelType();
         animateSlider(() => $('#nuclear').modal());
@@ -755,6 +758,7 @@ var chapters = {
             3000));
     },
     'nuclear': (map) => {
+        setActive('#nuclearPage');
         fuelSelect.value = "2";
         updateFuelType();
         animateSlider(() => $('#explore').modal());
@@ -764,6 +768,7 @@ var chapters = {
         navigationTimers.push(setTimeout(() => map.fitBounds([[-112.9721, 33.4462], [-112.814, 33.2811]]), 5000));
     },
     'explore': (map) => {
+        setActive('#explorePage');
         resetTimers();
         fuelSelect.value = "10";
         updateFuelType();
@@ -815,49 +820,20 @@ $('#wind').on('hide.bs.modal', popoverFunction('#windPage'));
 $('#nuclear').on('hide.bs.modal', popoverFunction('#nuclearPage'));
 $('#explore').on('hide.bs.modal', (e) => chapters['explore'](map));
 
-$('#intro').on('show.bs.modal', function (e) {
-    resetTimers();
-    $('#introPage').addClass('active');
-    $('#solarPage').removeClass('active');
-    $('#windPage').removeClass('active');
-    $('#nuclearPage').removeClass('active');
-    $('#explorePage').removeClass('active');
-});
+function setActive(activePage) {
+    ['#introPage', '#solarPage', '#windPage', '#nuclearPage', '#explorePage'].forEach((page) => {
+        if (page === activePage) {
+            $(page).addClass('active');
+        } else {
+            $(page).removeClass('active');
+        }
+    });
+}
 
-$('#solar').on('show.bs.modal', function (e) {
-    resetTimers();
-    $('#introPage').removeClass('active');
-    $('#solarPage').addClass('active');
-    $('#windPage').removeClass('active');
-    $('#nuclearPage').removeClass('active');
-    $('#explorePage').removeClass('active');
-});
-
-$('#wind').on('show.bs.modal', function (e) {
-    resetTimers();
-    $('#introPage').removeClass('active');
-    $('#solarPage').removeClass('active');
-    $('#windPage').addClass('active');
-    $('#nuclearPage').removeClass('active');
-    $('#explorePage').removeClass('active');
-});
-
-$('#nuclear').on('show.bs.modal', function (e) {
-    resetTimers();
-    $('#introPage').removeClass('active');
-    $('#solarPage').removeClass('active');
-    $('#windPage').removeClass('active');
-    $('#nuclearPage').addClass('active');
-    $('#explorePage').removeClass('active');
-});
-
-$('#explore').on('show.bs.modal', function (e) {
-    resetTimers();
-    $('#introPage').removeClass('active');
-    $('#solarPage').removeClass('active');
-    $('#windPage').removeClass('active');
-    $('#nuclearPage').removeClass('active');
-    $('#explorePage').addClass('active');
+['#intro', '#solar', '#wind', '#nuclear', '#explore'].forEach((modal) => {
+    $(modal).on('show.bs.modal', function (e) {
+        resetTimers();
+    });
 });
 
 </script>
