@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <style>
         html, body { padding: 0; margin: 0 }
-        #map { position: fixed; top:0; bottom: 0; width: 100%; }
+        #map { position: absolute; top:0; bottom: 0; left: 0; right: 0; }
         #year-text { left: 10px; color: white; }
         #slider { position: fixed; margin: 10px 10px; left: 0px; right: 0px; }
 
@@ -842,8 +842,6 @@ $('#explore').on('show.bs.modal', function (e) {
     $('#nuclearPage').removeClass('active');
     $('#explorePage').addClass('active');
 });
-
-
 
 </script>
 </body>
