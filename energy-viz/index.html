@@ -723,8 +723,8 @@ var chapters = {
     'intro': (map) => {
         fuelSelect.value = "10";
         updateFuelType();
-        map.fitBounds([[-128, 55], [-65, 25]]);
         animateSlider(() => $('#solar').modal(), 9);
+        map.fitBounds([[-128, 55], [-65, 25]]);
     },
     'solar': (map) => {
         fuelSelect.value = "5";
