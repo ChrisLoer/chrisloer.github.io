@@ -658,6 +658,7 @@ var timerAnimation;
 var navigationTimers = [];
 
 function resetTimers() {
+    map.stop();
     clearTimeout(timerAnimation);
     timerAnimation = null;
     navigationTimers.forEach(timer => clearTimeout(timer));
@@ -815,6 +816,7 @@ $('#nuclear').on('hide.bs.modal', popoverFunction('#nuclearPage'));
 $('#explore').on('hide.bs.modal', (e) => chapters['explore'](map));
 
 $('#intro').on('show.bs.modal', function (e) {
+    resetTimers();
     $('#introPage').addClass('active');
     $('#solarPage').removeClass('active');
     $('#windPage').removeClass('active');
@@ -823,6 +825,7 @@ $('#intro').on('show.bs.modal', function (e) {
 });
 
 $('#solar').on('show.bs.modal', function (e) {
+    resetTimers();
     $('#introPage').removeClass('active');
     $('#solarPage').addClass('active');
     $('#windPage').removeClass('active');
@@ -831,6 +834,7 @@ $('#solar').on('show.bs.modal', function (e) {
 });
 
 $('#wind').on('show.bs.modal', function (e) {
+    resetTimers();
     $('#introPage').removeClass('active');
     $('#solarPage').removeClass('active');
     $('#windPage').addClass('active');
@@ -839,6 +843,7 @@ $('#wind').on('show.bs.modal', function (e) {
 });
 
 $('#nuclear').on('show.bs.modal', function (e) {
+    resetTimers();
     $('#introPage').removeClass('active');
     $('#solarPage').removeClass('active');
     $('#windPage').removeClass('active');
@@ -847,6 +852,7 @@ $('#nuclear').on('show.bs.modal', function (e) {
 });
 
 $('#explore').on('show.bs.modal', function (e) {
+    resetTimers();
     $('#introPage').removeClass('active');
     $('#solarPage').removeClass('active');
     $('#windPage').removeClass('active');
