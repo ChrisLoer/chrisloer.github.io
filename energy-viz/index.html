@@ -161,7 +161,7 @@
                 <div style="display: table-cell">
                     <div style="float: right">
                         <select id="fuel">
-                            <option value="all fuels" selected>All Fuels (4012 TWh)</option>
+                            <option value="10" selected>All Fuels (4012 TWh)</option>
                             <option value="0">Natural Gas (1304 TWh)</option>
                             <option value="1">Coal (1202 TWh)</option>
                             <option value="2">Nuclear (805 TWh)</option>
@@ -587,7 +587,14 @@ var updateMonth = function() {
 const fuelTypeWeighting = {0:1304,1:1202,2:805,3:292,4:252,5:56,6:52,7:19,8:16,9:14};
 const totalGeneration = 4012;
 
+var currentFuelType = 10;
+
 var updateFuelType = function() {
+    const newFuelType = +fuelSelect.value;
+    if (newFuelType === currentFuelType) {
+        return;
+    }
+    currentFuelType = newFuelType;
     map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
       [
         "interpolate",
@@ -602,44 +609,45 @@ var updateFuelType = function() {
         let filter = null;
         let intensityRatio = 1;
         let source = "quarterly-generation-all";
-        if (fuelSelect.value != "all fuels") {
-            switch(+fuelSelect.value) {
-                case 0:
-                    source = "quarterly-generation-gas";
-                    break;
-                case 1:
-                    source = "quarterly-generation-coal";
-                    break;
-                case 2:
-                    source = "quarterly-generation-nuclear";
-                    break;
-                case 3:
-                    source = "quarterly-generation-hydro";
-                    break;
-                case 4:
-                    source = "quarterly-generation-wind";
-                    break;
-                case 5:
-                    source = "quarterly-generation-solar";
-                    break;
-                case 6:
-                    source = "quarterly-generation-renewable";
-                    break;
-                case 7:
-                    source = "quarterly-generation-other";
-                    break;
-                case 8:
-                    source = "quarterly-generation-geothermal";
-                    break;
-                case 9:
-                    source = "quarterly-generation-petroleum";
-                    break;
-                default:
-                    source = "quarterly-generation-all";
-
-            }
-            intensityRatio = 0.5 * totalGeneration / fuelTypeWeighting[fuelSelect.value];
+        switch(newFuelType) {
+            case 0:
+                source = "quarterly-generation-gas";
+                break;
+            case 1:
+                source = "quarterly-generation-coal";
+                break;
+            case 2:
+                source = "quarterly-generation-nuclear";
+                break;
+            case 3:
+                source = "quarterly-generation-hydro";
+                break;
+            case 4:
+                source = "quarterly-generation-wind";
+                break;
+            case 5:
+                source = "quarterly-generation-solar";
+                break;
+            case 6:
+                source = "quarterly-generation-renewable";
+                break;
+            case 7:
+                source = "quarterly-generation-other";
+                break;
+            case 8:
+                source = "quarterly-generation-geothermal";
+                break;
+            case 9:
+                source = "quarterly-generation-petroleum";
+                break;
+            case 10:
+            default:
+                source = "quarterly-generation-all";
         }
+        if (newFuelType !== 10) {
+            intensityRatio = 0.5 * totalGeneration / fuelTypeWeighting[newFuelType];
+        }
+
         setLayerSource('generation-heatmap', source, 'geojsonLayer');
         map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
           [
@@ -708,7 +716,7 @@ function animateSlider(completion) {
 
 var chapters = {
     'intro': (map) => {
-        fuelSelect.value = "all fuels";
+        fuelSelect.value = "10";
         updateFuelType();
         animateSlider(() => $('#solar').modal());
         // Fly fast to Boston at #6/42.807/-71.098
@@ -769,7 +777,7 @@ var chapters = {
     },
     'explore': (map) => {
         resetTimers();
-        fuelSelect.value = "all fuels";
+        fuelSelect.value = "10";
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
         $(".collapse").collapse('show');
