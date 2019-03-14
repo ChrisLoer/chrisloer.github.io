@@ -17,7 +17,7 @@
             text-align: center;
             color: white;
             text-shadow:
-               -1px -1px 0 #000,  
+               -1px -1px 0 #000,
                 1px -1px 0 #000,
                 -1px 1px 0 #000,
                  1px 1px 0 #000;
@@ -193,11 +193,11 @@
 
 <nav aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
   <ul id="pagination" class="pagination">
-    <li id="introPage" class="page-item active"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡</a></li>
-    <li id="solarPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️</a></li>
-    <li id="windPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️</a></li>
-    <li id="nuclearPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear">☢️</a></li>
-    <li id="explorePage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎</a></li>
+    <li id="introPage" class="page-item active"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡<span class="d-none d-md-block">Overview</span></a></li>
+    <li id="solarPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️<span class="d-none d-md-block">&nbsp;Solar&nbsp;</span></a></li>
+    <li id="windPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#wind">🌬️<span class="d-none d-md-block">&nbsp;Wind&nbsp;</span></a></li>
+    <li id="nuclearPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#nuclear">☢️<span class="d-none d-md-block">Nuclear</span></a></li>
+    <li id="explorePage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#explore">🔎<span class="d-none d-md-block">Explore</span></a></li>
   </ul>
 </nav>
 
@@ -768,6 +768,12 @@ var chapters = {
         updateFuelType();
         map.fitBounds([[-128, 55], [-65, 25]]);
         $(".collapse").collapse('show');
+        $('#fuel').popover('show');
+        $('#month').popover('show');
+        setTimeout(() => {
+            $('#fuel').popover('hide');
+            $('#month').popover('hide');
+        }, 3000);
     }
 };
 
@@ -782,12 +788,22 @@ function popoverFunction(id) {
 
 $('.page-item').popover({
     placement: 'top',
-    content: 'Resume tour here',
+    content: 'Resume tour',
     trigger: 'manual'
 });
 $('#pagination').popover({
     placement: 'top',
     content: 'Resume tour',
+    trigger: 'manual'
+});
+$('#fuel').popover({
+    placement: 'bottom',
+    content: 'Select fuel type',
+    trigger: 'manual'
+});
+$('#month').popover({
+    placement: 'bottom',
+    content: 'Adjust date',
     trigger: 'manual'
 });
 
