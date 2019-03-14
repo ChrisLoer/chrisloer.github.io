@@ -595,16 +595,8 @@ var updateFuelType = function() {
         return;
     }
     currentFuelType = newFuelType;
-    map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
-      [
-        "interpolate",
-        [ "exponential", 2 ],
-        [ "zoom" ],
-        0,
-        0,
-        16,
-        0
-      ]);
+    setHeatmapIntensity(0);
+
     setTimeout(() => {
         let filter = null;
         let intensityRatio = 1;
@@ -649,16 +641,7 @@ var updateFuelType = function() {
         }
 
         setLayerSource('generation-heatmap', source, 'geojsonLayer');
-        map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
-          [
-            "interpolate",
-            [ "exponential", 2 ],
-            [ "zoom" ],
-            0,
-            baseIntensity * intensityRatio,
-            16,
-            16 * baseIntensity * intensityRatio
-          ]);
+        setHeatmapIntensity(baseIntensity * intensityRatio);
       }, 300);
 
 }
@@ -686,7 +669,7 @@ fuelSelect.onchange = function() {
     updateFuelType();
 }
 
-function animationStep(completion) {
+function animationStep(completion, increment) {
     return () => {
         var currentMonth = Math.floor(monthInput.value);
         if (currentMonth == 203) {
@@ -694,49 +677,45 @@ function animationStep(completion) {
                 timerAnimation = setTimeout(() => {
                     completion();
                     resetTimers();
-                }, 500);
+                }, 800);
             } else {
                 resetTimers();
             }
             return;
         }
 
-        monthInput.value = Math.min(currentMonth + 1, 203);
+        monthInput.value = Math.min(currentMonth + (increment || 1), 203);
         updateMonth();
-        timerAnimation = setTimeout(animationStep(completion), 100);
+        timerAnimation = setTimeout(animationStep(completion, increment), 100);
     };
 }
 
-function animateSlider(completion) {
+function setHeatmapIntensity(intensity) {
+    map.setPaintProperty('generation-heatmap', 'heatmap-intensity',
+        [
+        "interpolate",
+        [ "exponential", 2 ],
+        [ "zoom" ],
+        0,
+        intensity,
+        16,
+        16 * intensity
+    ]);
+}
+
+function animateSlider(completion, increment) {
     monthInput.value = 0;
     updateMonth();
     resetTimers();
-    timerAnimation = setTimeout(animationStep(completion), 300);
+    timerAnimation = setTimeout(animationStep(completion, increment), 300);
 }
 
 var chapters = {
     'intro': (map) => {
         fuelSelect.value = "10";
         updateFuelType();
-        animateSlider(() => $('#solar').modal());
-        // Fly fast to Boston at #6/42.807/-71.098
-        // Or #5.02/44.05/-72.14
-        map.flyTo({
-            //center: [-71.098, 42.807],
-            center: [-72.14, 44.05],
-            zoom: 5
-        });
-        // Slowly ease across to Houston at #6/29.692/-96.124
-        // or #5.02/34.55/-118.9
-        navigationTimers.push(setTimeout(() =>
-            map.easeTo({
-                //center: [-96.124, 29.692],
-                center: [-118.9, 34.55],
-                duration: 15000
-            }),
-            5000));
-
-        //map.fitBounds([[-128, 55], [-65, 25]]);
+        map.fitBounds([[-128, 55], [-65, 25]]);
+        animateSlider(() => $('#solar').modal(), 9);
     },
     'solar': (map) => {
         fuelSelect.value = "5";
