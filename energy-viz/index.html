@@ -191,7 +191,7 @@
     <h1 id="year-text" class="date collapseGroup">2001</h1>
 </div>
 
-<nav aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
+<nav id="tour" aria-label="Feature Navigation" style="position: fixed; width: 100%; text-align: center; bottom: 0px">
   <ul id="pagination" class="pagination">
     <li id="introPage" class="page-item active"><a class="page-link" href="#" data-toggle="modal" data-target="#intro">⚡<span class="d-none d-md-block">Overview</span></a></li>
     <li id="solarPage" class="page-item"><a class="page-link" href="#" data-toggle="modal" data-target="#solar">☀️<span class="d-none d-md-block">&nbsp;Solar&nbsp;</span></a></li>
@@ -201,6 +201,9 @@
   </ul>
 </nav>
 
+<div id="restartTour" class="col-md-12 text-center" style="display: none; position: fixed; bottom: 15px">
+    <button type="button" class="btn btn-info" onclick="$('#restartTour').hide(); $('#tour').show()">Revisit Tour</button>
+</div>
 
 <div class="modal fade" id="intro" tabindex="-1" role="dialog" aria-labelledby="introLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -771,6 +774,8 @@ var chapters = {
     },
     'explore': (map) => {
         setActive('#explorePage');
+        $('#tour').hide();
+        $('#restartTour').show();
         resetTimers();
         fuelSelect.value = "10";
         updateFuelType();
