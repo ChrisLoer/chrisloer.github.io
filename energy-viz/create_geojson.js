@@ -5,6 +5,7 @@ const fs = require('fs');
 const async = require('async');
 const GeoJSON = require('geojson');
 const jsonfile = require('jsonfile');
+const supertiler = require('supertiler');
 
 const plants = {};
 const balancingAuthorities = {};
@@ -20,19 +21,21 @@ for (var year = 2001; year <= 2017; year++) {
 
 /*
 From "energy source prime movers" by EIA
-
-0: Gas
-1: Coal
-2: Nuclear
-3: Hydro
-4: Wind
-5: Solar
-6: Renewable Hydrocarbon
-7: Other
-8: Geothermal
-9: Petroleum
-
 */
+
+const fuelNameMap = {
+    0: 'Gas',
+    1: 'Coal',
+    2: 'Nuclear',
+    3: 'Hydro',
+    4: 'Wind',
+    5: 'Solar',
+    6: 'RenewableCarbon',
+    7: 'Other',
+    8: 'Geothermal',
+    9: 'Petroleum',
+    10: 'All'
+};
 
 let fuelTypeMap = {
     'NG': 0,
@@ -52,7 +55,6 @@ let fuelTypeMap = {
     'WC': 1,
     'SGC': 1,
     'WH': 7,
-    'DFO': 6,
     'BFG': 0,
     'PUR': 7,
     'OBG': 6,
@@ -89,7 +91,7 @@ locationRecords.forEach(function(record) {
   }
   plants[record.plant_code] = {
     plant_code: record.plant_code,
-    ba_code: record.balancing_authority_code,
+    //ba_code: record.balancing_authority_code,
     latitude: record.latitude,
     longitude: record.longitude
   };
@@ -102,22 +104,68 @@ for (var year = 2001; year <= 2017; year++) {
     console.log(`Parsing records for year ${year}`);
     var generationRecords = parse(fs.readFileSync(`CSV/${year}/netgen.csv`), {columns: true});
     generationRecords.forEach(function(record) {
-      const plant = plants[record.plant_code]
+      let plant = plants[record.plant_code]
       if (!plant) {
         // Only use plants we have in both data sets.
         // It looks like the net_gen data set has a lot of placeholder entries that aren't actually plants
         console.log(`Discarding plant ${record.plant_code} because we don't have a location for it.`);
         return;
       }
-
       if (!record.fuel_type) {
         console.log(`No plant fuel type for ${plant.plant_code}`);
       }
-      plant.fuel_type = fuelTypeMap[record.fuel_type];
-      if (typeof plant.fuel_type === 'undefined') {
+      let recordFuel = fuelTypeMap[record.fuel_type];
+      if (typeof recordFuel === 'undefined') {
           console.log(`${record.fuel_type} not recognized`);
-          plant.fuel_type = 7;
+          recordFuel = 7;
       }
+      if (plant.multi_fuel) {
+          // We've found records with multiple fuel types for this plant, so look up the plant by subtype
+          const plantCode = `${record.plant_code}-${recordFuel}`;
+          console.log(`Creating new multi_fuel plant ${plantCode}`);
+
+          // If this type hasn't been seen before, copy from the base
+          if (!plants[plantCode]) {
+              plants[plantCode] = {
+                plant_code: plantCode,
+                //ba_code: plant.ba_code,
+                latitude: plant.latitude,
+                longitude: plant.longitude,
+                fuel_type: recordFuel
+              };
+          }
+          plant = plants[plantCode];
+      } else if (!plant.fuel_type) {
+          // First record, record the fuel type
+          plant.fuel_type = recordFuel;
+      } else if (plant.fuel_type !== recordFuel) {
+          // First time we've found a second fuel type, split the records
+          const originalPlantCode = plant.plant_code;
+          const firstFuelCode = `${originalPlantCode}-${plant.fuel_type}`;
+          plant.plant_code = firstFuelCode;
+          // Move original to new location
+          console.log(`Copying multi_fuel plant ${firstFuelCode}`);
+          plants[firstFuelCode] = plant;
+          // Create multi-fuel placeholder for parent
+          plants[originalPlantCode] = {
+            plant_code: originalPlantCode,
+            //ba_code: plant.ba_code,
+            latitude: plant.latitude,
+            longitude: plant.longitude,
+            multi_fuel: true
+          };
+          // Create child for new fuel type, assign it to "plant"
+          const secondFuelCode = `${originalPlantCode}-${recordFuel}`;
+          console.log(`Splitting multi_fuel plant ${secondFuelCode}`);
+          plant = plants[secondFuelCode] = {
+            plant_code: secondFuelCode,
+            //ba_code: plant.ba_code,
+            latitude: plant.latitude,
+            longitude: plant.longitude,
+            fuel_type: recordFuel
+          };
+      }
+
       plant.name = record.plant_name;
       for (let month = 0; month < 12; month++) {
         const monthIndex = `netgen_${month}`; // Input CSV is indexed by month
@@ -131,7 +179,7 @@ for (var year = 2001; year <= 2017; year++) {
             plant.hasNetGen = true;
             plant.netgen = (plant.netgen || 0) + netgen_month;
             byMonthFuelType[yearMonthIndex][plant.fuel_type] = (byMonthFuelType[yearMonthIndex][plant.fuel_type] || 0) + plant[yearMonthIndex];
-            balancingAuthorities[plant.ba_code].totalGeneration += netgen_month;
+            //balancingAuthorities[plant.ba_code].totalGeneration += netgen_month;
             byFuelType[plant.fuel_type] = (byFuelType[plant.fuel_type] || 0) + netgen_month;
             totalGeneration += netgen_month;
         }
@@ -139,7 +187,7 @@ for (var year = 2001; year <= 2017; year++) {
     });
 }
 
-const plantsWithNetgen = Object.values(plants).filter(plant => plant.hasNetGen);
+const plantsWithNetgen = Object.values(plants).filter(plant => plant.hasNetGen && !plant.multi_fuel); // Filter out "multi_fuel" plants because there will be children for each fuel typee
 plantsWithNetgen.sort((a, b) => b.netgen - a.netgen);
 
 // We're splitting into two data sources. For high zoom, we'll include monthly data, along with plant names and other metadata
@@ -189,6 +237,7 @@ jsonfile.writeFile('plant_generation.geojson', geojson, function (err) {
 const quarterlyGeojson = GeoJSON.parse(quarterlyPlants, { Point: ['latitude', 'longitude']});
 jsonfile.writeFile('quarterly_generation.geojson', quarterlyGeojson, function (err) {
     if (err) throw err;
+    supertile();
 });
 
 const labelGeojson = GeoJSON.parse(plantLabels, { Point: ['latitude', 'longitude']});
@@ -211,3 +260,56 @@ console.log(JSON.stringify(byMonthFuelType));
 
 console.log(JSON.stringify(byFuelType));
 console.log(totalGeneration);
+
+function supertile() {
+    // Use supertiler to take quarterly_generation.geojson to 10 per-fuel type mbtiles files, adapted from original command line arguments
+
+    var quarters = []; for (var year = 2001; year <= 2017; year++) {
+        for (var quarter = 0; quarter <= 3; quarter++) {
+            quarters.push(`netgen_${year}_${quarter}`);
+        }
+    }
+
+    for (let fuel_type = 0; fuel_type <= 10; fuel_type++) {
+        var fuel_name = fuelNameMap[fuel_type];
+
+        var mapFn = (props) => {
+            if (fuel_type == 10 || props.fuel_type == fuel_type) {
+                const mapped = fuel_type == 10 ? {} : { fuel_type };
+                quarters.forEach((quarter) => mapped[quarter] = props[quarter]);
+                return mapped;
+            } else {
+                return {};
+            }
+        };
+
+        var reduceFn = (accumulated, props) => {
+            accumulated = accumulated || {};
+            if (fuel_type != 10) {
+                if (props.fuel_type !== fuel_type)
+                    return;
+                accumulated.fuel_type = props.fuel_type;;
+            }
+            quarters.forEach((quarter) => {
+                accumulated[quarter] = (accumulated[quarter] || 0) + (props[quarter] || 0);
+            });
+        };
+
+        var filterFn = fuel_type == 10 ?
+                        null :
+                        (props) => props.fuel_type == fuel_type;
+        supertiler({
+            input: 'quarterly_generation.geojson',
+            output: `${fuel_name}_clustered.mbtiles`,
+            includeUnclustered: false,
+            minZoom: 0,
+            maxZoom: 10,
+            radius: 32,
+            extent: 8192,
+            filter: filterFn,
+            map: mapFn,
+            reduce: reduceFn,
+        });
+
+    }
+}

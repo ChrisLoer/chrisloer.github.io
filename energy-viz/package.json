@@ -4,9 +4,10 @@
         "csv-parse": "^1.2.0",
         "geojson": "^0.4.1",
         "jsonfile": "^3.0.0",
+        "supertiler": "^0.0.2",
         "st": "^1.2.0"
     },
     "scripts": {
-        "start-server": "st --no-cache --localhost --port 9966 --index index.html ."
+        "start-server": "st --no-cache  --port 9966 --index index.html ."
     }
 }
