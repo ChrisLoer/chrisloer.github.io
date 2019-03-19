@@ -138,6 +138,13 @@ for (var year = 2001; year <= 2017; year++) {
       } else if (!plant.fuel_type) {
           // First record, record the fuel type
           plant.fuel_type = recordFuel;
+      } else if (plant.fuel_type !== recordFuel && plant.fuel_type == 7) {
+          // This is a kind of sketchy data-cleanup approach, but "other" as a category seems to have a lot of what look
+          // like either classification mistakes or subtle distinctions that go re-categorized -- so if we find another
+          // category we'll just prefer that one.
+          plant.fuel_type = recordFuel;
+      } else if (plant.fuel_type !== recordFuel && recordFuel == 7) {
+          // Same logic, don't change the fuel_type if it was something else and becomes "Other"
       } else if (plant.fuel_type !== recordFuel) {
           // First time we've found a second fuel type, split the records
           const originalPlantCode = plant.plant_code;
@@ -172,7 +179,7 @@ for (var year = 2001; year <= 2017; year++) {
         const netgen_month = parseInt(record[monthIndex].replace(/,/g, ''));
 
         const yearMonthIndex = `netgen_${year}_${month}`; // Output GeoJSON stores generation by year/month
-        plant[yearMonthIndex] = (plant[yearMonthIndex] || 0) + netgen_month ? netgen_month : 0;
+        plant[yearMonthIndex] = (plant[yearMonthIndex] || 0) + (netgen_month ? netgen_month : 0);
 
         // Collect statistics
         if (netgen_month > 0) {
