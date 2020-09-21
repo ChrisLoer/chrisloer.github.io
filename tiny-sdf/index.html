@@ -4,11 +4,11 @@
     <title>Mapbox GL JS debug page</title>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css' rel='stylesheet' />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         body { margin: 0; padding: 0; }
-        html, body, #originalMap, #newMap { height: 100%; }
-        #originalMap, #newMap { width: 49%; }
+        html, body { height: 100%; }
+
 
         #originalLabel {
             position: absolute;
@@ -34,113 +34,98 @@
             padding:10px;
         }
 
+        .map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
     </style>
 </head>
 
 <body>
 
-<div id='originalMap' style="float: left"></div>
-<div id='newMap' style="float: right"></div>
+<div id="comparison-container">
+  <div id="before" class="map"></div>
+  <div id="after" class="map"></div>
+</div>
 <label id='originalLabel'>Original Map</label>
 <label id='newLabel'>New Map</label>
 <div id='checkboxes'>
     <label><input id='show-overdraw-checkbox' type='checkbox'> overdraw debug</label><br />
+    <label style='display: inline-block; width: 100%'>Style: <input style='display: inline-block; width: 100%' id='map-style' type='text' value='mapbox://styles/mapbox/streets-v10'><input id="update-style" type="submit" value="Update"></label><br />
+    <label>Glyph Render Size: <input id='render-size' type='number' value=60><input id="update-render-size" type="submit" value="Update"></label><br />
+
 </div>
 
 <script src='./mapbox-gl.js'></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css"
+type="text/css"
+/>
 <script>
-
-function moveToMapPosition (master, clones) {
-  var center = master.getCenter();
-  var zoom = master.getZoom();
-  var bearing = master.getBearing();
-  var pitch = master.getPitch();
-
-  clones.forEach(function (clone) {
-    clone.jumpTo({
-      center: center,
-      zoom: zoom,
-      bearing: bearing,
-      pitch: pitch
-    });
-  });
-}
-
-// Sync movements of two maps.
-//
-// All interactions that result in movement end up firing
-// a "move" event. The trick here, though, is to
-// ensure that movements don't cycle from one map
-// to the other and back again, because such a cycle
-// - could cause an infinite loop
-// - prematurely halts prolonged movements like
-//   double-click zooming, box-zooming, and flying
-function syncMaps () {
-  var maps;
-  var argLen = arguments.length;
-  if (argLen === 1) {
-    maps = arguments[0];
-  } else {
-    maps = [];
-    for (var i = 0; i < argLen; i++) {
-      maps.push(arguments[i]);
-    }
-  }
-
-  // Create all the movement functions, because if they're created every time
-  // they wouldn't be the same and couldn't be removed.
-  var fns = [];
-  maps.forEach(function (map, index) {
-    fns[index] = sync.bind(null, map, maps.filter(function (o, i) { return i !== index; }));
-  });
-
-  function on () {
-    maps.forEach(function (map, index) {
-      map.on('move', fns[index]);
-    });
-  }
-
-  function off () {
-    maps.forEach(function (map, index) {
-      map.off('move', fns[index]);
-    });
-  }
-
-  // When one map moves, we turn off the movement listeners
-  // on all the maps, move it, then turn the listeners on again
-  function sync (master, clones) {
-    off();
-    moveToMapPosition(master, clones);
-    on();
-  }
-
-  on();
-}
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
 
-var originalMap = window.originalMap = new mapboxgl.Map({
-    container: 'originalMap',
+function localizeLayers(map) {
+    map.on('load', function() {
+        var style = map.getStyle();
+        for (var layerID in style.layers) {
+            var layer = style.layers[layerID];
+            if (layer.layout && layer.layout['text-field'] === "{name_en}") {
+                layer.layout['text-field'] = "{name}";
+            }
+        }
+        map.setStyle(style);
+    });
+}
+
+var originalMap = new mapboxgl.Map({
+    container: 'before',
     zoom: 8.8,
     center: [121.574, 31.1489],
-    style: './streets-zh-global-v1.json',
+    style: 'mapbox://styles/mapbox/streets-v10',
+    hash: true,
+    localGlyphRenderSize: 24
+});
+
+localizeLayers(originalMap);
+
+var newMap = new mapboxgl.Map({
+    container: 'after',
+    zoom: 8.8,
+    center: [121.574, 31.1489],
+    style: 'mapbox://styles/mapbox/streets-v10',
+    //Uses default localIdeographFontFamily 'sans-serif'
+    localGlyphRenderSize: 60,
     hash: true
 });
 
-var newMap = window.newMap = new mapboxgl.Map({
-    container: 'newMap',
-    zoom: 8.8,
-    center: [121.574, 31.1489],
-    style: './streets-zh-global-v1.json',
-    cjkGlyphFont: '"Noto Sans", "Noto Sans CJK SC", sans-serif',
-    hash: true
-});
+localizeLayers(newMap);
 
-syncMaps(originalMap, newMap);
+// A selector or reference to HTML element
+var container = '#comparison-container';
+
+var map = new mapboxgl.Compare(originalMap, newMap, container, {
+// Set this to enable comparing two maps by mouse movement:
+// mousemove: true
+});
 
 document.getElementById('show-overdraw-checkbox').onclick = function() {
     originalMap.showOverdrawInspector = !!this.checked;
     newMap.showOverdrawInspector = !!this.checked;
+};
+
+document.getElementById('update-render-size').onclick = function() {
+  newMap.setStyle(newMap.getStyle(), {localGlyphRenderSize: +document.getElementById('render-size').value});
+};
+
+document.getElementById('update-style').onclick = function() {
+  originalMap.setStyle(document.getElementById('map-style').value);
+  newMap.setStyle(document.getElementById('map-style').value, {localGlyphRenderSize: +document.getElementById('render-size').value});
 };
 
 </script>
