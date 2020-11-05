@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "browserify": "^17.0.0",
+    "pngjs": "^6.0.0",
+    "st": "^2.0.0"
+  },
+  "scripts": {
+      "start-server": "st --no-cache --localhost --port 9966 --index index.html ."
+  }
+}
