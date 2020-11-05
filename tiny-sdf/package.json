@@ -1,6 +1,6 @@
 {
     "dependencies": {
-        "st": "^1.2.0"
+        "st": "^1.2.2"
     },
     "scripts": {
         "start-server": "st --no-cache --localhost --port 9966 --index index.html ."
