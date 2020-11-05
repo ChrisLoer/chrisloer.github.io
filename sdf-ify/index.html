@@ -127,7 +127,7 @@ function makeRGBAImageData(alphaChannel, width, height) {
         data[4 * i + 0] = alphaChannel[i];
         data[4 * i + 1] = alphaChannel[i];
         data[4 * i + 2] = alphaChannel[i];
-        data[4 * i + 3] = 255;
+        data[4 * i + 3] = alphaChannel[i];
     }
     return imageData;
 }
