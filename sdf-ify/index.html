@@ -6,7 +6,7 @@
 <style>
 body { font: 14px/1 Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
 #container { width: 1000px; margin: 0 auto; }
-input { width: 880px; }
+input { width: 300px; }
 label { font-weight: bold; width: 90px; display: inline-block; }
 a { color: #0af; }
 #log { margin: 0; }
@@ -21,15 +21,15 @@ a { color: #0af; }
         <label for="img">Select image:</label>
         <input type="file" id="img" name="img" accept="image/*" onchange="handleFiles(this.files)">
     </p>
-    <canvas id="canvas" width="1000" height="400"></canvas>
+    <canvas id="canvas" width="400" height="400"></canvas>
     <p id="log"></p>
     <p>
-        <label>Size</label> <input type="range" value="128" step="0.01" min="16" max="256.0" id="scale">
-        <label>Halo</label> <input type="range" value="0.55" step="0.01" min="0.0" max="0.9" id="halo">
-        <label>Angle</label> <input type="range" value="0" step="0.01" min="-0.1" max="0.1" id="angle">
-        <label>Gamma</label> <input type="range" value="2" step="0.01" min="0" max="4" id="gamma">
+        <label>Size</label> <input type="range" value="128" step="0.01" min="16" max="1024.0" id="scale"><br>
+        <label>Halo</label> <input type="range" value="0.55" step="0.01" min="0.0" max="0.9" id="halo"><br>
+        <label>Angle</label> <input type="range" value="0" step="0.01" min="-1" max="1" id="angle"><br>
+        <label>Gamma</label> <input type="range" value="2" step="0.01" min="0" max="4" id="gamma"><br>
     </p>
-    <canvas id="canvas2" width="1000" height="100"></canvas>
+    <canvas id="canvas2" width="400" height="400"></canvas>
 </div>
 
 <script id="sdf-vertex" type="x-shader/x-vertex">
@@ -73,6 +73,9 @@ var images = ['ramenImage'];
 
 var img = new Image();
 
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+
 var localCanvas = document.createElement('canvas');
 var rgba = extractRGBA(document.getElementById(images[0]), localCanvas);
 
@@ -102,13 +105,12 @@ function extractRGBA(img, localCanvas) {
   var buffer = 20;
   localCanvas.width = img.width + 2 * buffer;
   localCanvas.height = img.height + 2 * buffer;
+  ctx.canvas.height = localCanvas.height;
+  ctx.canvas.width = localCanvas.width;
   context.drawImage(img, buffer, buffer);
   return context.getImageData(0, 0, localCanvas.width, localCanvas.height);
 }
 
-
-var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
 
 var sdfs = {};
 
@@ -144,7 +146,7 @@ function updateSDF() {
 
     ctx.putImageData(makeRGBAImageData(sdf.draw(rgba), sdf.width, sdf.height), x, y);
     sdfs[images[0]] = {x: x, y: y};
-    getEl('log').innerHTML = ' image with ' + buffer + 'px buffer) rendered in ' + Math.round(performance.now() - now) + 'ms.';
+    getEl('log').innerHTML = 'Created ' + localCanvas.width + 'px by ' + localCanvas.height + 'px image with ' + buffer + 'px buffer, and ' + Math.round(radius) + 'px radius, rendered in ' + Math.round(performance.now() - now) + 'ms.';
 }
 
 var canvas2 = document.getElementById('canvas2');
