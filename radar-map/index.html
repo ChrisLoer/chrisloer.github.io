@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapbox GL JS debug page</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
+        #originalLabel {
+            position: absolute;
+            background: #fff;
+            top:0;
+            left:0;
+            padding:10px;
+        }
+
+        #newLabel {
+            position: absolute;
+            background: #fff;
+            top:0;
+            right:0;
+            padding:10px;
+        }
+
+        #controls {
+            position: absolute;
+            background: #fff;
+            bottom:35px;
+            left:0;
+            padding:10px;
+        }
+
+        .map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="comparison-container">
+  <div id="before" class="map"></div>
+  <div id="after" class="map"></div>
+</div>
+<label id='originalLabel'>Original Map</label>
+<label id='newLabel'>New Map</label>
+
+<div id='controls'>
+    <label><input id='slider' type="range" min="0" max="12" value="0"/> frame</label><br />
+    <button onclick="playPause()">Play/Pause</button><br />
+    <button onclick="cycleSource()">Change Simplification</button>
+</div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+<link
+rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css"
+type="text/css"
+/>
+<script>
+
+mapboxgl.accessToken = 'pk.eyJ1IjoieWFob29qYXBhbiIsImEiOiJjazRtZ29oamYwdHphM2tuNTA0M3gyOGI2In0.KVkgy3pqcZ1OcDpqUvITog'
+//mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
+
+var newMap = new mapboxgl.Map({
+    container: 'after',
+    zoom: 4.5,
+    center: [137.8, 36.5],
+    style: "mapbox://styles/mapbox/light-v9",
+    hash: true
+});
+
+var slider = document.getElementById('slider');
+
+function updateFilter(filterIndex) {
+  newMap.setFilter('fill', ['==', ['get', 'idx'], filterIndex]);
+}
+
+var rainfallScale = 3;
+
+var currentSource;
+
+function setLayerSource(source) {
+  currentSource = source;
+  if (newMap.getLayer('fill')) {
+    newMap.removeLayer('fill');
+  }
+  newMap.addLayer({
+    'id': 'fill',
+    'type': 'fill',
+    'source': source,
+    'source-layer': 'output',
+    'layout': {},
+    'paint': {
+      "fill-opacity": 0.5,
+      'fill-color': ['to-color', [
+                    'step', ['get', 'value'],
+                    'string',
+                    0, '#ADFFFF',
+                    0.5*rainfallScale, '#4DFFFF', 1.5*rainfallScale, '#00CCFF', 3*rainfallScale, '#0099FF',
+                    6*rainfallScale, '#3366FF', 10*rainfallScale, '#33FF00', 14*rainfallScale, '#33CC00',
+                    20*rainfallScale, '#199900', 28*rainfallScale, '#FFFF00', 36*rainfallScale, '#FFCC00',
+                    44*rainfallScale, '#FF9900', 52*rainfallScale, '#FF5066', 60*rainfallScale, '#FF0000',
+                    72*rainfallScale, '#B70014', 90*rainfallScale, '#000000'
+                ]]
+    }
+  });
+  updateFilter(+slider.value);
+};
+
+newMap.on('load', function () {
+  newMap.addSource('half', {
+    'type': 'vector',
+    'url': "mapbox://chrisloer.9dx1u2yw" // Rendered at .5 scale with 1px blur
+  });
+
+  newMap.addSource('quarter', {
+    'type': 'vector',
+    'url': "mapbox://chrisloer.3et189ou" // Rendered at .25 scale with 1px blur
+  });
+
+  setLayerSource('half');
+
+  updateFilter(0);
+});
+
+var oldMap = new mapboxgl.Map({
+    container: 'before',
+    zoom: 4.5,
+    center: [137.8, 36.5],
+    style: "mapbox://styles/mapbox/light-v9",
+    hash: true
+});
+
+var removeLayerTimeout;
+
+function updateLayer(layerIndex) {
+  clearTimeout(removeLayerTimeout);
+  addLayer(layerIndex);
+  removeLayerTimeout = setTimeout(() => {
+    for (var j = 0; j < 13; j++) {
+      if (j != layerIndex && oldMap.getLayer('l' + j)) {
+        oldMap.removeLayer('l' + j);
+      }
+    }
+  }, 100);
+};
+
+function addLayer(i) {
+  oldMap.addLayer({
+    'id': 'l' + i,
+    'type': 'fill',
+    'source': i == 0 ? "measured" : "forecast",
+    'source-layer': 'rain250m_' + i,
+    'layout': {},
+    'paint': {
+      "fill-opacity": 0.5,
+      'fill-color': [
+          'match', ['get', 'DN'],
+          [1], '#ADFFFF', [2], '#4DFFFF', [3], '#00CCFF',
+          [4], '#0099FF', [5], '#3366FF', [6], '#33FF00',
+          [7], '#33CC00', [8], '#199900', [9], '#FFFF00',
+          [10], '#FFCC00', [11], '#FF9900', [12], '#FF5066',
+          [13], '#FF0000', [14], '#B70014',
+          '#000000'
+      ]
+    }
+  });
+};
+
+
+oldMap.on('load', function () {
+  oldMap.addSource('measured', {
+    'type': 'vector',
+    'url': "mapbox://yahoojapan.rain250m_20201102130000"
+  });
+  oldMap.addSource('forecast', {
+    'type': 'vector',
+    'url': "mapbox://yahoojapan.rain250m_F201102130000"
+  });
+
+  updateLayer(0);
+});
+
+
+function updateFrame(index) {
+  updateFilter(index);
+  updateLayer(index);
+}
+
+var playing = false;
+var nextUpdateTimer;
+
+function nextUpdate() {
+  var nextValue = (+slider.value + 1) % 13;
+  slider.value = nextValue;
+  updateFrame(nextValue);
+  nextUpdateTimer = setTimeout(() => {
+    nextUpdate();
+  }, 200);
+};
+
+function playPause() {
+  if (playing) {
+    playing = false;
+    clearTimeout(nextUpdateTimer);
+  } else {
+    playing = true;
+    nextUpdate();
+  }
+}
+
+function cycleSource() {
+  if (currentSource == 'half') {
+    setLayerSource('quarter');
+  } else {
+    setLayerSource('half');
+  }
+}
+
+// A selector or reference to HTML element
+var container = '#comparison-container';
+
+var map = new mapboxgl.Compare(oldMap, newMap, container, {
+// Set this to enable comparing two maps by mouse movement:
+// mousemove: true
+});
+
+document.getElementById('slider').oninput = () => {
+  updateFrame(+document.getElementById('slider').value);
+};
+
+
+</script>
+</body>
+</html>
