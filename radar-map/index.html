@@ -99,7 +99,7 @@ function setLayerSource(source) {
     'type': 'fill',
     'source': source,
     'source-layer': 'output',
-    'maxzoom': 7,
+    'maxzoom': 9,
     'layout': {},
     'paint': {
       "fill-opacity": 0.5,
@@ -121,17 +121,17 @@ function setLayerSource(source) {
 newMap.on('load', function () {
   newMap.addSource('half', {
     'type': 'vector',
-    'url': "mapbox://chrisloer.9dx1u2yw" // Rendered at .5 scale with 1px blur
+    'url': "mapbox://chrisloer.1q9j6n1r" // Rendered at .5 scale with 1px blur
   });
 
   newMap.addSource('quarter', {
     'type': 'vector',
-    'url': "mapbox://chrisloer.3et189ou" // Rendered at .25 scale with 1px blur
+    'url': "mapbox://chrisloer.98hyt5f0" // Rendered at .25 scale with 1px blur
   });
 
   newMap.addSource('full', {
     'type': 'vector',
-    'url': "mapbox://chrisloer.0lsrhl14" // Rendered at 1x scale with 1px blur
+    'url': "mapbox://chrisloer.8f2x9tv2" // Rendered at 1x scale with 1px blur
   });
 
   newMap.addLayer({
@@ -139,7 +139,7 @@ newMap.on('load', function () {
     'type': 'fill',
     'source': 'full',
     'source-layer': 'output',
-    'minzoom': 7,
+    'minzoom': 9,
     'layout': {},
     'paint': {
       "fill-opacity": 0.5,
@@ -171,7 +171,9 @@ var removeLayerTimeout;
 
 function updateLayer(layerIndex) {
   clearTimeout(removeLayerTimeout);
-  addLayer(layerIndex);
+  if (!oldMap.getLayer('l' + layerIndex)) {
+    addLayer(layerIndex);
+  }
   removeLayerTimeout = setTimeout(() => {
     for (var j = 0; j < 13; j++) {
       if (j != layerIndex && oldMap.getLayer('l' + j)) {
