@@ -55,7 +55,7 @@
 <div id='controls'>
     <label><input id='slider' type="range" min="0" max="12" value="0"/> frame</label><br />
     <button onclick="playPause()">Play/Pause</button><br />
-    <button onclick="cycleSource()">Change Simplification</button>
+    <!--<button onclick="cycleSource()">Change Simplification</button>-->
 </div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
@@ -70,6 +70,8 @@ type="text/css"
 mapboxgl.accessToken = 'pk.eyJ1IjoieWFob29qYXBhbiIsImEiOiJjazRtZ29oamYwdHphM2tuNTA0M3gyOGI2In0.KVkgy3pqcZ1OcDpqUvITog'
 //mapboxgl.accessToken = 'pk.eyJ1IjoiY2hyaXNsb2VyIiwiYSI6ImNpdGo5aW11OTA3OWkyc252OTU2b29zM3IifQ.u2B_kCe8kOg0Eky8yC0U4Q';
 
+mapboxgl.clearStorage(); // So we're using more recent tilesets
+
 var newMap = new mapboxgl.Map({
     container: 'after',
     zoom: 4.5,
@@ -82,24 +84,81 @@ var slider = document.getElementById('slider');
 
 function updateFilter(filterIndex) {
   newMap.setFilter('fill', ['==', ['get', 'idx'], filterIndex]);
-  newMap.setFilter('fill2', ['==', ['get', 'idx'], filterIndex]);
+  // newMap.setFilter('fill2', ['==', ['get', 'idx'], filterIndex]);
+  // newMap.setFilter('fill3', ['==', ['get', 'idx'], filterIndex]);
 }
 
 var rainfallScale = 3;
 
 var currentSource;
 
-function setLayerSource(source) {
-  currentSource = source;
-  if (newMap.getLayer('fill')) {
-    newMap.removeLayer('fill');
-  }
+// function setLayerSource(source) {
+//   currentSource = source;
+//   const sourceLayer = 'yj-contoured';//'yj-contoured' + ((source == "half") ? 2 : 4);
+//   if (newMap.getLayer('fill')) {
+//     newMap.removeLayer('fill');
+//   }
+//   newMap.addLayer({
+//     'id': 'fill',
+//     'type': 'fill',
+//     'source': source,
+//     //'source-layer': sourceLayer, // MTS layer name
+//     'source-layer': 'output',
+//     'maxzoom': 9,
+//     'layout': {},
+//     'paint': {
+//       "fill-opacity": 0.5,
+//       'fill-color': ['to-color', [
+//                     'step', ['get', 'value'],
+//                     'string',
+//                     0, '#ADFFFF',
+//                     0.5*rainfallScale, '#4DFFFF', 1.5*rainfallScale, '#00CCFF', 3*rainfallScale, '#0099FF',
+//                     6*rainfallScale, '#3366FF', 10*rainfallScale, '#33FF00', 14*rainfallScale, '#33CC00',
+//                     20*rainfallScale, '#199900', 28*rainfallScale, '#FFFF00', 36*rainfallScale, '#FFCC00',
+//                     44*rainfallScale, '#FF9900', 52*rainfallScale, '#FF5066', 60*rainfallScale, '#FF0000',
+//                     72*rainfallScale, '#B70014', 90*rainfallScale, '#000000'
+//                 ]]
+//     }
+//   });
+//   updateFilter(+slider.value);
+// };
+
+newMap.on('load', function () {
+  newMap.addSource('full', {
+    'type': 'vector',
+    'url': 'mapbox://chrisloer.yj-contoured' // Composite 1x, 2x, 4x, made with MTS
+    //'url': "mapbox://chrisloer.8f2x9tv2" // Rendered at 1x scale with 1px blur
+  });
+  //
+  // newMap.addSource('half', {
+  //   'type': 'vector',
+  //   //'url': 'mapbox://chrisloer.yj-contoured2' // .5 scale, made with MTS
+  //   'url': "mapbox://chrisloer.1q9j6n1r" // Rendered at .5 scale with 1px blur
+  // });
+  //
+  // newMap.addSource('quarter', {
+  //   'type': 'vector',
+  //   //'url': 'mapbox://chrisloer.yj-contoured4' // .25 scale, made with MTS
+  //   'url': "mapbox://chrisloer.98hyt5f0" // Rendered at .25 scale with 1px blur
+  // });
+  //
+  // newMap.addSource('full', {
+  //   'type': 'vector',
+  //   'url': 'mapbox://chrisloer.yj-contoured' // 1x scale, made with MTS
+  //   //'url': "mapbox://chrisloer.8f2x9tv2" // Rendered at 1x scale with 1px blur
+  // });
+  //
+  // newMap.addSource('noblur', {
+  //   'type': 'vector',
+  //   //'url': 'mapbox://chrisloer.yj-contoured' // 1x scale, made with MTS
+  //   'url': "mapbox://chrisloer.96bmnm6x" // Rendered at 1x scale with no blur
+  // });
+
   newMap.addLayer({
     'id': 'fill',
     'type': 'fill',
-    'source': source,
-    'source-layer': 'output',
-    'maxzoom': 9,
+    'source': 'full',
+    'source-layer': 'yj-contoured',
     'layout': {},
     'paint': {
       "fill-opacity": 0.5,
@@ -116,47 +175,56 @@ function setLayerSource(source) {
     }
   });
   updateFilter(+slider.value);
-};
 
-newMap.on('load', function () {
-  newMap.addSource('half', {
-    'type': 'vector',
-    'url': "mapbox://chrisloer.1q9j6n1r" // Rendered at .5 scale with 1px blur
-  });
+  // newMap.addLayer({
+  //   'id': 'fill2',
+  //   'type': 'fill',
+  //   'source': 'full',
+  //   'source-layer': 'yj-contoured', // MTS layer name
+  //   //'source-layer': 'output',
+  //   'minzoom': 9,
+  //   'maxzoom': 10,
+  //   'layout': {},
+  //   'paint': {
+  //     "fill-opacity": 0.5,
+  //     'fill-color': ['to-color', [
+  //                   'step', ['get', 'value'],
+  //                   'string',
+  //                   0, '#ADFFFF',
+  //                   0.5*rainfallScale, '#4DFFFF', 1.5*rainfallScale, '#00CCFF', 3*rainfallScale, '#0099FF',
+  //                   6*rainfallScale, '#3366FF', 10*rainfallScale, '#33FF00', 14*rainfallScale, '#33CC00',
+  //                   20*rainfallScale, '#199900', 28*rainfallScale, '#FFFF00', 36*rainfallScale, '#FFCC00',
+  //                   44*rainfallScale, '#FF9900', 52*rainfallScale, '#FF5066', 60*rainfallScale, '#FF0000',
+  //                   72*rainfallScale, '#B70014', 90*rainfallScale, '#000000'
+  //               ]]
+  //   }
+  // });
+  //
+  // newMap.addLayer({
+  //   'id': 'fill3',
+  //   'type': 'fill',
+  //   'source': 'noblur',
+  //   //'source-layer': 'yj-contoured', // MTS layer name
+  //   'source-layer': 'output1noblur',
+  //   'minzoom': 10,
+  //   'layout': {},
+  //   'paint': {
+  //     "fill-opacity": 0.5,
+  //     'fill-color': ['to-color', [
+  //                   'step', ['get', 'value'],
+  //                   'string',
+  //                   0, '#ADFFFF',
+  //                   0.5*rainfallScale, '#4DFFFF', 1.5*rainfallScale, '#00CCFF', 3*rainfallScale, '#0099FF',
+  //                   6*rainfallScale, '#3366FF', 10*rainfallScale, '#33FF00', 14*rainfallScale, '#33CC00',
+  //                   20*rainfallScale, '#199900', 28*rainfallScale, '#FFFF00', 36*rainfallScale, '#FFCC00',
+  //                   44*rainfallScale, '#FF9900', 52*rainfallScale, '#FF5066', 60*rainfallScale, '#FF0000',
+  //                   72*rainfallScale, '#B70014', 90*rainfallScale, '#000000'
+  //               ]]
+  //   }
+  // });
 
-  newMap.addSource('quarter', {
-    'type': 'vector',
-    'url': "mapbox://chrisloer.98hyt5f0" // Rendered at .25 scale with 1px blur
-  });
 
-  newMap.addSource('full', {
-    'type': 'vector',
-    'url': "mapbox://chrisloer.8f2x9tv2" // Rendered at 1x scale with 1px blur
-  });
-
-  newMap.addLayer({
-    'id': 'fill2',
-    'type': 'fill',
-    'source': 'full',
-    'source-layer': 'output',
-    'minzoom': 9,
-    'layout': {},
-    'paint': {
-      "fill-opacity": 0.5,
-      'fill-color': ['to-color', [
-                    'step', ['get', 'value'],
-                    'string',
-                    0, '#ADFFFF',
-                    0.5*rainfallScale, '#4DFFFF', 1.5*rainfallScale, '#00CCFF', 3*rainfallScale, '#0099FF',
-                    6*rainfallScale, '#3366FF', 10*rainfallScale, '#33FF00', 14*rainfallScale, '#33CC00',
-                    20*rainfallScale, '#199900', 28*rainfallScale, '#FFFF00', 36*rainfallScale, '#FFCC00',
-                    44*rainfallScale, '#FF9900', 52*rainfallScale, '#FF5066', 60*rainfallScale, '#FF0000',
-                    72*rainfallScale, '#B70014', 90*rainfallScale, '#000000'
-                ]]
-    }
-  });
-
-  setLayerSource('half');
+  // setLayerSource('half');
 });
 
 var oldMap = new mapboxgl.Map({
@@ -234,7 +302,7 @@ function nextUpdate() {
   updateFrame(nextValue);
   nextUpdateTimer = setTimeout(() => {
     nextUpdate();
-  }, 200);
+  }, 400);
 };
 
 function playPause() {
@@ -247,13 +315,13 @@ function playPause() {
   }
 }
 
-function cycleSource() {
-  if (currentSource == 'half') {
-    setLayerSource('quarter');
-  } else {
-    setLayerSource('half');
-  }
-}
+// function cycleSource() {
+//   if (currentSource == 'half') {
+//     setLayerSource('quarter');
+//   } else {
+//     setLayerSource('half');
+//   }
+// }
 
 // A selector or reference to HTML element
 var container = '#comparison-container';
