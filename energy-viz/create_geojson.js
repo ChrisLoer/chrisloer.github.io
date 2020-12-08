@@ -12,8 +12,8 @@ const balancingAuthorities = {};
 const byFuelType = {};
 const byMonthFuelType = {};
 
-for (var year = 2001; year <= 2017; year++) {
-    for (let month = 0; month < 12; month++) {
+for (var year = 2001; year <= 2020; year++) {
+    for (let month = 0; month < (year === 2020 ? 9 : 12); month++) {
         byMonthFuelType[`netgen_${year}_${month}`] = {};
     }
 }
@@ -100,7 +100,7 @@ locationRecords.forEach(function(record) {
   }
 });
 
-for (var year = 2001; year <= 2017; year++) {
+for (var year = 2001; year <= 2020; year++) {
     console.log(`Parsing records for year ${year}`);
     var generationRecords = parse(fs.readFileSync(`CSV/${year}/netgen.csv`), {columns: true});
     generationRecords.forEach(function(record) {
@@ -174,7 +174,7 @@ for (var year = 2001; year <= 2017; year++) {
       }
 
       plant.name = record.plant_name;
-      for (let month = 0; month < 12; month++) {
+      for (let month = 0; month < (year === 2020 ? 9 : 12); month++) {
         const monthIndex = `netgen_${month}`; // Input CSV is indexed by month
         const netgen_month = parseInt(record[monthIndex].replace(/,/g, ''));
 
@@ -206,8 +206,8 @@ for (const plant of plantsWithNetgen) {
         longitude: plant.longitude,
         fuel_type: plant.fuel_type
     };
-    for (var year = 2001; year <= 2017; year++) {
-        for (let month = 0; month < 12; month++) {
+    for (var year = 2001; year <= 2020; year++) {
+        for (let month = 0; month < (year === 2020 ? 9 : 12); month++) {
             const yearMonthIndex = `netgen_${year}_${month}`;
             const yearQuarterIndex = `netgen_${year}_${Math.floor(month / 3)}`;
 
@@ -271,8 +271,8 @@ console.log(totalGeneration);
 function supertile() {
     // Use supertiler to take quarterly_generation.geojson to 10 per-fuel type mbtiles files, adapted from original command line arguments
 
-    var quarters = []; for (var year = 2001; year <= 2017; year++) {
-        for (var quarter = 0; quarter <= 3; quarter++) {
+    var quarters = []; for (var year = 2001; year <= 2020; year++) {
+        for (var quarter = 0; quarter <= (year === 2020 ? 2 : 3); quarter++) {
             quarters.push(`netgen_${year}_${quarter}`);
         }
     }

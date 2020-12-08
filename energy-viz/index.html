@@ -4,7 +4,7 @@
     <title>US Electric Generation</title>
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta property="og:title" content="Explore 17 years of US electric generation" />
+    <meta property="og:title" content="Explore two decades of US electric generation" />
     <meta property="og:description" content="See how much our power sources have already changed in the 21st century." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://electricitytransition.com/" />
@@ -166,7 +166,7 @@
         <div class="card-heading" role="tab" id="headingOne">
             <a class="accordion-toggle collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne"></a>
             <div style="margin-left: 0px; margin-right: 40px">
-                <input id="month" type="range" min="0" max="203" value="0" step=".25"/>
+                <input id="month" type="range" min="0" max="236" value="0" step=".25"/>
             </div>
         </div>
         <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne">
@@ -221,10 +221,10 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="introLabel">⚡ Mapping 68 Petawatt Hours</h5>
+        <h5 class="modal-title" id="introLabel">⚡ Mapping 78 Petawatt Hours</h5>
       </div>
       <div class="modal-body">
-        Overall US electricity generation has been relatively stable at around 4 PWh/year for the last 17 years, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies a massive shift away from coal and towards gas, wind, and solar.
+        Overall US electricity generation has been relatively stable at around 4 PWh/year for the last 19 years, reflecting increasing energy efficiency even as our economy continues to grow. However, that relative stability belies a massive shift away from coal and towards gas, wind, and solar.
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="chapters['intro'](map);">Show Me ✨</button>
@@ -364,58 +364,58 @@ map.on('load', function() {
 
     map.addSource('plant-generation', {
         "type": "vector",
-        "url": "mapbox://chrisloer.ac4xyki8"
+        "url": "mapbox://chrisloer.cpbcg09f"
     });
     // Splitting plant labels into a different source from plant-generation duplicates some data
     // but allows us to avoid expensive label re-generation on every date change.
     map.addSource('plant-labels', {
         "type": "vector",
-        "url": "mapbox://chrisloer.ao6jmeje"
+        "url": "mapbox://chrisloer.228z79un"
     });
 
     map.addSource('quarterly-generation-all', {
         "type": "vector",
-        "url": "mapbox://chrisloer.9v4ety4d"
+        "url": "mapbox://chrisloer.73ntfprk"
     });
     map.addSource('quarterly-generation-gas', {
         "type": "vector",
-        "url": "mapbox://chrisloer.5vva62hd"
+        "url": "mapbox://chrisloer.1omwjshy"
     });
     map.addSource('quarterly-generation-coal', {
         "type": "vector",
-        "url": "mapbox://chrisloer.3goocsnw"
+        "url": "mapbox://chrisloer.0b6q82rp"
     });
     map.addSource('quarterly-generation-nuclear', {
         "type": "vector",
-        "url": "mapbox://chrisloer.aa153gkx"
+        "url": "mapbox://chrisloer.b80w29qa"
     });
     map.addSource('quarterly-generation-hydro', {
         "type": "vector",
-        "url": "mapbox://chrisloer.9bb3s0f0"
+        "url": "mapbox://chrisloer.79vyez15"
     });
     map.addSource('quarterly-generation-wind', {
         "type": "vector",
-        "url": "mapbox://chrisloer.3o674uex"
+        "url": "mapbox://chrisloer.9m3z5qoe"
     });
     map.addSource('quarterly-generation-solar', {
         "type": "vector",
-        "url": "mapbox://chrisloer.8k295r49"
+        "url": "mapbox://chrisloer.a9swq64j"
     });
     map.addSource('quarterly-generation-renewable', {
         "type": "vector",
-        "url": "mapbox://chrisloer.1p4pqjk0"
+        "url": "mapbox://chrisloer.6wlfxrlc"
     });
     map.addSource('quarterly-generation-other', {
         "type": "vector",
-        "url": "mapbox://chrisloer.8ffwhxz3"
+        "url": "mapbox://chrisloer.d74avejb"
     });
     map.addSource('quarterly-generation-geothermal', {
         "type": "vector",
-        "url": "mapbox://chrisloer.8w5wg42y"
+        "url": "mapbox://chrisloer.d407sscq"
     });
     map.addSource('quarterly-generation-petroleum', {
         "type": "vector",
-        "url": "mapbox://chrisloer.6z5qna0c"
+        "url": "mapbox://chrisloer.5090wiuf"
     });
 
     map.addLayer({
@@ -487,7 +487,7 @@ map.on('load', function() {
         "id": "plant-circles",
         "type": "circle",
         "source": "plant-generation",
-        "source-layer": "plant_generation-4ibjvx",
+        "source-layer": "plant_generation-chypsr",
         "paint": {
             'circle-radius': ["interpolate",
                 ["linear"],
@@ -518,7 +518,7 @@ map.on('load', function() {
     map.addLayer({
         "id": "plant-labels",
         "source": "plant-labels",
-        "source-layer": "plant_labels-93wi0s",
+        "source-layer": "plant_labels-a2le94",
         "type": "symbol",
         "minzoom": 10,
         "layout": {
@@ -592,8 +592,9 @@ var updateMonth = function() {
   const baseYearQuarter = toYearQuarter(baseQuarter);
   const nextYearQuarter = toYearQuarter(nextQuarter);
 
-  monthText.innerHTML = monthNames[baseYearMonth.month] + " " + baseYearMonth.year;
-  yearText.innerHTML = baseYearMonth.year;
+  const yearLabel = (baseYearMonth.year == 2020) ? "2020 (partial)" : baseYearMonth.year;
+  monthText.innerHTML = monthNames[baseYearMonth.month] + " " + yearLabel;
+  yearText.innerHTML = yearLabel;
 
   map.setPaintProperty('generation-heatmap', 'heatmap-weight', ["/", ["+",
     ["*", ["to-number", ["get", `netgen_${baseYearQuarter.year}_${baseYearQuarter.quarter}`]], baseMix],
@@ -700,7 +701,7 @@ fuelSelect.onchange = function() {
 function animationStep(completion, increment) {
     return () => {
         var currentMonth = Math.floor(monthInput.value);
-        if (currentMonth == 203) {
+        if (currentMonth == 236) {
             if (completion) {
                 timerAnimation = setTimeout(() => {
                     completion();
@@ -712,7 +713,7 @@ function animationStep(completion, increment) {
             return;
         }
 
-        monthInput.value = Math.min(currentMonth + (increment || 1), 203);
+        monthInput.value = Math.min(currentMonth + (increment || 1), 236);
         updateMonth();
         timerAnimation = setTimeout(animationStep(completion, increment), 100);
     };
