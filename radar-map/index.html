@@ -40,6 +40,16 @@
             width: 100%;
         }
 
+        #features {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: 15%;
+          overflow: auto;
+          background: rgba(255, 255, 255, 0.8);
+        }
+
     </style>
 </head>
 
@@ -49,6 +59,7 @@
   <div id="before" class="map"></div>
   <div id="after" class="map"></div>
 </div>
+<pre id="features"></pre>
 <label id='originalLabel'>Original Map</label>
 <label id='newLabel'>New Map</label>
 
@@ -88,7 +99,7 @@ function updateFilter(filterIndex) {
   // newMap.setFilter('fill3', ['==', ['get', 'idx'], filterIndex]);
 }
 
-var rainfallScale = 3;
+var rainfallScale = 1;
 
 var currentSource;
 
@@ -175,6 +186,27 @@ newMap.on('load', function () {
     }
   });
   updateFilter(+slider.value);
+
+  newMap.on('mousemove', function (e) {
+    var features = newMap.queryRenderedFeatures(e.point);
+
+    // Limit the number of properties we're displaying for
+    // legibility and performance
+    var displayProperties = [
+      'id', 'type', 'source-layer',
+      'properties'
+    ];
+
+    var displayFeatures = features.map(function (feat) {
+      var displayFeat = {};
+      displayProperties.forEach(function (prop) {
+        displayFeat[prop] = feat[prop];
+      });
+      return displayFeat;
+    });
+
+    document.getElementById('features').innerHTML = JSON.stringify(displayFeatures,null,2);
+  });
 
   // newMap.addLayer({
   //   'id': 'fill2',
@@ -285,6 +317,27 @@ oldMap.on('load', function () {
   });
 
   updateLayer(0);
+
+  oldMap.on('mousemove', function (e) {
+    var features = oldMap.queryRenderedFeatures(e.point);
+
+    // Limit the number of properties we're displaying for
+    // legibility and performance
+    var displayProperties = [
+      'id', 'type', 'source-layer',
+      'properties'
+    ];
+
+    var displayFeatures = features.map(function (feat) {
+      var displayFeat = {};
+      displayProperties.forEach(function (prop) {
+        displayFeat[prop] = feat[prop];
+      });
+      return displayFeat;
+    });
+
+    document.getElementById('features').innerHTML = JSON.stringify(displayFeatures,null,2);
+  });
 });
 
 
