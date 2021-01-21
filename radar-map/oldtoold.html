@@ -45,6 +45,7 @@
           top: 0;
           right: 0;
           bottom: 0;
+          width: 15%;
           overflow: auto;
           background: rgba(255, 255, 255, 0.8);
         }
@@ -90,8 +91,6 @@ var newMap = new mapboxgl.Map({
     hash: true
 });
 
-newMap.showTileBoundaries = true;
-
 var slider = document.getElementById('slider');
 
 var rainfallScale = 1;
@@ -105,17 +104,11 @@ var oldMap = new mapboxgl.Map({
     hash: true
 });
 
-oldMap.showTileBoundaries = true;
-
 var removeOldLayerTimeout;
 var removeNewLayerTimeout;
 
-var currentOldLayer;
-var currentNewLayer;
-
 function updateOldLayer(layerIndex) {
   clearTimeout(removeOldLayerTimeout);
-  currentOldLayer = 'rain250m_' + layerIndex;
   if (!oldMap.getLayer('l' + layerIndex)) {
     oldAddLayer(layerIndex);
   }
@@ -129,52 +122,56 @@ function updateOldLayer(layerIndex) {
 };
 
 function updateNewLayer(layerIndex) {
-    newMap.setPaintProperty('l' + layerIndex, 'fill-opacity', 0.5);
-    currentNewLayer = 'rain250m_' + layerIndex;
-    for (var j = 0; j < 13; j++) {
-      if (j != layerIndex && newMap.getLayer('l' + j)) {
-        newMap.setPaintProperty('l' + j, 'fill-opacity', 0);
-      }
+    clearTimeout(removeNewLayerTimeout);
+    if (!newMap.getLayer('l' + layerIndex)) {
+      newAddLayer(layerIndex);
     }
+    removeOldLayerTimeout = setTimeout(() => {
+      for (var j = 0; j < 13; j++) {
+        if (j != layerIndex && newMap.getLayer('l' + j)) {
+          newMap.removeLayer('l' + j);
+        }
+      }
+    }, 100);
 };
 
 var currentSource;
 
 newMap.on('load', function () {
-  newMap.addSource('full', {
-    'type': 'vector',
-    'url': 'mapbox://chrisloer.yj-contoured-all2' // Composite 1x, 2x, 4x, made with MTS
-  });
-
-  //updateFilter(+slider.value);
-  for (var i = 0; i < 13; i++) {
-      newAddLayer(i);
-  }
-  updateNewLayer(0);
-
-  newMap.on('mousemove', function (e) {
-    var features = newMap.queryRenderedFeatures(e.point);
-
-    // Limit the number of properties we're displaying for
-    // legibility and performance
-    var displayProperties = [
-      'id', 'type', 'source-layer',
-      'properties'
-    ];
-
-    var displayFeatures = features.filter((feature) => feature['sourceLayer'] == currentNewLayer).map(function (feat) {
-      var displayFeat = {};
-      displayFeat["map"] = "new";
-      displayProperties.forEach(function (prop) {
-        displayFeat[prop] = feat[prop];
-      });
-      if (feat.geometry.type === "MultiPolygon")
-        displayFeat['geometrySize'] = feat.geometry.coordinates.reduce((sum, current) => sum + current.reduce((sum2, current2) => sum2 + current2.length, 0), 0);
-      return displayFeat;
+    newMap.addSource('measured', {
+      'type': 'vector',
+      //'url': "mapbox://yahoojapan.rain250m_20201102130000"
+      'url': "mapbox://chrisloer.yj-contoured-measured2"
+    });
+    newMap.addSource('forecast', {
+      'type': 'vector',
+      //'url': "mapbox://yahoojapan.rain250m_F201102130000"
+      'url': "mapbox://chrisloer.yj-contoured-all"
     });
 
-    document.getElementById('features').innerHTML = JSON.stringify(displayFeatures,null,2);
-  });
+    updateNewLayer(0);
+
+    newMap.on('mousemove', function (e) {
+      var features = newMap.queryRenderedFeatures(e.point);
+
+      // Limit the number of properties we're displaying for
+      // legibility and performance
+      var displayProperties = [
+        'id', 'type', 'source-layer',
+        'properties'
+      ];
+
+      var displayFeatures = features.map(function (feat) {
+        var displayFeat = {};
+        displayProperties.forEach(function (prop) {
+          displayFeat[prop] = feat[prop];
+        });
+        displayFeat['geometrySize'] = feat.geometry.coordinates.length;
+        return displayFeat;
+      });
+
+      document.getElementById('features').innerHTML = JSON.stringify(displayFeatures,null,2);
+    });
 
 });
 
@@ -203,23 +200,23 @@ function oldAddLayer(i) {
 
 function newAddLayer(i) {
   newMap.addLayer({
-    'id': 'l' + i,
-    'type': 'fill',
-    'source': 'full',
-    'source-layer': 'rain250m_' + i,
-    'layout': {},
-    'paint': {
-      "fill-opacity": 0,
-      'fill-color': [
-          'match', ['get', 'DN'],
-          [1], '#ADFFFF', [2], '#4DFFFF', [3], '#00CCFF',
-          [4], '#0099FF', [5], '#3366FF', [6], '#33FF00',
-          [7], '#33CC00', [8], '#199900', [9], '#FFFF00',
-          [10], '#FFCC00', [11], '#FF9900', [12], '#FF5066',
-          [13], '#FF0000', [14], '#B70014',
-          '#000000'
-      ]
-    }
+      'id': 'l' + i,
+      'type': 'fill',
+      'source': i == 0 ? "measured" : "forecast",
+      'source-layer': 'rain250m_' + i,
+      'layout': {},
+      'paint': {
+        "fill-opacity": 0.5,
+        'fill-color': [
+            'match', ['get', 'DN'],
+            [1], '#ADFFFF', [2], '#4DFFFF', [3], '#00CCFF',
+            [4], '#0099FF', [5], '#3366FF', [6], '#33FF00',
+            [7], '#33CC00', [8], '#199900', [9], '#FFFF00',
+            [10], '#FFCC00', [11], '#FF9900', [12], '#FF5066',
+            [13], '#FF0000', [14], '#B70014',
+            '#000000'
+        ]
+      }
   });
 };
 
@@ -248,14 +245,12 @@ oldMap.on('load', function () {
       'properties'
     ];
 
-    var displayFeatures = features.filter((feature) => feature['sourceLayer'] == currentOldLayer).map(function (feat) {
+    var displayFeatures = features.map(function (feat) {
       var displayFeat = {};
-      displayFeat["map"] = "old";
       displayProperties.forEach(function (prop) {
         displayFeat[prop] = feat[prop];
       });
-      if (feat.geometry.type === "MultiPolygon")
-        displayFeat['geometrySize'] = feat.geometry.coordinates.reduce((sum, current) => sum + current.reduce((sum2, current2) => sum2 + current2.length, 0), 0);
+      displayFeat['geometrySize'] = feat.geometry.coordinates.length;
       return displayFeat;
     });
 
