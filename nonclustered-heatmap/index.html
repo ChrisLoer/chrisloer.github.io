@@ -5,8 +5,9 @@
     <meta property="og:description" content="View local GeoJSON without server upload." />
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel='stylesheet' href='../../dist/maplibre-gl.css' />
-    <script src='../../dist/maplibre-gl-dev.js'></script>
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.js'></script>
+ 
     <style>
         body { margin: 0; padding: 0; }
         html, body, #map { height: 100%; }
@@ -55,30 +56,29 @@
                 'id': 'uploaded-polygons',
                 'type': 'heatmap',
                 'source': 'uploaded-source',
-                'filter': ['>=', ['get', 'mag'], 8],
                 'paint': {
                     'heatmap-radius': 5,
-                    "heatmap-color": [
-                      "interpolate-hcl",
-                      [
-                          "linear"
-                      ],
-                      [
-                          "heatmap-density"
-                      ],
-                      0,
-                      "transparent",
-                      0.2,
-                      "hsla(198.91304347826087, 100%, 18.03921568627451%, 0)",
-                      0.4,
-                      "hsl(189.77777777777777, 100%, 26.47058823529412%)",
-                      0.6000000000000001,
-                      "hsl(168.58895705521473, 100%, 31.960784313725487%)",
-                      0.8,
-                      "hsl(111.70731707317073, 56.16438356164384%, 57.05882352941176%)",
-                      1,
-                      "hsl(55.039370078740156, 100%, 50.19607843137255%)"
-                  ],
+                    'heatmap-color': [
+                        'interpolate-hcl',
+                        [
+                            'linear'
+                        ],
+                        [
+                            'heatmap-density'
+                        ],
+                        0,
+                        'transparent',
+                        0.2,
+                        'hsla(198.91304347826087, 100%, 18.03921568627451%, 0)',
+                        0.4,
+                        'hsl(189.77777777777777, 100%, 26.47058823529412%)',
+                        0.6000000000000001,
+                        'hsl(168.58895705521473, 100%, 31.960784313725487%)',
+                        0.8,
+                        'hsl(111.70731707317073, 56.16438356164384%, 57.05882352941176%)',
+                        1,
+                        'hsl(55.039370078740156, 100%, 50.19607843137255%)'
+                    ],
                 }
             });
         };
