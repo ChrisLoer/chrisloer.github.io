@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Family Shopping List</title>
+<style>
+  :root{
+    --bg:#f6f7f5; --card:#ffffff; --ink:#1f2421; --muted:#7b827c; --line:#e7e9e5;
+    --have:#1f9d57; --have-bg:#e7f6ec;
+    --want:#d2502b; --want-bg:#fdeae3;
+    --unsure:#8a8f8a; --unsure-bg:#eef0ed;
+    --accent:#2f6f4f;
+    --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-text-size-adjust:100%;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 14px 80px;}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);
+    padding:8px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px;}
+  h1{font-size:20px;margin:0 0 2px;letter-spacing:-.01em}
+  .sub{font-size:12.5px;color:var(--muted);margin:0}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .filters{display:flex;gap:6px;background:var(--unsure-bg);padding:3px;border-radius:10px}
+  .filters button{border:0;background:transparent;color:var(--muted);font-size:12.5px;
+    font-weight:600;padding:6px 10px;border-radius:8px;cursor:pointer}
+  .filters button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .spacer{flex:1}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-size:12.5px;
+    font-weight:600;padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .sync{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--unsure)}
+  .dot.ok{background:var(--have)} .dot.busy{background:#e0a106} .dot.off{background:#c33}
+  section{margin:18px 0}
+  .sec-h{display:flex;align-items:baseline;gap:8px;margin:0 2px 8px}
+  .sec-h h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:0}
+  .sec-h .cnt{font-size:11.5px;color:var(--muted)}
+  ul{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  li{display:flex;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid var(--line)}
+  li:first-child{border-top:0}
+  li[data-state="0"] .name{color:var(--muted);text-decoration:line-through;text-decoration-color:#c9cdc8}
+  li[data-state="1"]{background:linear-gradient(0deg,var(--want-bg),var(--want-bg))}
+  .name{flex:1;font-size:14.5px;line-height:1.25}
+  .name .note{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:400;text-decoration:none}
+  .seg{display:flex;gap:0;flex:0 0 auto;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:#fff;color:var(--muted);font-size:0;width:38px;height:34px;
+    cursor:pointer;position:relative;border-left:1px solid var(--line)}
+  .seg button:first-child{border-left:0}
+  .seg button::after{font-size:15px;line-height:1}
+  .seg button[data-v="0"]::after{content:"✓"}
+  .seg button[data-v="1"]::after{content:"+"}
+  .seg button[data-v="2"]::after{content:"?"}
+  .seg button[data-v="0"].sel{background:var(--have-bg);color:var(--have)}
+  .seg button[data-v="1"].sel{background:var(--want-bg);color:var(--want)}
+  .seg button[data-v="2"].sel{background:var(--unsure-bg);color:var(--unsure)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 2px 0}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .chip{width:18px;height:18px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .chip.h{background:var(--have-bg);color:var(--have)} .chip.w{background:var(--want-bg);color:var(--want)} .chip.u{background:var(--unsure-bg);color:var(--unsure)}
+  .banner{background:#fff7e6;border:1px solid #f0dca0;color:#7a5a00;font-size:12.5px;
+    padding:10px 12px;border-radius:12px;margin:0 0 14px;display:none}
+  .banner.show{display:block}
+  .banner a{color:#7a5a00;font-weight:700;cursor:pointer;text-decoration:underline}
+  .empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
+  footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🛒 Family Shopping List</h1>
+    <p class="sub">Tap a status for each item. Shared & synced across everyone with this page.</p>
+    <div class="legend">
+      <span><i class="chip h">✓</i> Have / don't want</span>
+      <span><i class="chip w">+</i> Want (need to buy)</span>
+      <span><i class="chip u">?</i> Unsure</span>
+    </div>
+    <div class="toolbar">
+      <div class="filters">
+        <button data-f="all" class="on">All</button>
+        <button data-f="1">Need to buy</button>
+        <button data-f="2">Unsure</button>
+      </div>
+      <span class="spacer"></span>
+      <span class="sync"><span class="dot" id="dot"></span><span id="syncLabel">Local only</span></span>
+      <button class="btn" id="resetBtn">Reset all</button>
+    </div>
+  </header>
+
+  <div class="banner" id="setupBanner">
+    Sync isn't set up yet, so checkmarks are saved only on this device.
+    <a id="setupLink">Add your sync URL</a> to share state with the family.
+  </div>
+
+  <main id="list"></main>
+  <footer>Built from your standing list · last-write-wins sync</footer>
+</div>
+
+<script>
+/* ============================================================
+   1) CLOUD SYNC SETUP
+   Paste your Google Apps Script Web App URL between the quotes
+   below (it looks like https://script.google.com/macros/s/AKfy.../exec).
+   Leave it blank to run in local-only mode on this device.
+   ============================================================ */
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwd567zY2xZTBNf3MkZmsBcuow06FUf3A-6pQ1Dwu3U8uqO6o5PudIw-B_cu2dCPhzn/exec";
+
+/* ---- items: [id, label, optional note] grouped by store-flow section ---- */
+const DATA = [
+  ["Produce", [
+    ["greens","Mixed greens / butter lettuce / arugula","Just one, small container — we like them fresh"],
+    ["broccoli","Broccoli or cauliflower"],
+    ["avocado","Avocados ×8"],
+    ["carrots","Baby carrots ×1"],
+    ["snappeas","Snap peas"],
+    ["mushroom","Button mushrooms ×5"],
+    ["squash","Squash"],
+    ["cucumber","Persian cucumbers — 2-pack"],
+    ["tomatoes_cherry","Cherry / small tomatoes"],
+    ["bananas","Bananas — greenish"],
+    ["cuties","“Cuties” oranges"],
+    ["oranges","Oranges"],
+    ["apples","Apples — gala / tastiest, 1 bag"],
+    ["blueberries","Organic blueberries"],
+    ["melon","Melon or honey mango","Whichever's cheapest"],
+    ["lemons","Lemons ×3"],
+    ["limes","Limes ×4"],
+    ["potatoes","Potatoes"],
+    ["onions","Onions"],
+    ["sweetpotato","Sweet potatoes"],
+    ["garlic","Head of garlic"]
+  ]],
+  ["Pantry & Dry Goods", [
+    ["tortillas_flour","Flour tortillas — large taco size","We go through a lot"],
+    ["tortillas_corn","Corn tortillas"],
+    ["oats","Quick-cooking oats (bulk)","Refill the oat jar"],
+    ["lentils","Brown lentils (bulk)"],
+    ["rice","Basmati rice, long grain — 10 lb"],
+    ["pasta","Pasta — assorted","Kids like bow tie"],
+    ["pasta_gf","Gluten-free pasta","Bean/legume based"],
+    ["beans_black","Black beans (cans) ×3"],
+    ["beans_kidney","Kidney beans (cans) ×3"],
+    ["beans_garbanzo","Garbanzo beans (cans) ×3"],
+    ["beans_northern","Northern beans (cans) ×2"],
+    ["tomatoes_canned","Canned whole tomatoes (28 oz)"],
+    ["tomato_paste","Tomato paste"],
+    ["garlic_powder","Garlic powder (bulk)"],
+    ["raisins","Golden raisins"],
+    ["cashews","Cashews (bulk)"],
+    ["almonds","Sliced almonds — 2 lb"],
+    ["walnuts","Walnuts"],
+    ["pb","Peanut butter (natural)"],
+    ["honey","Honey"],
+    ["seaweed","Seaweed snacks ×12","Kids"],
+    ["jerky","Beef jerky","Kids"],
+    ["goldfish","Goldfish","Kids"]
+  ]],
+  ["Dairy & Refrigerated", [
+    ["yogurt","Full-fat Greek yogurt","Fage preferred — or a gallon of whole milk to make more"],
+    ["altmilk","Hemp / soy / flax milk"],
+    ["halfhalf","Half-and-half (quart)"],
+    ["eggs","Free-range eggs (1–2 dozen)"],
+    ["creamcheese","Cream cheese"],
+    ["goatcheese","Goat cheese"],
+    ["shredded","Shredded cheese","e.g. “Mexican”"],
+    ["jack","Monterey Jack block (2 lb)"],
+    ["cottage","Cottage cheese","Nancy's, or Daisy"],
+    ["stringcheese","String cheese, full-fat","Kids' snack"]
+  ]],
+  ["Meat & Poultry", [
+    ["groundbeef","Ground beef"],
+    ["stewbeef","Stew beef (cheap) — 3 lb","Doesn't have to be cut"],
+    ["salmon","Wild-caught salmon — 5 lb","In addition to the meal salmon"],
+    ["chicken","Chicken thighs or drumsticks"]
+  ]],
+  ["Frozen", [
+    ["edamame","Frozen edamame","Unshelled preferred, shelled OK"]
+  ]]
+];
+
+/* ---- state: { id: 0|1|2 }  (0 have, 1 want, 2 unsure). Missing = 2 (unsure). ---- */
+let state = {};
+let filter = "all";
+let dirty = false;          // local changes not yet confirmed saved
+let saveTimer = null;
+
+const $ = s => document.querySelector(s);
+const dot = $("#dot"), syncLabel = $("#syncLabel");
+
+function getBackend(){
+  return BACKEND_URL || localStorage.getItem("shop_backend") || "";
+}
+function val(id){ return (id in state) ? state[id] : 2; }
+
+/* ---------- rendering ---------- */
+function render(){
+  const list = $("#list");
+  list.innerHTML = "";
+  let shown = 0;
+  DATA.forEach(([sec, items])=>{
+    const visible = items.filter(it => filter==="all" ? true : String(val(it[0]))===filter);
+    if(!visible.length) return;
+    shown += visible.length;
+    const s = document.createElement("section");
+    const wantCount = items.filter(it=>val(it[0])===1).length;
+    s.innerHTML = `<div class="sec-h"><h2>${sec}</h2>`+
+      `<span class="cnt">${wantCount?wantCount+" to buy":items.length+" items"}</span></div>`;
+    const ul = document.createElement("ul");
+    visible.forEach(([id,label,note])=>{
+      const li = document.createElement("li");
+      li.dataset.state = val(id);
+      li.innerHTML =
+        `<span class="name">${label}${note?`<span class="note">${note}</span>`:""}</span>`+
+        `<span class="seg" role="radiogroup" aria-label="${label}">`+
+          seg(id,0)+seg(id,1)+seg(id,2)+
+        `</span>`;
+      ul.appendChild(li);
+    });
+    s.appendChild(ul);
+    list.appendChild(s);
+  });
+  if(!shown){
+    list.innerHTML = `<p class="empty">Nothing here yet. Try the “All” filter.</p>`;
+  }
+}
+function seg(id,v){
+  const sel = val(id)===v ? " sel" : "";
+  return `<button class="${sel}" data-id="${id}" data-v="${v}" aria-checked="${val(id)===v}"></button>`;
+}
+
+/* ---------- interaction ---------- */
+$("#list").addEventListener("click", e=>{
+  const b = e.target.closest(".seg button");
+  if(!b) return;
+  const id = b.dataset.id, v = +b.dataset.v;
+  if(v===2) delete state[id]; else state[id]=v;   // keep payload tiny: don't store unsure
+  render();
+  queueSave();
+});
+
+document.querySelectorAll(".filters button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".filters button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    filter = b.dataset.f;
+    render();
+  });
+});
+
+$("#resetBtn").addEventListener("click", ()=>{
+  if(!confirm("Reset every item back to “Unsure” for everyone?")) return;
+  state = {};
+  render();
+  queueSave(true);
+});
+
+$("#setupLink").addEventListener("click", ()=>{
+  const u = prompt("Paste your Google Apps Script Web App URL (ends in /exec):", getBackend());
+  if(u && /\/exec\b/.test(u)){
+    localStorage.setItem("shop_backend", u.trim());
+    location.reload();
+  } else if(u){
+    alert("That doesn't look like a /exec URL.");
+  }
+});
+
+/* ---------- sync ---------- */
+function setSync(cls,label){ dot.className="dot "+(cls||""); syncLabel.textContent=label; }
+
+function loadLocal(){ try{ state = JSON.parse(localStorage.getItem("shop_state")||"{}"); }catch(_){ state={}; } }
+function saveLocal(){ localStorage.setItem("shop_state", JSON.stringify(state)); }
+
+function queueSave(immediate){
+  saveLocal();
+  dirty = true;
+  const url = getBackend();
+  if(!url){ return; }
+  setSync("busy","Saving…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(pushState, immediate ? 0 : 600);
+}
+
+async function pushState(){
+  const url = getBackend();
+  if(!url) return;
+  try{
+    const r = await fetch(url + "?action=save&state=" + encodeURIComponent(JSON.stringify(state)),
+                          {method:"GET"});
+    if(!r.ok) throw 0;
+    dirty = false;
+    setSync("ok","Synced");
+  }catch(_){
+    setSync("off","Offline — saved locally");
+  }
+}
+
+async function pullState(){
+  const url = getBackend();
+  if(!url){ setSync("","Local only"); $("#setupBanner").classList.add("show"); return; }
+  $("#setupBanner").classList.remove("show");
+  try{
+    const r = await fetch(url + "?t=" + Date.now(), {method:"GET"});
+    const j = await r.json();
+    if(!dirty && j && j.state){
+      state = j.state;
+      saveLocal();
+      render();
+    }
+    setSync(dirty?"busy":"ok", dirty?"Saving…":"Synced");
+  }catch(_){
+    setSync("off","Offline — using local copy");
+  }
+}
+
+/* ---------- boot ---------- */
+loadLocal();
+render();
+pullState();
+setInterval(pullState, 20000);                 // pick up others' changes
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) pullState(); });
+window.addEventListener("focus", pullState);
+</script>
+</body>
+</html>
