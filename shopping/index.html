@@ -31,6 +31,9 @@
   .btn{border:1px solid var(--line);background:#fff;color:var(--ink);font-size:12.5px;
     font-weight:600;padding:8px 12px;border-radius:10px;cursor:pointer}
   .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.danger{background:#fff;border-color:#e7b4a6;color:var(--want)}
+  .btn.add{background:var(--accent);border-color:var(--accent);color:#fff}
   .sync{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--unsure)}
   .dot.ok{background:var(--have)} .dot.busy{background:#e0a106} .dot.off{background:#c33}
@@ -43,8 +46,8 @@
   li{display:flex;align-items:center;gap:10px;padding:11px 12px;border-top:1px solid var(--line)}
   li:first-child{border-top:0}
   li[data-state="0"] .name{color:var(--muted);text-decoration:line-through;text-decoration-color:#c9cdc8}
-  li[data-state="1"]{background:linear-gradient(0deg,var(--want-bg),var(--want-bg))}
-  .name{flex:1;font-size:14.5px;line-height:1.25}
+  li[data-state="1"]{background:var(--want-bg)}
+  .name{flex:1;font-size:14.5px;line-height:1.25;min-width:0}
   .name .note{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:400;text-decoration:none}
   .seg{display:flex;gap:0;flex:0 0 auto;border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .seg button{border:0;background:#fff;color:var(--muted);font-size:0;width:38px;height:34px;
@@ -57,6 +60,9 @@
   .seg button[data-v="0"].sel{background:var(--have-bg);color:var(--have)}
   .seg button[data-v="1"].sel{background:var(--want-bg);color:var(--want)}
   .seg button[data-v="2"].sel{background:var(--unsure-bg);color:var(--unsure)}
+  .edit{flex:0 0 auto;border:0;background:transparent;color:var(--muted);cursor:pointer;
+    font-size:15px;width:30px;height:34px;border-radius:8px;opacity:.65}
+  .edit:hover{opacity:1;background:var(--unsure-bg)}
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 2px 0}
   .legend span{display:flex;align-items:center;gap:6px}
   .chip{width:18px;height:18px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
@@ -67,6 +73,21 @@
   .banner a{color:#7a5a00;font-weight:700;cursor:pointer;text-decoration:underline}
   .empty{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
   footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px}
+  /* editor dialog */
+  .overlay{position:fixed;inset:0;background:rgba(20,24,21,.38);display:flex;
+    align-items:flex-end;justify-content:center;z-index:20;padding:0}
+  @media(min-width:560px){.overlay{align-items:center;padding:16px}}
+  .overlay[hidden]{display:none}
+  .dialog{background:#fff;width:100%;max-width:440px;border-radius:16px 16px 0 0;
+    padding:18px 16px 16px;box-shadow:0 -8px 40px rgba(0,0,0,.18)}
+  @media(min-width:560px){.dialog{border-radius:16px}}
+  .dialog h3{margin:0 0 12px;font-size:16px}
+  .dialog label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:10px 0 4px}
+  .dialog input,.dialog select{width:100%;font-size:15px;padding:10px 11px;border:1px solid var(--line);
+    border-radius:10px;background:#fff;color:var(--ink);-webkit-appearance:none;appearance:none}
+  .dialog select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%237b827c' stroke-width='1.5' fill='none'/></svg>");
+    background-repeat:no-repeat;background-position:right 11px center}
+  .dlg-actions{display:flex;align-items:center;gap:8px;margin-top:16px}
 </style>
 </head>
 <body>
@@ -87,30 +108,50 @@
       </div>
       <span class="spacer"></span>
       <span class="sync"><span class="dot" id="dot"></span><span id="syncLabel">Local only</span></span>
-      <button class="btn" id="resetBtn">Reset all</button>
+      <button class="btn add" id="addBtn">＋ Add</button>
+      <button class="btn" id="resetBtn">Reset</button>
     </div>
   </header>
 
   <div class="banner" id="setupBanner">
-    Sync isn't set up yet, so checkmarks are saved only on this device.
-    <a id="setupLink">Add your sync URL</a> to share state with the family.
+    Sync isn't set up yet, so changes are saved only on this device.
+    <a id="setupLink">Add your sync URL</a> to share with the family.
   </div>
 
   <main id="list"></main>
-  <footer>Built from your standing list · last-write-wins sync</footer>
+  <footer>Built from your standing list · last-write-wins sync · tap ✎ to edit, ＋ Add for new items</footer>
+</div>
+
+<!-- editor dialog -->
+<div class="overlay" id="overlay" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h3 id="dlgTitle">Add item</h3>
+    <label for="fLabel">Item</label>
+    <input id="fLabel" type="text" autocomplete="off" placeholder="e.g. Olive oil">
+    <label for="fNote">Note (optional)</label>
+    <input id="fNote" type="text" autocomplete="off" placeholder="e.g. extra virgin, 1 L">
+    <label for="fSec">Section</label>
+    <select id="fSec"></select>
+    <input id="fNewSec" type="text" placeholder="New section name" hidden style="margin-top:8px">
+    <div class="dlg-actions">
+      <button class="btn danger" id="fDelete" hidden>Delete</button>
+      <span class="spacer"></span>
+      <button class="btn" id="fCancel">Cancel</button>
+      <button class="btn primary" id="fSave">Save</button>
+    </div>
+  </div>
 </div>
 
 <script>
 /* ============================================================
-   1) CLOUD SYNC SETUP
-   Paste your Google Apps Script Web App URL between the quotes
-   below (it looks like https://script.google.com/macros/s/AKfy.../exec).
-   Leave it blank to run in local-only mode on this device.
+   CLOUD SYNC: paste your Google Apps Script Web App URL (ends in /exec).
+   Leave blank to run local-only on this device.
    ============================================================ */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwd567zY2xZTBNf3MkZmsBcuow06FUf3A-6pQ1Dwu3U8uqO6o5PudIw-B_cu2dCPhzn/exec";
 
-/* ---- items: [id, label, optional note] grouped by store-flow section ---- */
-const DATA = [
+/* ---- seed list, used only the first time (before anything is saved) ----
+   each item: [id, label, optional note], grouped by store-flow section ---- */
+const SEED = [
   ["Produce", [
     ["greens","Mixed greens / butter lettuce / arugula","Just one, small container — we like them fresh"],
     ["broccoli","Broccoli or cauliflower"],
@@ -182,62 +223,102 @@ const DATA = [
   ]]
 ];
 
-/* ---- state: { id: 0|1|2 }  (0 have, 1 want, 2 unsure). Missing = 2 (unsure). ---- */
-let state = {};
+/* ---- model = { items:[{id,sec,label,note}], status:{id:0|1} }
+   status: 0 = have / don't want, 1 = want. Missing = unsure (2). ---- */
+let model = { items: [], status: {} };
 let filter = "all";
 let dirty = false;          // local changes not yet confirmed saved
 let saveTimer = null;
+let editingId = null;
 
 const $ = s => document.querySelector(s);
 const dot = $("#dot"), syncLabel = $("#syncLabel");
 
-function getBackend(){
-  return BACKEND_URL || localStorage.getItem("shop_backend") || "";
+function getBackend(){ return BACKEND_URL || localStorage.getItem("shop_backend") || ""; }
+function uid(){ return "u" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function val(id){ return (id in model.status) ? model.status[id] : 2; }
+
+function seedModel(){
+  const items = [];
+  SEED.forEach(([sec, list]) => list.forEach(([id,label,note]) =>
+    items.push({ id, sec, label, note: note || "" })));
+  return { items, status: {} };
 }
-function val(id){ return (id in state) ? state[id] : 2; }
+
+/* Accept either the new {items,status} shape or the old flat {id:0|1} status map. */
+function normalize(raw){
+  if(!raw || typeof raw !== "object") return null;
+  if(Array.isArray(raw.items)) {                       // new format
+    return { items: raw.items, status: raw.status || {} };
+  }
+  if(Object.keys(raw).length){                         // old format: just statuses
+    const base = seedModel();
+    base.status = raw;
+    return base;
+  }
+  return null;
+}
+
+function sections(){
+  const seen = [];
+  model.items.forEach(it => { if(!seen.includes(it.sec)) seen.push(it.sec); });
+  return seen;
+}
 
 /* ---------- rendering ---------- */
 function render(){
   const list = $("#list");
   list.innerHTML = "";
   let shown = 0;
-  DATA.forEach(([sec, items])=>{
-    const visible = items.filter(it => filter==="all" ? true : String(val(it[0]))===filter);
+  sections().forEach(sec=>{
+    const all = model.items.filter(it => it.sec === sec);
+    const visible = all.filter(it => filter==="all" ? true : String(val(it.id))===filter);
     if(!visible.length) return;
     shown += visible.length;
     const s = document.createElement("section");
-    const wantCount = items.filter(it=>val(it[0])===1).length;
-    s.innerHTML = `<div class="sec-h"><h2>${sec}</h2>`+
-      `<span class="cnt">${wantCount?wantCount+" to buy":items.length+" items"}</span></div>`;
+    const wantCount = all.filter(it=>val(it.id)===1).length;
+    s.innerHTML = `<div class="sec-h"><h2></h2><span class="cnt"></span></div>`;
+    s.querySelector("h2").textContent = sec;
+    s.querySelector(".cnt").textContent = wantCount ? wantCount+" to buy" : all.length+" items";
     const ul = document.createElement("ul");
-    visible.forEach(([id,label,note])=>{
+    visible.forEach(it=>{
       const li = document.createElement("li");
-      li.dataset.state = val(id);
-      li.innerHTML =
-        `<span class="name">${label}${note?`<span class="note">${note}</span>`:""}</span>`+
-        `<span class="seg" role="radiogroup" aria-label="${label}">`+
-          seg(id,0)+seg(id,1)+seg(id,2)+
-        `</span>`;
+      li.dataset.state = val(it.id);
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = it.label;
+      if(it.note){ const n=document.createElement("span"); n.className="note"; n.textContent=it.note; name.appendChild(n); }
+      const seg = document.createElement("span");
+      seg.className = "seg"; seg.setAttribute("role","radiogroup");
+      [0,1,2].forEach(v=>{
+        const b=document.createElement("button");
+        b.dataset.id=it.id; b.dataset.v=v;
+        if(val(it.id)===v) b.classList.add("sel");
+        seg.appendChild(b);
+      });
+      const ed = document.createElement("button");
+      ed.className = "edit"; ed.dataset.edit = it.id; ed.title = "Edit"; ed.textContent = "✎";
+      li.append(name, seg, ed);
       ul.appendChild(li);
     });
     s.appendChild(ul);
     list.appendChild(s);
   });
-  if(!shown){
-    list.innerHTML = `<p class="empty">Nothing here yet. Try the “All” filter.</p>`;
+  if(!model.items.length){
+    list.innerHTML = `<p class="empty">No items yet — tap ＋ Add to start your list.</p>`;
+  } else if(!shown){
+    list.innerHTML = `<p class="empty">Nothing matches this filter. Try “All”.</p>`;
   }
-}
-function seg(id,v){
-  const sel = val(id)===v ? " sel" : "";
-  return `<button class="${sel}" data-id="${id}" data-v="${v}" aria-checked="${val(id)===v}"></button>`;
 }
 
 /* ---------- interaction ---------- */
 $("#list").addEventListener("click", e=>{
+  const ed = e.target.closest("[data-edit]");
+  if(ed){ openEditor(model.items.find(it=>it.id===ed.dataset.edit)); return; }
   const b = e.target.closest(".seg button");
   if(!b) return;
   const id = b.dataset.id, v = +b.dataset.v;
-  if(v===2) delete state[id]; else state[id]=v;   // keep payload tiny: don't store unsure
+  if(v===2) delete model.status[id]; else model.status[id]=v;
   render();
   queueSave();
 });
@@ -245,40 +326,93 @@ $("#list").addEventListener("click", e=>{
 document.querySelectorAll(".filters button").forEach(b=>{
   b.addEventListener("click",()=>{
     document.querySelectorAll(".filters button").forEach(x=>x.classList.remove("on"));
-    b.classList.add("on");
-    filter = b.dataset.f;
-    render();
+    b.classList.add("on"); filter = b.dataset.f; render();
   });
 });
 
 $("#resetBtn").addEventListener("click", ()=>{
-  if(!confirm("Reset every item back to “Unsure” for everyone?")) return;
-  state = {};
-  render();
-  queueSave(true);
+  if(!confirm("Reset every item's status back to “Unsure”? (Items themselves are kept.)")) return;
+  model.status = {}; render(); queueSave(true);
 });
+
+$("#addBtn").addEventListener("click", ()=> openEditor(null));
 
 $("#setupLink").addEventListener("click", ()=>{
   const u = prompt("Paste your Google Apps Script Web App URL (ends in /exec):", getBackend());
-  if(u && /\/exec\b/.test(u)){
-    localStorage.setItem("shop_backend", u.trim());
-    location.reload();
-  } else if(u){
-    alert("That doesn't look like a /exec URL.");
+  if(u && /\/exec\b/.test(u)){ localStorage.setItem("shop_backend", u.trim()); location.reload(); }
+  else if(u){ alert("That doesn't look like a /exec URL."); }
+});
+
+/* ---------- editor dialog ---------- */
+const overlay=$("#overlay"), fLabel=$("#fLabel"), fNote=$("#fNote"),
+      fSec=$("#fSec"), fNewSec=$("#fNewSec"), fDelete=$("#fDelete");
+
+function buildSectionOptions(selected){
+  const secs = sections();
+  if(secs.length===0) secs.push("Other");
+  fSec.innerHTML = "";
+  secs.forEach(s=>{ const o=document.createElement("option"); o.value=s; o.textContent=s; fSec.appendChild(o); });
+  const o=document.createElement("option"); o.value="__new__"; o.textContent="＋ New section…"; fSec.appendChild(o);
+  fSec.value = selected && secs.includes(selected) ? selected : secs[0];
+  toggleNewSec();
+}
+function toggleNewSec(){
+  const isNew = fSec.value==="__new__";
+  fNewSec.hidden = !isNew;
+  if(isNew){ fNewSec.value=""; fNewSec.focus(); }
+}
+fSec.addEventListener("change", toggleNewSec);
+
+function openEditor(item){
+  editingId = item ? item.id : null;
+  $("#dlgTitle").textContent = item ? "Edit item" : "Add item";
+  fLabel.value = item ? item.label : "";
+  fNote.value  = item ? (item.note||"") : "";
+  buildSectionOptions(item ? item.sec : sections()[0]);
+  fDelete.hidden = !item;
+  overlay.hidden = false;
+  setTimeout(()=>fLabel.focus(), 30);
+}
+function closeEditor(){ overlay.hidden = true; editingId = null; }
+
+$("#fCancel").addEventListener("click", closeEditor);
+overlay.addEventListener("click", e=>{ if(e.target===overlay) closeEditor(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !overlay.hidden) closeEditor(); });
+
+$("#fSave").addEventListener("click", ()=>{
+  const label = fLabel.value.trim();
+  if(!label){ fLabel.focus(); return; }
+  let sec = fSec.value==="__new__" ? fNewSec.value.trim() : fSec.value;
+  if(!sec){ fNewSec.focus(); return; }
+  const note = fNote.value.trim();
+  if(editingId){
+    const it = model.items.find(x=>x.id===editingId);
+    if(it){ it.label=label; it.note=note; it.sec=sec; }
+  } else {
+    model.items.push({ id: uid(), sec, label, note });
   }
+  closeEditor(); render(); queueSave(true);
+});
+
+$("#fDelete").addEventListener("click", ()=>{
+  if(!editingId) return;
+  const it = model.items.find(x=>x.id===editingId);
+  if(!confirm(`Delete “${it?it.label:"this item"}” for everyone?`)) return;
+  model.items = model.items.filter(x=>x.id!==editingId);
+  delete model.status[editingId];
+  closeEditor(); render(); queueSave(true);
 });
 
 /* ---------- sync ---------- */
 function setSync(cls,label){ dot.className="dot "+(cls||""); syncLabel.textContent=label; }
-
-function loadLocal(){ try{ state = JSON.parse(localStorage.getItem("shop_state")||"{}"); }catch(_){ state={}; } }
-function saveLocal(){ localStorage.setItem("shop_state", JSON.stringify(state)); }
+function loadLocal(){
+  try{ const m=JSON.parse(localStorage.getItem("shop_model")||"null"); if(m&&Array.isArray(m.items)) model=m; }catch(_){}
+}
+function saveLocal(){ localStorage.setItem("shop_model", JSON.stringify(model)); }
 
 function queueSave(immediate){
-  saveLocal();
-  dirty = true;
-  const url = getBackend();
-  if(!url){ return; }
+  saveLocal(); dirty = true;
+  if(!getBackend()) return;
   setSync("busy","Saving…");
   clearTimeout(saveTimer);
   saveTimer = setTimeout(pushState, immediate ? 0 : 600);
@@ -288,39 +422,38 @@ async function pushState(){
   const url = getBackend();
   if(!url) return;
   try{
-    const r = await fetch(url + "?action=save&state=" + encodeURIComponent(JSON.stringify(state)),
-                          {method:"GET"});
+    const r = await fetch(url + "?action=save&state=" + encodeURIComponent(JSON.stringify(model)), {method:"GET"});
     if(!r.ok) throw 0;
-    dirty = false;
-    setSync("ok","Synced");
-  }catch(_){
-    setSync("off","Offline — saved locally");
-  }
+    dirty = false; setSync("ok","Synced");
+  }catch(_){ setSync("off","Offline — saved locally"); }
 }
 
 async function pullState(){
   const url = getBackend();
-  if(!url){ setSync("","Local only"); $("#setupBanner").classList.add("show"); return; }
+  if(!url){ setSync("","Local only"); $("#setupBanner").classList.add("show");
+            if(!model.items.length){ model=seedModel(); saveLocal(); render(); } return; }
   $("#setupBanner").classList.remove("show");
   try{
     const r = await fetch(url + "?t=" + Date.now(), {method:"GET"});
     const j = await r.json();
-    if(!dirty && j && j.state){
-      state = j.state;
-      saveLocal();
-      render();
+    const incoming = normalize(j && j.state);
+    if(!dirty){
+      if(incoming){ model = incoming; saveLocal(); render(); }
+      else if(!model.items.length){ model = seedModel(); saveLocal(); render(); queueSave(true); }
     }
     setSync(dirty?"busy":"ok", dirty?"Saving…":"Synced");
   }catch(_){
     setSync("off","Offline — using local copy");
+    if(!model.items.length){ model=seedModel(); render(); }
   }
 }
 
 /* ---------- boot ---------- */
 loadLocal();
+if(!model.items.length) model = seedModel();
 render();
 pullState();
-setInterval(pullState, 20000);                 // pick up others' changes
+setInterval(pullState, 20000);
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) pullState(); });
 window.addEventListener("focus", pullState);
 </script>
