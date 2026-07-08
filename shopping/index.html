@@ -418,12 +418,28 @@ function queueSave(immediate){
   saveTimer = setTimeout(pushState, immediate ? 0 : 600);
 }
 
+/* Reads use JSONP (a <script> tag) to sidestep Apps Script's lack of CORS. */
+function jsonp(qs){
+  return new Promise((resolve,reject)=>{
+    const url = getBackend(); if(!url){ reject(new Error("no backend")); return; }
+    const cb = "__scb" + Math.random().toString(36).slice(2);
+    const s = document.createElement("script");
+    const t = setTimeout(()=>{ cleanup(); reject(new Error("timeout")); }, 12000);
+    function cleanup(){ clearTimeout(t); try{ delete window[cb]; }catch(_){ window[cb]=undefined; } s.remove(); }
+    window[cb] = d => { cleanup(); resolve(d); };
+    s.onerror = ()=>{ cleanup(); reject(new Error("script error")); };
+    s.src = url + (url.includes("?")?"&":"?") + qs + "&callback=" + cb + "&t=" + Date.now();
+    document.head.appendChild(s);
+  });
+}
+
+/* Writes use a no-cors POST: the request reaches the script and saves;
+   we just can't read the reply, which is fine. */
 async function pushState(){
   const url = getBackend();
   if(!url) return;
   try{
-    const r = await fetch(url + "?action=save&state=" + encodeURIComponent(JSON.stringify(model)), {method:"GET"});
-    if(!r.ok) throw 0;
+    await fetch(url, { method:"POST", mode:"no-cors", body: JSON.stringify(model) });
     dirty = false; setSync("ok","Synced");
   }catch(_){ setSync("off","Offline — saved locally"); }
 }
@@ -434,8 +450,7 @@ async function pullState(){
             if(!model.items.length){ model=seedModel(); saveLocal(); render(); } return; }
   $("#setupBanner").classList.remove("show");
   try{
-    const r = await fetch(url + "?t=" + Date.now(), {method:"GET"});
-    const j = await r.json();
+    const j = await jsonp("action=load");
     const incoming = normalize(j && j.state);
     if(!dirty){
       if(incoming){ model = incoming; saveLocal(); render(); }
