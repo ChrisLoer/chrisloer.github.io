@@ -54,7 +54,7 @@
     cursor:pointer;position:relative;border-left:1px solid var(--line)}
   .seg button:first-child{border-left:0}
   .seg button::after{font-size:15px;line-height:1}
-  .seg button[data-v="0"]::after{content:"✓"}
+  .seg button[data-v="0"]::after{content:"−"}
   .seg button[data-v="1"]::after{content:"+"}
   .seg button[data-v="2"]::after{content:"?"}
   .seg button[data-v="0"].sel{background:var(--have-bg);color:var(--have)}
@@ -96,7 +96,7 @@
     <h1>🛒 Family Shopping List</h1>
     <p class="sub">Tap a status for each item. Shared & synced across everyone with this page.</p>
     <div class="legend">
-      <span><i class="chip h">✓</i> Have / don't want</span>
+      <span><i class="chip h">−</i> Have / don't want</span>
       <span><i class="chip w">+</i> Want (need to buy)</span>
       <span><i class="chip u">?</i> Unsure</span>
     </div>
