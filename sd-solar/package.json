@@ -1,6 +1,6 @@
 {
     "dependencies": {
-        "async": "^2.4.1",
+        "async": "^2.6.4",
         "csv-parse": "^1.2.0",
         "geojson": "^0.4.1",
         "jsonfile": "^3.0.0",
