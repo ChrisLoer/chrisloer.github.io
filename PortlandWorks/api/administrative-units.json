@@ -1,0 +1,102 @@
+{
+  "lastUpdated": "2025-06-30",
+  "dataSource": "Official Adopted Budgets (City of Portland, Multnomah County, Metro, TriMet, PPS)",
+  "dataSourceUrl": "https://www.tsccmultco.com/",
+  "units": [
+    {
+      "id": "portland-city",
+      "name": "City of Portland",
+      "shortName": "City of Portland",
+      "type": "Municipal Government",
+      "state": "Oregon",
+      "population": 635000,
+      "headcount": 7386,
+      "totalBudget": 8045475348,
+      "year": 2025,
+      "badgeColor": "bg-blue-600",
+      "notes": "Portland’s newly reformed municipal government under a 12-member council and professional City Administrator. Responsible for police, fire, drinking water, sewers, parks, and city roads.",
+      "references": [
+        {
+          "title": "City of Portland Adopted Budget",
+          "url": "https://www.portland.gov/cbo/2024-2025-budget"
+        }
+      ]
+    },
+    {
+      "id": "multnomah-county",
+      "name": "Multnomah County",
+      "shortName": "Multnomah County",
+      "type": "County Government",
+      "state": "Oregon",
+      "population": 815000,
+      "headcount": 5969,
+      "totalBudget": 3320000000,
+      "year": 2025,
+      "badgeColor": "bg-indigo-600",
+      "notes": "Oregon’s most populous county. Administers social safety nets, public health clinics, mental health crisis response, the library system, jails, juvenile justice, and Willamette River bridges.",
+      "references": [
+        {
+          "title": "Multnomah County Adopted Budget",
+          "url": "https://www.multco.us/budget"
+        }
+      ]
+    },
+    {
+      "id": "portland-metro",
+      "name": "Metro Regional Government",
+      "shortName": "Metro",
+      "type": "Regional Government",
+      "state": "Oregon",
+      "population": 1800000,
+      "headcount": 1100,
+      "totalBudget": 2094572285,
+      "year": 2025,
+      "badgeColor": "bg-teal-600",
+      "notes": "The nation’s only directly elected regional government, serving 1.8M residents across Clackamas, Multnomah, and Washington counties. Manages regional land use, supportive housing, solid waste, the Oregon Zoo, and regional parks.",
+      "references": [
+        {
+          "title": "Metro Adopted Budget & TSCC Review",
+          "url": "https://www.oregonmetro.gov/how-metro-works/budget"
+        }
+      ]
+    },
+    {
+      "id": "trimet-district",
+      "name": "TriMet Transit District",
+      "shortName": "TriMet",
+      "type": "Regional Transit Agency",
+      "state": "Oregon",
+      "population": 1800000,
+      "headcount": 3300,
+      "totalBudget": 1838291228,
+      "year": 2025,
+      "badgeColor": "bg-emerald-600",
+      "notes": "Tri-County Metropolitan Transportation District of Oregon. Provides bus, MAX light rail, WES commuter rail, and LIFT paratransit service across 533 square miles of the Portland metro area.",
+      "references": [
+        {
+          "title": "TriMet Adopted Budget",
+          "url": "https://trimet.org/about/budget.htm"
+        }
+      ]
+    },
+    {
+      "id": "pps-district",
+      "name": "Portland Public Schools",
+      "shortName": "PPS",
+      "type": "School District",
+      "state": "Oregon",
+      "population": 600000,
+      "headcount": 5995,
+      "totalBudget": 2388852000,
+      "year": 2025,
+      "badgeColor": "bg-amber-600",
+      "notes": "Oregon’s largest PK-12 urban school district, serving approximately 44,000 students across 81 school campuses. Funded primarily through State School Fund formula allocations and local property tax levies/bonds.",
+      "references": [
+        {
+          "title": "PPS Adopted Budget",
+          "url": "https://www.pps.net/Page/208"
+        }
+      ]
+    }
+  ]
+}
