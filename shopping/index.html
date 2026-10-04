@@ -22,7 +22,30 @@
     padding:8px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px;}
   h1{font-size:20px;margin:0 0 2px;letter-spacing:-.01em}
   .sub{font-size:12.5px;color:var(--muted);margin:0}
-  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .search-wrap{position:relative;display:flex;align-items:center;margin-top:10px;width:100%}
+  .search-input{width:100%;font-size:16px;line-height:1.3;padding:9px 34px 9px 34px;
+    border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);
+    -webkit-appearance:none;appearance:none;box-shadow:0 1px 2px rgba(0,0,0,.03);
+    transition:border-color .15s ease,box-shadow .15s ease}
+  .search-input::-webkit-search-decoration,
+  .search-input::-webkit-search-cancel-button,
+  .search-input::-webkit-search-results-button,
+  .search-input::-webkit-search-results-decoration{display:none;-webkit-appearance:none}
+  .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,111,79,.15)}
+  .search-input::placeholder{color:var(--muted);opacity:.85}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+  .search-clear{position:absolute;right:3px;top:50%;transform:translateY(-50%);width:32px;height:32px;
+    border:0;background:transparent;color:var(--muted);border-radius:50%;display:flex;align-items:center;
+    justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+  .search-clear:active{background:var(--unsure-bg);color:var(--ink)}
+  .search-clear[hidden]{display:none !important}
+  @media(max-width:480px){
+    .wrap{padding:12px 12px 80px}
+    .toolbar{gap:6px}
+    .filters button{padding:6px 8px;font-size:12px}
+    .btn{padding:7px 10px;font-size:12px}
+  }
   .filters{display:flex;gap:6px;background:var(--unsure-bg);padding:3px;border-radius:10px}
   .filters button{border:0;background:transparent;color:var(--muted);font-size:12.5px;
     font-weight:600;padding:6px 10px;border-radius:8px;cursor:pointer}
@@ -100,6 +123,19 @@
       <span><i class="chip w">+</i> Want (need to buy)</span>
       <span><i class="chip u">?</i> Unsure</span>
     </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="search" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search items">
+      <button type="button" id="searchClear" class="search-clear" aria-label="Clear search" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
     <div class="toolbar">
       <div class="filters">
         <button data-f="all" class="on">All</button>
@@ -153,70 +189,70 @@ const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwd567zY2xZTBNf3MkZ
    each item: [id, label, optional note], grouped by store-flow section ---- */
 const SEED = [
   ["Produce", [
-    ["greens","Mixed greens / butter lettuce / arugula","Just one, small container — we like them fresh"],
-    ["broccoli","Broccoli or cauliflower"],
+    ["apples","Apples — gala / tastiest, 1 bag"],
     ["avocado","Avocados ×8"],
     ["carrots","Baby carrots ×1"],
-    ["snappeas","Snap peas"],
-    ["mushroom","Button mushrooms ×5"],
-    ["squash","Squash"],
-    ["cucumber","Persian cucumbers — 2-pack"],
-    ["tomatoes_cherry","Cherry / small tomatoes"],
     ["bananas","Bananas — greenish"],
+    ["broccoli","Broccoli or cauliflower"],
+    ["mushroom","Button mushrooms ×5"],
+    ["tomatoes_cherry","Cherry / small tomatoes"],
     ["cuties","“Cuties” oranges"],
-    ["oranges","Oranges"],
-    ["apples","Apples — gala / tastiest, 1 bag"],
-    ["blueberries","Organic blueberries"],
-    ["melon","Melon or honey mango","Whichever's cheapest"],
+    ["garlic","Head of garlic"],
     ["lemons","Lemons ×3"],
     ["limes","Limes ×4"],
-    ["potatoes","Potatoes"],
+    ["melon","Melon or honey mango","Whichever's cheapest"],
+    ["greens","Mixed greens / butter lettuce / arugula","Just one, small container — we like them fresh"],
     ["onions","Onions"],
-    ["sweetpotato","Sweet potatoes"],
-    ["garlic","Head of garlic"]
+    ["oranges","Oranges"],
+    ["blueberries","Organic blueberries"],
+    ["cucumber","Persian cucumbers — 2-pack"],
+    ["potatoes","Potatoes"],
+    ["snappeas","Snap peas"],
+    ["squash","Squash"],
+    ["sweetpotato","Sweet potatoes"]
   ]],
   ["Pantry & Dry Goods", [
-    ["tortillas_flour","Flour tortillas — large taco size","We go through a lot"],
-    ["tortillas_corn","Corn tortillas"],
-    ["oats","Quick-cooking oats (bulk)","Refill the oat jar"],
-    ["lentils","Brown lentils (bulk)"],
     ["rice","Basmati rice, long grain — 10 lb"],
-    ["pasta","Pasta — assorted","Kids like bow tie"],
-    ["pasta_gf","Gluten-free pasta","Bean/legume based"],
-    ["beans_black","Black beans (cans) ×3"],
-    ["beans_kidney","Kidney beans (cans) ×3"],
-    ["beans_garbanzo","Garbanzo beans (cans) ×3"],
-    ["beans_northern","Northern beans (cans) ×2"],
-    ["tomatoes_canned","Canned whole tomatoes (28 oz)"],
-    ["tomato_paste","Tomato paste"],
-    ["garlic_powder","Garlic powder (bulk)"],
-    ["raisins","Golden raisins"],
-    ["cashews","Cashews (bulk)"],
-    ["almonds","Sliced almonds — 2 lb"],
-    ["walnuts","Walnuts"],
-    ["pb","Peanut butter (natural)"],
-    ["honey","Honey"],
-    ["seaweed","Seaweed snacks ×12","Kids"],
     ["jerky","Beef jerky","Kids"],
-    ["goldfish","Goldfish","Kids"]
+    ["beans_black","Black beans (cans) ×3"],
+    ["lentils","Brown lentils (bulk)"],
+    ["tomatoes_canned","Canned whole tomatoes (28 oz)"],
+    ["cashews","Cashews (bulk)"],
+    ["tortillas_corn","Corn tortillas"],
+    ["tortillas_flour","Flour tortillas — large taco size","We go through a lot"],
+    ["beans_garbanzo","Garbanzo beans (cans) ×3"],
+    ["garlic_powder","Garlic powder (bulk)"],
+    ["pasta_gf","Gluten-free pasta","Bean/legume based"],
+    ["raisins","Golden raisins"],
+    ["goldfish","Goldfish","Kids"],
+    ["honey","Honey"],
+    ["beans_kidney","Kidney beans (cans) ×3"],
+    ["beans_northern","Northern beans (cans) ×2"],
+    ["pasta","Pasta — assorted","Kids like bow tie"],
+    ["pb","Peanut butter (natural)"],
+    ["oats","Quick-cooking oats (bulk)","Refill the oat jar"],
+    ["seaweed","Seaweed snacks ×12","Kids"],
+    ["almonds","Sliced almonds — 2 lb"],
+    ["tomato_paste","Tomato paste"],
+    ["walnuts","Walnuts"]
   ]],
   ["Dairy & Refrigerated", [
-    ["yogurt","Full-fat Greek yogurt","Fage preferred — or a gallon of whole milk to make more"],
-    ["altmilk","Hemp / soy / flax milk"],
-    ["halfhalf","Half-and-half (quart)"],
-    ["eggs","Free-range eggs (1–2 dozen)"],
-    ["creamcheese","Cream cheese"],
-    ["goatcheese","Goat cheese"],
-    ["shredded","Shredded cheese","e.g. “Mexican”"],
-    ["jack","Monterey Jack block (2 lb)"],
     ["cottage","Cottage cheese","Nancy's, or Daisy"],
+    ["creamcheese","Cream cheese"],
+    ["eggs","Free-range eggs (1–2 dozen)"],
+    ["yogurt","Full-fat Greek yogurt","Fage preferred — or a gallon of whole milk to make more"],
+    ["goatcheese","Goat cheese"],
+    ["halfhalf","Half-and-half (quart)"],
+    ["altmilk","Hemp / soy / flax milk"],
+    ["jack","Monterey Jack block (2 lb)"],
+    ["shredded","Shredded cheese","e.g. “Mexican”"],
     ["stringcheese","String cheese, full-fat","Kids' snack"]
   ]],
   ["Meat & Poultry", [
+    ["chicken","Chicken thighs or drumsticks"],
     ["groundbeef","Ground beef"],
     ["stewbeef","Stew beef (cheap) — 3 lb","Doesn't have to be cut"],
-    ["salmon","Wild-caught salmon — 5 lb","In addition to the meal salmon"],
-    ["chicken","Chicken thighs or drumsticks"]
+    ["salmon","Wild-caught salmon — 5 lb","In addition to the meal salmon"]
   ]],
   ["Frozen", [
     ["edamame","Frozen edamame","Unshelled preferred, shelled OK"]
@@ -233,6 +269,39 @@ let editingId = null;
 
 const $ = s => document.querySelector(s);
 const dot = $("#dot"), syncLabel = $("#syncLabel");
+const searchInput = $("#searchInput"), searchClear = $("#searchClear");
+
+function sortKey(s){
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/^[^a-zA-Z0-9]+/, "")
+    .trim();
+}
+
+function compareItems(a, b){
+  const ka = sortKey(a.label);
+  const kb = sortKey(b.label);
+  return ka.localeCompare(kb, undefined, { numeric: true, sensitivity: "base" }) ||
+         a.label.localeCompare(b.label) ||
+         a.id.localeCompare(b.id);
+}
+
+function normStr(str){
+  return (str || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function matchItem(it, query){
+  if(!query) return true;
+  const q = normStr(query).trim();
+  if(!q) return true;
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const haystack = normStr((it.label || "") + " " + (it.note || "") + " " + (it.sec || ""));
+  return tokens.every(tok => haystack.includes(tok));
+}
 
 function getBackend(){ return BACKEND_URL || localStorage.getItem("shop_backend") || ""; }
 function uid(){ return "u" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -270,16 +339,26 @@ function render(){
   const list = $("#list");
   list.innerHTML = "";
   let shown = 0;
+  const q = searchInput ? searchInput.value : "";
   sections().forEach(sec=>{
     const all = model.items.filter(it => it.sec === sec);
-    const visible = all.filter(it => filter==="all" ? true : String(val(it.id))===filter);
+    all.sort(compareItems);
+    const visible = all.filter(it => {
+      const matchesFilter = filter==="all" ? true : String(val(it.id))===filter;
+      const matchesSearch = matchItem(it, q);
+      return matchesFilter && matchesSearch;
+    });
     if(!visible.length) return;
     shown += visible.length;
     const s = document.createElement("section");
     const wantCount = all.filter(it=>val(it.id)===1).length;
     s.innerHTML = `<div class="sec-h"><h2></h2><span class="cnt"></span></div>`;
     s.querySelector("h2").textContent = sec;
-    s.querySelector(".cnt").textContent = wantCount ? wantCount+" to buy" : all.length+" items";
+    if(q.trim()){
+      s.querySelector(".cnt").textContent = visible.length + (visible.length === 1 ? " match" : " matches");
+    } else {
+      s.querySelector(".cnt").textContent = wantCount ? wantCount+" to buy" : all.length+" items";
+    }
     const ul = document.createElement("ul");
     visible.forEach(it=>{
       const li = document.createElement("li");
@@ -307,8 +386,60 @@ function render(){
   if(!model.items.length){
     list.innerHTML = `<p class="empty">No items yet — tap ＋ Add to start your list.</p>`;
   } else if(!shown){
-    list.innerHTML = `<p class="empty">Nothing matches this filter. Try “All”.</p>`;
+    if(q.trim()){
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = `No items found matching “${q.trim()}”. `;
+      p.appendChild(document.createElement("br"));
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "btn";
+      clearBtn.style.marginTop = "10px";
+      clearBtn.textContent = "Clear search";
+      clearBtn.onclick = () => {
+        searchInput.value = "";
+        updateClearBtn();
+        render();
+        searchInput.focus();
+      };
+      p.appendChild(clearBtn);
+      list.appendChild(p);
+    } else {
+      list.innerHTML = `<p class="empty">Nothing matches this filter. Try “All”.</p>`;
+    }
   }
+}
+
+function updateClearBtn(){
+  if(searchClear) searchClear.hidden = !searchInput.value;
+}
+
+if(searchInput){
+  searchInput.addEventListener("input", () => {
+    updateClearBtn();
+    render();
+  });
+  searchInput.addEventListener("keydown", e => {
+    if(e.key === "Escape"){
+      if(searchInput.value){
+        searchInput.value = "";
+        updateClearBtn();
+        render();
+      }
+      searchInput.blur();
+    } else if(e.key === "Enter"){
+      searchInput.blur();
+    }
+  });
+}
+
+if(searchClear){
+  searchClear.addEventListener("click", () => {
+    const wasFocused = (document.activeElement === searchInput);
+    searchInput.value = "";
+    updateClearBtn();
+    render();
+    if(wasFocused) searchInput.focus();
+  });
 }
 
 /* ---------- interaction ---------- */
