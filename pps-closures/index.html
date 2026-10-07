@@ -109,11 +109,19 @@ select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var
 .badge { position: absolute; left: 10px; top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px; font-size: 12.5px; font-weight: 600; max-width: calc(100% - 70px); }
 .badge.alt { border-color: var(--accent); color: var(--accent); }
 .vs { color: var(--muted); font-family: var(--mono); font-size: 11.5px; font-weight: 400; }
+.felt-mark { display: inline-block; vertical-align: middle; color: currentColor; }
+.made { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-2); text-decoration: none; }
+.made:hover, .made:focus-visible { color: #f33f75; }
+.mapcredit { position: absolute; right: 8px; bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--muted); }
+.mapcredit .made { background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line); border-radius: 4px; padding: 3px 7px; font-size: 11px; font-weight: 600; color: var(--ink); }
+.mapcredit .made:hover { color: #f33f75; border-color: #f33f75; }
+.eyebrow .made { color: var(--muted); text-transform: none; letter-spacing: 0; }
+.eyebrow .made:hover { color: #f33f75; }
+footer .made { font-weight: 600; color: var(--ink); }
 .tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.12); max-width: 260px; z-index: 3; }
 .tip b { font-weight: 650; }
 .tip table { border-collapse: collapse; margin-top: 4px; }
 .tip td { padding: 1px 6px 1px 0; font-family: var(--mono); font-size: 11.5px; }
-.attrib { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--muted); }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; align-self: start; }
 .panel .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -195,23 +203,25 @@ details td, details th { padding: 4px 10px 4px 0; border-bottom: 1px solid var(-
 code { font-family: var(--mono); font-size: 0.9em; }
 footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
 @media (max-width: 600px) {
+  .mapcredit .osm { display: none; }
+  .legend { max-width: calc(100% - 110px); }
   .mapbox { height: 62vh; min-height: 360px; }
   .cmpwrap { height: 58vh; min-height: 340px; }
   .legend { font-size: 11px; padding: 6px 8px; left: 6px; bottom: 6px; }
   .legend .sw, .legend .lbls span { width: 22px; }
   .legend .lbls { font-size: 9.5px; }
   .legend .keys { gap: 8px; margin-top: 4px; }
-  .attrib { display: none; }
-  .badge { font-size: 11.5px; }
+    .badge { font-size: 11.5px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="felt-logo" viewBox="0 0 234 131"><path d="M0 128.089C2.72474 126.788 5.05047 124.795 6.73858 122.312C8.52392 119.744 9.41679 116.213 9.41721 111.718V25.0392C9.41721 21.1871 8.63239 17.8164 7.06275 14.9271C5.53655 12.0764 3.03275 9.85673 0.000626675 8.66628V8.18463H65.2687C68.5606 8.23258 71.834 7.68868 74.9292 6.57944C77.663 5.60678 80.0576 3.88002 81.8295 1.60364H82.4791L89.2983 42.696L88.6487 43.0171C84.8986 37.6703 80.861 32.5264 76.5532 27.6074C72.4938 23.0079 68.2719 19.3162 63.8874 16.5323C59.6663 13.7981 54.7271 12.3472 49.6807 12.3589C46.3242 12.3589 43.8346 13.4289 42.2119 15.569C40.5892 17.709 39.7774 21.0798 39.7766 25.6814V60.1916H42.3499C47.761 60.1916 52.659 59.0947 57.0437 56.9009C61.4285 54.7072 65.2441 50.7747 68.4906 45.1036H68.9769V81.059H68.4906C65.134 76.1384 61.2642 72.313 56.8813 69.5828C52.5898 66.8799 47.6006 65.4586 42.5123 65.4894H39.7766V111.717C39.7766 116.212 40.6696 119.743 42.4555 122.311C44.1423 124.795 46.4681 126.789 49.1935 128.09V128.571H0V128.089Z" fill="currentColor"/><path d="M142.91 76.7477C142.91 70.0065 141.476 64.0938 138.609 59.0098C135.893 54.0881 131.882 49.9842 126.999 47.1328C122.127 44.3 116.661 42.8825 110.6 42.8804C105.265 42.8361 99.999 44.0753 95.2565 46.4912C90.4982 48.94 86.32 52.3597 82.9983 56.524C79.4421 60.9749 76.7449 66.0348 75.0414 71.4508C73.1717 77.3178 72.2409 83.4375 72.2825 89.5886C72.2825 96.4383 73.2836 102.43 75.2856 107.565C77.2892 112.704 80.022 117.038 83.4842 120.567C86.7519 123.967 90.7075 126.647 95.0932 128.434C99.6124 130.266 104.472 131.135 109.355 130.983C114.237 130.831 119.032 129.661 123.425 127.55C128.264 125.188 132.466 121.721 135.683 117.437C139.094 112.998 141.449 107.675 142.746 101.466L141.774 100.985C139.978 104.47 137.144 107.327 133.655 109.171C130.177 111.074 126.265 112.068 122.29 112.059C118.141 112.119 114.088 110.821 110.762 108.368C107.405 105.907 104.752 102.081 102.806 96.8908C101.103 92.3564 100.145 86.6586 99.9303 79.7975H142.91V76.7477ZM99.893 74.8199C99.9714 65.4411 100.644 58.6193 101.912 54.3545C103.266 49.8076 105.134 47.5337 107.514 47.5326C109.139 47.5326 110.411 48.4966 111.33 50.4244C112.25 52.3491 112.953 55.3184 113.44 59.3321C113.927 63.3459 114.171 68.5084 114.171 74.8199H99.893Z" fill="currentColor"/><path d="M234 115.41C230.663 119.889 226.471 123.678 221.661 126.565C216.791 129.506 211.109 130.977 204.615 130.978C201.148 130.999 197.715 130.288 194.548 128.892C191.511 127.587 188.898 125.476 186.999 122.793C185.102 120.118 184.154 116.908 184.155 113.163V51.5247H177.258V113.321C177.258 116.749 177.854 119.745 179.045 122.309C180.236 124.879 181.86 126.805 183.917 128.09V128.57H141.54V128.09C143.747 126.65 145.492 124.618 146.572 122.232C147.763 119.718 148.359 116.748 148.359 113.321V29.5343C148.371 26.3827 147.707 23.2643 146.411 20.3848C145.111 17.4962 143.216 15.3555 140.727 13.9629V13.4825C149.786 13.1335 158.668 10.8909 166.786 6.90239C170.846 4.86918 174.12 2.56838 176.609 0H177.258V48.6236C183.828 44.5896 189.973 39.915 195.601 34.67C202.255 28.4703 208.215 21.5821 213.381 14.124H213.866V39.1735H231.243V51.5247H213.868V107.863C213.868 110.968 214.626 113.43 216.141 115.249C217.657 117.067 219.931 117.976 222.963 117.976C224.671 117.947 226.365 117.676 227.995 117.173C229.974 116.582 231.881 115.774 233.679 114.765L234 115.41Z" fill="currentColor"/></symbol></svg>
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">Portland Public Schools · rightsizing scenarios released Oct 5, 2026</div>
+    <div class="eyebrow">Portland Public Schools · rightsizing scenarios released Oct 5, 2026 · <a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener">Made with <svg class="felt-mark" style="height:10px;width:18px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
     <h1>How much farther is school?</h1>
     <p class="lede prose">PPS has proposed closing 14 schools (Scenario A) or 11 (Scenario B). This page estimates how each closure changes the trip to school for the families who live in its attendance area, walking, biking, and by car or bus. It covers K–5 closures and the middle-school moves that come with them.</p>
   </header>
@@ -241,6 +251,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
               <div class="cmplab" id="cmpR" style="right:10px"></div>
               <div class="cmphandle" id="cmpH"></div>
               <div class="tip" id="ctip" hidden></div>
+              <div class="mapcredit"><span class="osm">Basemap © OpenStreetMap</span><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener" aria-label="Made with Felt">Made with <svg class="felt-mark" style="height:12px;width:21px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
             </div>
           </div>
           <figure class="src" id="pps-src"></figure>
@@ -257,7 +268,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
       <div class="badge" id="badge"></div>
       <div class="legend" id="legend"></div>
       <div class="tip" id="tip" hidden></div>
-      <div class="attrib">Basemap © OpenStreetMap, rendered by Felt</div>
+      <div class="mapcredit"><span class="osm">Basemap © OpenStreetMap</span><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener" aria-label="Made with Felt">Made with <svg class="felt-mark" style="height:12px;width:21px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
     </div>
     <aside class="panel" id="panel" aria-live="polite"></aside>
   </div>
@@ -390,13 +401,13 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     </details>
   </section>
 
-  <footer>Independent analysis, not affiliated with Portland Public Schools. Figures are estimates for comparing scenarios, not official projections.</footer>
+  <footer><p><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener">Made with <svg class="felt-mark" style="height:14px;width:25px" aria-hidden="true"><use href="#felt-logo"/></svg></a>. The maps, travel times and boundary tracing were produced with Felt: Felt maps and its <code>isochrone()</code> SQL function, driven by Claude through the Felt MCP server.</p><p>Independent analysis, not affiliated with Portland Public Schools. Figures are estimates for comparing scenarios, not official projections.</p></footer>
 </div>
 
 <script>
 (async function () {
-  const D = await (await fetch("data.json")).json();
-  const B = await (await fetch("boundaries.json")).json();
+  const D = await (await fetch("data.json?v=3a14a5e7a9")).json();
+  const B = await (await fetch("boundaries.json?v=97360759be")).json();
   const MODES = ["walk", "bike", "drive"];
   const MODE_LABEL = { walk: "Walk", bike: "Bike", drive: "Drive / bus" };
   const STRATS = ["pps", "pair", "capacity", "nearest", "single"];
