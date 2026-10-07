@@ -149,6 +149,8 @@ section.block { margin-top: 44px; }
 .cmplab { position: absolute; top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 4px 9px; font-size: 12.5px; font-weight: 650; pointer-events: none; }
 .cmphandle { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--ink); pointer-events: none; }
 .cmphandle::after { content: "⇆"; position: absolute; top: 50%; left: -16px; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); display: grid; place-items: center; font-size: 14px; color: var(--ink); }
+.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.chk input { accent-color: var(--accent); width: 16px; height: 16px; }
 .mapbar { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .bc { margin-top: 18px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
 .bc h2 { margin-bottom: 6px; }
@@ -247,7 +249,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     </details>
   </section>
 
-  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div></div>
+  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div><label class="chk"><input type="checkbox" id="c-weight" checked> Weight by number of students (student-minutes)</label></div>
   <div class="bench" style="margin-top:8px">
     <div class="mapbox" id="mapbox">
       <canvas id="map" aria-label="Map of travel time changes by neighborhood"></canvas>
@@ -328,7 +330,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     <details>
       <summary>Who counts as a student here</summary>
       <div>
-        <p>Children under 18 from the 2020 Census (block level, redistricting file) show where kids live inside each attendance area. Each school's 2025–26 K–5 enrollment (or grades 6–8 for middle schools), minus its immersion enrollment, is spread over its area in proportion to those children. That estimates where each school's neighborhood students live. Immersion students are not in the travel averages, because their homes can be anywhere in the city. The program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) will lengthen many of their trips too.</p>
+        <p>Where school-age children live comes from the 2020 Census Demographic and Housing Characteristics file, table P12, at the census-block level: ages 5–9 plus a fifth of ages 10–14 for K–5, and three fifths of ages 10–14 for grades 6–8. Block counts are split into the hexagons by area. Each school's 2025–26 K–5 enrollment (or grades 6–8 for middle schools), minus its immersion enrollment, is spread over its area in proportion to those children. With "Weight by number of students" on, each hexagon's opacity follows that estimate, so long trips where few students live fade out. Block-level Census counts include deliberate statistical noise for privacy, which mostly averages out at the hexagon scale. That estimates where each school's neighborhood students live. Immersion students are not in the travel averages, because their homes can be anywhere in the city. The program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) will lengthen many of their trips too.</p>
         <p>Building loads in the trade-off chart add each school's immersion students, following the program moves, to its neighborhood students. Capacity is the 2021 Long-Range Facility Plan's functional capacity. These are 2025–26 estimates; PPS's own figures use 2031–32 projections and will differ.</p>
       </div>
     </details>
@@ -354,7 +356,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
           <li><b>Labeling map areas by their text labels.</b> Labels sit at uneven offsets from school symbols and sometimes merge with street names. School building locations were used instead.</li>
           <li><b>Reading every boundary shift between open schools from the maps.</b> River and frame edges look like erased lines on one map and not the other. Only the two shifts PPS describes in writing were kept.</li>
           <li><b>The City's older open-data boundary layer.</b> It predates the 2025 Southeast changes (no Kellogg or Harriet Tubman). The current City of Portland School Boundaries service, last edited Nov 3, 2025, was used instead.</li>
-          <li><b>Census API for age detail.</b> The API now requires a key, so the bulk 2020 redistricting file was used. It gives children under 18, not school-age children specifically.</li>
+          <li><b>Census API for age detail.</b> The API now requires a key, so the bulk 2020 files were used instead: the redistricting file for children under 18, and the DHC file for ages 5–9 and 10–14. Newer American Community Survey estimates exist only for larger block groups and carry sampling error, so the 2020 block counts were kept.</li>
           <li><b>Live Felt map embeds driven by the JS SDK.</b> This page runs in a sandbox that blocks third-party frames, so the maps are drawn here from the same Felt-computed data over a Felt-rendered basemap. The Felt maps are linked below.</li>
         </ul>
       </div>
@@ -401,7 +403,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   const STRAT_LABEL = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Shortest walks within capacity", nearest: "Nearest open school", single: "Whole school to one receiver" };
   const STRAT_SHORT = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Within capacity", nearest: "Nearest school", single: "One receiver" };
   const CAP = 120;
-  const S = { tag: "A", level: "k5", mode: "walk", strat: "pps", view: "delta", sel: null, pinHex: null };
+  const S = { tag: "A", level: "k5", mode: "walk", strat: "pps", view: "delta", sel: null, pinHex: null, weight: true };
   const SN = D.schools, SI = {}, sidxOf = {}; SN.forEach((n, i) => sidxOf[n] = i);
   let hoverSel = null; D.school_info.forEach(s => SI[s.name] = s);
   const key = () => `${S.tag}_${S.strat}`;
@@ -421,6 +423,27 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   function curS(r, lvl) { return r[lvl === "k5" ? 4 : 5]; }
   function newS(r, k, lvl) { return r[13 + 8 * kidx(k) + (lvl === "k5" ? 0 : 1)]; }
   function wt(r, lvl) { return lvl === "k5" ? r[2] : r[3]; }
+  // student-minutes per hexagon: estimated neighborhood students living there x minutes
+  function minutesOf(r, k, lvl, m, view) {
+    if (view === "delta") return newS(r, k, lvl) === curS(r, lvl) ? null : afterT(r, k, lvl, m) - before(r, lvl, m);
+    return view === "after" ? afterT(r, k, lvl, m) : before(r, lvl, m);
+  }
+  function studentMinutes(r, k, lvl, m, view) { const t = minutesOf(r, k, lvl, m, view), w = wt(r, lvl); return t == null || w < 0.05 ? null : w * t; }
+  const NICE = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+  const niceUp = v => { if (v <= 1) return 1; const e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; let best = 10; NICE.forEach(n => { if (Math.abs(n - f) < Math.abs(best - f)) best = n; }); return Math.round(best * e); };
+  const WB = {};
+  function weightedBins(lvl, m, view) {
+    const id = `${lvl}_${m}_${view}`; if (WB[id]) return WB[id];
+    const v = [];
+    H.forEach(r => { (view === "before" ? [D.keys[0]] : D.keys).forEach(k => { const x = studentMinutes(r, k, lvl, m, view); if (x != null && x > 0) v.push(x); }); });
+    v.sort((a, b) => a - b);
+    const q = p => v[Math.min(v.length - 1, Math.floor(v.length * p))] || 1;
+    let b = [0.3, 0.5, 0.65, 0.78, 0.87, 0.93, 0.97, 0.99].map(p => niceUp(q(p)));
+    b = b.filter((x, i) => i === 0 || x > b[i - 1]);
+    while (b.length < 8) b.push(niceUp(b[b.length - 1] * 1.3) > b[b.length - 1] ? niceUp(b[b.length - 1] * 1.3) : b[b.length - 1] + 1);
+    return (WB[id] = b);
+  }
+  const fmtSM = v => v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k" : Math.round(v).toString();
 
   // ---------- projection ----------
   const BM = [-122.86, 45.424641, -122.55, 45.655338];
@@ -471,6 +494,14 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   function readPal() { PAL = { up: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--up-${i}`)), dn: [css("--dn-1"), css("--dn-2")], abs: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--abs-${i}`)), ink: css("--ink"), muted: css("--muted"), closed: css("--closed"), recv: css("--recv"), surface: css("--surface"), accent: css("--accent") }; }
   function colorFor(r) {
     const k = key(), lvl = S.level, m = S.mode;
+    if (S.weight) {
+      const x = studentMinutes(r, k, lvl, m, S.view); if (x == null) return null;
+      const b = weightedBins(lvl, m, S.view);
+      if (S.view === "delta" && x < 0) return x <= -b[1] ? PAL.dn[1] : PAL.dn[0];
+      if (S.view === "delta" && x === 0) return null;
+      let i = 0; while (i < b.length && x > b[i]) i++;
+      return (S.view === "delta" ? PAL.up : PAL.abs)[i];
+    }
     if (S.view === "delta") {
       if (newS(r, k, lvl) === curS(r, lvl)) return null;
       const d = afterT(r, k, lvl, m) - before(r, lvl, m), b = BINS.delta[m];
@@ -503,7 +534,8 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     for (let i = 0; i < H.length; i++) {
       const r = H[i], c = colorFor(r); if (!c) continue;
       const a = hexM[i]; ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); for (let j = 1; j < 6; j++) ctx.lineTo(px(a[2 * j]), py(a[2 * j + 1])); ctx.closePath();
-      ctx.globalAlpha = r[1] < 1 ? 0.3 : (S.view === "delta" ? 0.86 : 0.7); ctx.fillStyle = c; ctx.fill();
+      const base = S.view === "delta" ? 0.88 : 0.75;
+      ctx.globalAlpha = S.weight || r[1] >= 1 ? base : 0.3; ctx.fillStyle = c; ctx.fill();
     }
     ctx.globalAlpha = 1;
     // after boundaries
@@ -582,7 +614,9 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   function hexHTML(i) {
     const r = H[i], k = key(), lvl = S.level, c = SN[curS(r, lvl)], n = SN[newS(r, k, lvl)] || "—";
     const rows = MODES.map(m => { const a = before(r, lvl, m), b = afterT(r, k, lvl, m); return `<tr><td>${MODE_LABEL[m]}</td><td>${fmtMin(a)}</td><td>→</td><td>${fmtMin(b)}</td><td>${c !== n ? sign(b - a) : ""}</td></tr>`; }).join("");
-    return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${c === n ? `Stays at ${nice(c)}` : `${nice(c)} → <b>${nice(n)}</b>`}<table>${rows}</table><span style="color:var(--muted)">minutes · about ${Math.round(r[1])} children live here</span>`;
+    const st = wt(r, lvl), tm = minutesOf(r, k, lvl, S.mode, S.view);
+    const smLine = S.weight && tm != null && st >= 0.05 ? `<br><b>≈ ${st >= 10 ? Math.round(st) : st.toFixed(1)} students × ${sign(tm).replace("+", S.view === "delta" ? "+" : "")} min = ${fmtSM(Math.abs(st * tm))} ${S.view === "delta" ? (tm < 0 ? "fewer " : "added ") : ""}student-minutes</b> (${MODE_LABEL[S.mode].toLowerCase()})` : "";
+    return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${c === n ? `Stays at ${nice(c)}` : `${nice(c)} → <b>${nice(n)}</b>`}<table>${rows}</table><span style="color:var(--muted)">minutes · about ${st >= 1 ? Math.round(st) : st > 0.05 ? "<1" : "no"} ${lvl === "k5" ? "K–5" : "grade 6–8"} neighborhood student${Math.round(st) === 1 ? "" : "s"} live here</span>${smLine}`;
   }
   function showTip(X, Y, html) { tip.innerHTML = html; tip.hidden = false; const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(X + 14, W - tw - 6) + "px"; tip.style.top = Math.min(Y + 14, Hh - th - 6) + "px"; }
   function click(X, Y) {
@@ -605,6 +639,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   }
   const sel = document.getElementById("c-strat"); STRATS.forEach(s => { const o = document.createElement("option"); o.value = s; o.textContent = STRAT_LABEL[s]; sel.appendChild(o); });
   sel.onchange = () => { S.strat = sel.value; refresh(); };
+  document.getElementById("c-weight").onchange = e => { S.weight = e.target.checked; renderLegend(); draw(); };
   function refresh() {
     seg("c-tag", [["A", "A · 14 closures"], ["B", "B · 11 closures"]], "tag");
     seg("c-level", [["k5", "K–5"], ["ms", "Middle 6–8"]], "level");
@@ -618,9 +653,17 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     readPal();
     const m = S.mode, el = document.getElementById("legend");
     let h = "";
-    if (S.view === "delta") {
+    const ML = MODE_LABEL[m].toLowerCase().replace("drive / bus", "drive or bus"), LV = S.level === "k5" ? "K–5" : "grade 6–8";
+    if (S.weight) {
+      const b = weightedBins(S.level, m, S.view), pal = S.view === "delta" ? PAL.up : PAL.abs;
+      const t = S.view === "delta" ? `Added ${ML} student-minutes` : `${MODE_LABEL[m]} student-minutes to school, ${S.view === "after" ? "after" : "today"}`;
+      h = `<div class="t">${t}</div><div class="hint" style="margin:-3px 0 5px">${LV} students living in each hexagon (≈0.1 km²) × their minutes, one way</div><div class="row">${pal.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${fmtSM(v)}</span>`).join("")}<span>${fmtSM(b[7])}+</span></div>`;
+      let tot = 0; H.forEach(r => { const x = studentMinutes(r, key(), S.level, m, S.view); if (x != null) tot += x; });
+      h += `<div class="keys"><span>Map total: <b class="num">${Math.round(tot).toLocaleString()}</b> ${S.view === "delta" ? "added " : ""}student-minutes per school day, each way</span></div>`;
+      if (S.view === "delta") h += `<div class="keys"><span><i style="background:${PAL.dn[1]};border-radius:2px"></i>shorter</span><span>blank: school unchanged or no students</span></div>`;
+    } else if (S.view === "delta") {
       const b = BINS.delta[m];
-      h = `<div class="t">Added ${MODE_LABEL[m].toLowerCase()} time, minutes</div><div class="row">${PAL.up.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
+      h = `<div class="t">Added ${ML} time, minutes</div><div class="row">${PAL.up.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
       h += `<div class="keys"><span><i style="background:${PAL.dn[1]};border-radius:2px"></i>shorter</span><span>blank: school unchanged</span></div>`;
     } else {
       const b = BINS.abs[m];
