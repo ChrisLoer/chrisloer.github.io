@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Estimated walk, bike and drive time changes for every Portland Public Schools closure proposed in Scenarios A and B.">
+<style>[hidden]{display:none!important} img{max-width:100%}</style>
+<title>PPS Closure Commutes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Public+Sans:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: civic field report. Narrow reading column for prose, a wide map bench with a side panel, tables below. */
+:root {
+  --bg: #f4f6f4;
+  --surface: #fdfefd;
+  --ink: #17211f;
+  --ink-2: #4a5754;
+  --muted: #7d8985;
+  --line: #d8dfdc;
+  --accent: #0e5f63;
+  --accent-soft: #d6ebea;
+  --closed: #b3261e;
+  --recv: #0e5f63;
+  --up-1: #fdedd5; --up-2: #fbd3a3; --up-3: #f6b26f; --up-4: #ef8c47; --up-5: #e0652f; --up-6: #c4441f; --up-7: #9c2c19; --up-8: #6e1c18; --up-9: #43101f;
+  --dn-1: #c8ddf4; --dn-2: #5f98d9;
+  --abs-1: #e8f3f1; --abs-2: #c4e3de; --abs-3: #97cdc6; --abs-4: #69b2ad; --abs-5: #418f8f; --abs-6: #256f73; --abs-7: #145257; --abs-8: #0b383e; --abs-9: #062328;
+  --z1: #cfe3d8; --z2: #f3d9b1; --z3: #d6d1ee; --z4: #f2c9c4; --z5: #c9dff0; --z6: #e7e2b6; --z7: #d9e8c0; --z8: #ead0e4;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101514; --surface: #161c1b; --ink: #e5ece9; --ink-2: #b2bfbb; --muted: #84928e; --line: #2b3533;
+    --accent: #5cc3c1; --accent-soft: #173836; --z1: #2c4a3d; --z2: #5a4628; --z3: #3f3a5c; --z4: #5a3431; --z5: #2d4659; --z6: #4f4b2a; --z7: #3e4f2c; --z8: #523a4c; --closed: #f07167; --recv: #5cc3c1;
+    --up-1: #3d2a1c; --up-2: #5e3820; --up-3: #874723; --up-4: #b05a26; --up-5: #d3712e; --up-6: #ec8f45; --up-7: #f8b06b; --up-8: #fdd09b; --up-9: #fff0d6;
+    --dn-1: #1f3a5a; --dn-2: #4f8fd6;
+    --abs-1: #10302f; --abs-2: #144440; --abs-3: #1a5a55; --abs-4: #24756d; --abs-5: #36918a; --abs-6: #55aea5; --abs-7: #7cc8be; --abs-8: #a8dfd6; --abs-9: #d4f2ec;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101514; --surface: #161c1b; --ink: #e5ece9; --ink-2: #b2bfbb; --muted: #84928e; --line: #2b3533;
+  --accent: #5cc3c1; --accent-soft: #173836; --z1: #2c4a3d; --z2: #5a4628; --z3: #3f3a5c; --z4: #5a3431; --z5: #2d4659; --z6: #4f4b2a; --z7: #3e4f2c; --z8: #523a4c; --closed: #f07167; --recv: #5cc3c1;
+  --up-1: #3d2a1c; --up-2: #5e3820; --up-3: #874723; --up-4: #b05a26; --up-5: #d3712e; --up-6: #ec8f45; --up-7: #f8b06b; --up-8: #fdd09b; --up-9: #fff0d6;
+  --dn-1: #1f3a5a; --dn-2: #4f8fd6;
+  --abs-1: #10302f; --abs-2: #144440; --abs-3: #1a5a55; --abs-4: #24756d; --abs-5: #36918a; --abs-6: #55aea5; --abs-7: #7cc8be; --abs-8: #a8dfd6; --abs-9: #d4f2ec;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; margin: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: clamp(16px, 3vw, 32px); padding-block: 28px 64px; }
+.prose { max-width: 70ch; }
+h1, h2, h3 { font-family: var(--display); font-stretch: 85%; text-wrap: balance; margin: 0; line-height: 1.1; }
+h1 { font-size: clamp(32px, 5vw, 54px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 750; margin-bottom: 6px; }
+h3 { font-size: 18px; font-weight: 700; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.lede { font-size: 17px; color: var(--ink-2); margin-top: 14px; }
+p { margin: 0 0 12px; }
+a { color: var(--accent); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+header.top { display: grid; gap: 4px; padding-bottom: 14px; }
+
+/* key findings */
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-block: 12px 0; }
+.finding { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; }
+.finding .big { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 34px; line-height: 1; }
+.finding .big small { font-size: 16px; font-weight: 600; color: var(--ink-2); font-stretch: 100%; }
+.finding p { margin: 8px 0 0; color: var(--ink-2); font-size: 14px; }
+
+/* compare table A vs B */
+.compare { width: 100%; border-collapse: collapse; font-size: 14px; }
+.compare th, .compare td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+.compare th:first-child, .compare td:first-child { text-align: left; }
+.compare thead th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.scroll-x { overflow-x: auto; }
+
+/* controls */
+@media (max-width: 700px) { .controls { position: static !important; } }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px);
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); margin-top: 8px; }
+.ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ctl > span { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 13px; padding: 6px 11px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.seg button:focus-visible, select:focus-visible, .rank tbody tr:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); max-width: 100%; }
+
+/* map bench */
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; margin-top: 16px; }
+@media (max-width: 900px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.mapbox { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; height: min(78vh, 760px); min-height: 420px; touch-action: none; }
+#map { width: 100%; height: 100%; display: block; cursor: grab; }
+#map.dragging { cursor: grabbing; }
+.mapbtns { position: absolute; top: 10px; right: 10px; display: grid; gap: 4px; }
+.mapbtns button { width: 32px; height: 32px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 17px; cursor: pointer; line-height: 1; }
+.legend { position: absolute; left: 10px; bottom: 10px; background: color-mix(in srgb, var(--surface) 94%, transparent); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 12px; max-width: calc(100% - 20px); }
+.legend .t { font-weight: 600; margin-bottom: 5px; }
+.legend .row { display: flex; gap: 0; align-items: stretch; }
+.legend .sw { width: 28px; height: 10px; }
+.legend .lbls { display: flex; font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+.legend .lbls span { width: 28px; }
+.legend .keys { display: flex; gap: 12px; margin-top: 6px; color: var(--ink-2); flex-wrap: wrap; }
+.legend .keys i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+.badge { position: absolute; left: 10px; top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 5px 9px; font-size: 12.5px; font-weight: 600; max-width: calc(100% - 70px); }
+.badge.alt { border-color: var(--accent); color: var(--accent); }
+.vs { color: var(--muted); font-family: var(--mono); font-size: 11.5px; font-weight: 400; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.12); max-width: 260px; z-index: 3; }
+.tip b { font-weight: 650; }
+.tip table { border-collapse: collapse; margin-top: 4px; }
+.tip td { padding: 1px 6px 1px 0; font-family: var(--mono); font-size: 11.5px; }
+.attrib { position: absolute; right: 8px; bottom: 6px; font-size: 10px; color: var(--muted); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; align-self: start; }
+.panel .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.panel h3 { font-size: 24px; margin: 4px 0 6px; }
+.panel .sub { color: var(--ink-2); font-size: 14px; margin-bottom: 12px; }
+.recv { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 14px; }
+.chip { font-size: 12.5px; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+.chip.closed { background: transparent; border-color: var(--closed); color: var(--closed); }
+.modes { display: grid; gap: 12px; }
+.mrow .lab { display: flex; justify-content: space-between; font-size: 13px; }
+.mrow .lab b { font-weight: 650; }
+.mrow svg { width: 100%; height: 26px; display: block; }
+.statline { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 8px 0; border-top: 1px solid var(--line); }
+.strat-mini { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+.strat-mini td { padding: 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.strat-mini td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; padding-left: 8px; }
+.strat-mini tr.on td { font-weight: 650; }
+.hint { color: var(--muted); font-size: 13px; }
+
+section.block { margin-top: 44px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 16px 0; }
+.opt { text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; cursor: pointer; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.opt:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+.opt[aria-checked="true"] { border: 2px solid var(--accent); padding: 11px 13px; background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
+.opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.opt .on { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.opt b.nm { font-family: var(--display); font-stretch: 88%; font-size: 17px; font-weight: 750; line-height: 1.15; }
+.opt p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.opt dl { margin: 4px 0 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; font-size: 12.5px; }
+.opt dt { color: var(--muted); } .opt dd { margin: 0; font-family: var(--mono); text-align: right; }
+.cmpwrap { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; height: min(70vh, 640px); min-height: 380px; touch-action: none; }
+#cmp { width: 100%; height: 100%; display: block; cursor: grab; }
+.cmplab { position: absolute; top: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 4px 9px; font-size: 12.5px; font-weight: 650; pointer-events: none; }
+.cmphandle { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--ink); pointer-events: none; }
+.cmphandle::after { content: "⇆"; position: absolute; top: 50%; left: -16px; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); display: grid; place-items: center; font-size: 14px; color: var(--ink); }
+.mapbar { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bc { margin-top: 18px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.bc h2 { margin-bottom: 6px; }
+.bc > p { margin-bottom: 4px; }
+.bc details { border: 0; padding: 6px 0 0; }
+.bc summary { font-family: var(--body); font-stretch: 100%; font-size: 14.5px; font-weight: 650; color: var(--accent); }
+.bc-body { padding-top: 12px; }
+.bc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .bc-grid { grid-template-columns: minmax(0, 1fr); } }
+.src { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.src img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; display: block; background: #fff; }
+.src figcaption { margin-top: 8px; display: grid; gap: 4px; }
+.src .alt { padding: 12px; border: 1px dashed var(--line); border-radius: 4px; }
+.cmpbar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 10px 0; }
+.rank { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 760px; }
+.rank th, .rank td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.rank thead th { font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 500; cursor: pointer; user-select: none; white-space: nowrap; }
+.rank thead th[aria-sort] { color: var(--ink); }
+.rank tbody tr { cursor: pointer; }
+.rank tbody tr:hover, .rank tbody tr.sel { background: var(--accent-soft); }
+.rank .delta { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.rank .bar { height: 8px; border-radius: 0 3px 3px 0; background: var(--up-4); min-width: 1px; }
+.rank .bar.neg { background: var(--dn-2); }
+.rank .ba { color: var(--muted); font-family: var(--mono); font-size: 11.5px; }
+.rank td.r, .rank th.r { text-align: right; }
+
+.trade { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 12px; }
+.trade figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
+.trade figcaption { font-weight: 650; margin-bottom: 4px; }
+.trade svg { width: 100%; height: auto; display: block; overflow: visible; }
+.trade text { fill: var(--ink-2); font-family: var(--body); font-size: 11px; }
+.trade .axis line, .trade .grid line { stroke: var(--line); }
+.trade .pt { cursor: default; }
+
+details { border-top: 1px solid var(--line); padding: 12px 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-family: var(--display); font-stretch: 90%; font-weight: 700; font-size: 18px; list-style-position: outside; }
+details > div { padding-top: 10px; max-width: 78ch; color: var(--ink); }
+details li { margin-bottom: 6px; }
+details table { border-collapse: collapse; font-size: 13px; margin: 8px 0 14px; }
+details td, details th { padding: 4px 10px 4px 0; border-bottom: 1px solid var(--line); text-align: left; }
+code { font-family: var(--mono); font-size: 0.9em; }
+footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) {
+  .mapbox { height: 62vh; min-height: 360px; }
+  .cmpwrap { height: 58vh; min-height: 340px; }
+  .legend { font-size: 11px; padding: 6px 8px; left: 6px; bottom: 6px; }
+  .legend .sw, .legend .lbls span { width: 22px; }
+  .legend .lbls { font-size: 9.5px; }
+  .legend .keys { gap: 8px; margin-top: 4px; }
+  .attrib { display: none; }
+  .badge { font-size: 11.5px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Portland Public Schools · rightsizing scenarios released Oct 5, 2026</div>
+    <h1>How much farther is school?</h1>
+    <p class="lede prose">PPS has proposed closing 14 schools (Scenario A) or 11 (Scenario B). This page estimates how each closure changes the trip to school for the families who live in its attendance area, walking, biking, and by car or bus. It covers K–5 closures and the middle-school moves that come with them.</p>
+  </header>
+
+
+  <div class="controls" role="toolbar" aria-label="Map and table settings">
+    <div class="ctl"><span>Scenario</span><div class="seg" id="c-tag"></div></div>
+    <div class="ctl"><span>Grades</span><div class="seg" id="c-level"></div></div>
+    <div class="ctl"><span>Travel</span><div class="seg" id="c-mode"></div></div>
+    <div class="ctl"><span>Boundary adjustments</span><select id="c-strat" aria-label="Boundary adjustments"></select></div>
+  </div>
+
+  <section class="bc" id="approaches">
+    <h2>Boundary changes</h2>
+    <p class="prose" id="bc-lede"></p>
+    <details id="bc-details">
+      <summary id="bc-sum">See what changes, PPS's source map, and other ways to draw the lines</summary>
+      <div class="bc-body">
+        <p class="prose">Every option closes the same schools in the selected scenario. They differ only in which open schools absorb each closing school's neighborhood, for K–5 and for grades 6–8. The PPS plan is the district's proposal; the others are alternative boundary adjustments for comparison, not anything PPS has proposed. Choosing one updates every number and map on the page.</p>
+        <div class="opts" id="opts" role="radiogroup" aria-label="Boundary adjustments"></div>
+        <div class="bc-grid">
+          <div>
+            <p class="hint" id="cmp-hint"></p>
+            <div class="cmpwrap" id="cmpwrap">
+              <canvas id="cmp" aria-label="Before and after attendance areas"></canvas>
+              <div class="cmplab" id="cmpL" style="left:10px"></div>
+              <div class="cmplab" id="cmpR" style="right:10px"></div>
+              <div class="cmphandle" id="cmpH"></div>
+              <div class="tip" id="ctip" hidden></div>
+            </div>
+          </div>
+          <figure class="src" id="pps-src"></figure>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div></div>
+  <div class="bench" style="margin-top:8px">
+    <div class="mapbox" id="mapbox">
+      <canvas id="map" aria-label="Map of travel time changes by neighborhood"></canvas>
+      <div class="mapbtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Reset view" style="font-size:13px">⤢</button></div>
+      <div class="badge" id="badge"></div>
+      <div class="legend" id="legend"></div>
+      <div class="tip" id="tip" hidden></div>
+      <div class="attrib">Basemap © OpenStreetMap, rendered by Felt</div>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+
+  <section class="block">
+    <h2>What stands out</h2>
+    <div class="findings" id="findings"></div>
+  </section>
+
+  <section class="block">
+    <h2 id="rank-title">Which closures add the most travel time</h2>
+    <p class="hint prose" id="rank-hint">Averages are over the estimated neighborhood students who live in each closing school's area today. Click a row to show it on the map. Click a column heading to sort.</p>
+    <div class="scroll-x"><table class="rank" id="rank"></table></div>
+  </section>
+
+  <section class="block">
+    <h2>Where the longest new trips are</h2>
+    <p class="hint prose">For the grades selected above, neighborhoods ranked by total added student-minutes in the selected travel mode (students moved × minutes added), for the scenario and boundary approach chosen above.</p>
+    <div class="scroll-x"><table class="rank" id="nbhd"></table></div>
+  </section>
+
+  <section class="block">
+    <h2>Shorter trips, or fuller schools?</h2>
+    <p class="prose" id="trade-intro"></p>
+    <div class="trade" id="trade"></div>
+  </section>
+
+  <section class="block">
+    <h2>Middle school moves, school to school</h2>
+    <p class="prose">Both scenarios turn seven K–8 schools into K–5 schools and close Sellwood Middle School. Grades 6–8 from those areas go to a middle school, often much farther from home than the K–8 was. This table follows the scenario and boundary approach chosen above.</p>
+    <div class="scroll-x"><table class="rank" id="mid"></table></div>
+  </section>
+
+  <section class="block">
+    <h2>Scenario A and B side by side</h2>
+    <p class="hint prose">Totals for the boundary approach chosen above. Estimates of neighborhood students, 2025–26.</p>
+    <div class="scroll-x"><table class="compare" id="compare"></table></div>
+  </section>
+
+  <section class="block" id="more">
+    <h2>How this was built</h2>
+    <details>
+      <summary>Rebuilding PPS's proposed boundaries</summary>
+      <div>
+        <p>PPS's Oct 6, 2026 board packet includes the superintendent's memo and 36×48-inch attendance-area maps for Scenario A, Scenario B and the status quo at each grade band. The maps are vector PDFs exported from ArcGIS Pro, with no geographic coordinates.</p>
+        <ol>
+          <li><b>Georeferencing.</b> The boundary lines were extracted from the status-quo K–5 map and fitted to the City of Portland's current attendance-area layer, first with school labels as control points and then by iterative closest-point matching on the lines themselves. Median distance between the map's lines and the city layer after fitting: <b>0.6 ft</b>. All the scenario maps share the same frame, so the same transform applies to A and B.</li>
+          <li><b>Erased and new lines.</b> A boundary counts as erased when it is drawn on the status-quo map but not on the scenario map, and it borders a closing school. New lines inside a closing school's area split that area into pieces.</li>
+          <li><b>Receivers.</b> The memo names every receiving school, at most two per closure. Each piece of a closing school's area goes to one of those receivers: the only one, or, for a two-way split, whichever receiver is the shorter average walk for that piece.</li>
+          <li><b>Checks against the memo.</b> The memo gives split percentages for three closures. The rebuilt splits, weighted by children living in each piece: Maplewood <b>66 / 34</b> to Hayhurst / Rieke (memo: 70 / 30); Stephenson <b>72 / 28</b> to Markham / Capitol Hill (memo: 70 / 30); Buckman <b>56 / 44</b> to Abernethy / Sunnyside (memo: 50 / 50).</li>
+          <li><b>Other shifts.</b> Two boundary moves between schools that stay open are described in writing and included: Duniway's southern edge to Llewellyn (A) and part of Whitman to Lewis (B). Both scenarios list more than 30 other "boundary change" schools. Those smaller adjustments could not be read reliably from the maps and are not modeled.</li>
+          <li><b>Special cases.</b> Lent and Rigler enroll only immersion students. Neighborhood students from the Lent area attend Marysville today, and the slides send them to Kelly. Those from the Rigler area attend Scott. César Chávez becomes a Spanish immersion hub, so its neighborhood K–5 students go to Rosa Parks.</li>
+        </ol>
+      </div>
+    </details>
+    <details>
+      <summary>Measuring travel time</summary>
+      <div>
+        <p>Travel times come from Felt's <code>isochrone()</code> SQL function, which runs on a self-hosted Valhalla routing engine using OpenStreetMap streets. For each of the 67 elementary, K–8 and middle schools with an attendance area, nested isochrones were traced at fine steps: walking every 3 minutes to an hour, then up to 105 minutes; biking every 2 minutes to 30, then up to 50; driving every minute to 15, then 17, 20 and 25. That is about 4,100 isochrones.</p>
+        <p>The district was divided into about 3,900 hexagons, each about 0.1 km² (H3 resolution 9). For each hexagon and school, the time is read from the smallest isochrone containing the hexagon's center and interpolated by distance between neighboring bands.</p>
+        <ul>
+          <li><b>Walking</b> uses Valhalla's default adult pace, about 5.1 km/h. Young children walk slower, so real walking times are likely longer.</li>
+          <li><b>Biking</b> uses Valhalla's default bicycle profile, which favors bike-friendly streets.</li>
+          <li><b>Driving</b> is free-flow time with no traffic, parking or drop-off line. It also stands in for the school bus here. Real bus rides are longer because routes make stops.</li>
+          <li><b>Cross-check.</b> ppsdata.info computed driving times between 119 pairs of schools with a different routing engine (OSRM). The two sets agree closely (correlation 0.96). Valhalla's times run about 19% shorter, a typical gap between free-flow engines.</li>
+          <li><b>One mile</b> of walking is about 19 minutes at this pace. PPS buses K–5 students who live more than 1 mile from school and middle schoolers beyond 1.5 miles (about 28 minutes). The "over 1 mile" figures use those minute thresholds as a proxy for bus eligibility.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>Who counts as a student here</summary>
+      <div>
+        <p>Children under 18 from the 2020 Census (block level, redistricting file) show where kids live inside each attendance area. Each school's 2025–26 K–5 enrollment (or grades 6–8 for middle schools), minus its immersion enrollment, is spread over its area in proportion to those children. That estimates where each school's neighborhood students live. Immersion students are not in the travel averages, because their homes can be anywhere in the city. The program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) will lengthen many of their trips too.</p>
+        <p>Building loads in the trade-off chart add each school's immersion students, following the program moves, to its neighborhood students. Capacity is the 2021 Long-Range Facility Plan's functional capacity. These are 2025–26 estimates; PPS's own figures use 2031–32 projections and will differ.</p>
+      </div>
+    </details>
+    <details>
+      <summary>The other boundary approaches</summary>
+      <div>
+        <p>All five approaches close the same schools and make the same program and grade-level changes. They differ in where students from closing schools are sent: K–5 students from closing elementary schools, and grade 6–8 students from Sellwood and the seven K–8 schools that become K–5. The same rule is applied to both, using each middle school's functional capacity. The alternatives leave the two optional middle-school area shifts in PPS's plan (Maplewood to Gray, Irvington to Beaumont) where they are.</p>
+        <table>
+          <tr><th>Approach</th><th>Rule</th></tr>
+          <tr><td>PPS plan</td><td>PPS's receivers and lines, rebuilt from its maps as described above.</td></tr>
+          <tr><td>PPS rules, shortest trips</td><td>Keeps PPS's own rules: at most two receivers per closure, near the building's capacity. Among the six nearest open schools, it picks the one or two that minimize total walking time. Each home goes to the closer of the pair.</td></tr>
+          <tr><td>Shortest walks within capacity</td><td>A linear program that sends every home to an open school, minimizing total walking time while keeping each building under 95% of functional capacity. There is no limit on how many schools a closure's area splits among.</td></tr>
+          <tr><td>Nearest open school</td><td>Every home goes to the closest open neighborhood school by walking time, ignoring capacity. This is the floor on how little a closure can add.</td></tr>
+          <tr><td>Whole school to one receiver</td><td>Each closing school's whole area goes to the single open school with the shortest average walk, which keeps classmates together.</td></tr>
+        </table>
+      </div>
+    </details>
+    <details>
+      <summary>Paths considered and set aside</summary>
+      <div>
+        <ul>
+          <li><b>Polygonizing the PDF lines directly.</b> Gaps where lines meet the river or the map frame let neighboring areas bleed together. The approach was replaced with "current GIS polygons, minus erased lines, plus new lines."</li>
+          <li><b>Labeling map areas by their text labels.</b> Labels sit at uneven offsets from school symbols and sometimes merge with street names. School building locations were used instead.</li>
+          <li><b>Reading every boundary shift between open schools from the maps.</b> River and frame edges look like erased lines on one map and not the other. Only the two shifts PPS describes in writing were kept.</li>
+          <li><b>The City's older open-data boundary layer.</b> It predates the 2025 Southeast changes (no Kellogg or Harriet Tubman). The current City of Portland School Boundaries service, last edited Nov 3, 2025, was used instead.</li>
+          <li><b>Census API for age detail.</b> The API now requires a key, so the bulk 2020 redistricting file was used. It gives children under 18, not school-age children specifically.</li>
+          <li><b>Live Felt map embeds driven by the JS SDK.</b> This page runs in a sandbox that blocks third-party frames, so the maps are drawn here from the same Felt-computed data over a Felt-rendered basemap. The Felt maps are linked below.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>Limitations</summary>
+      <div>
+        <ul>
+          <li>The rebuilt K–5 lines follow PPS's maps closely where closures are involved, but are drawn on a ~0.1 km² hexagon grid. Homes within a block or two of a new line may be assigned to the wrong side.</li>
+          <li>About 30 smaller boundary changes at open schools are not modeled, and the middle-school lines follow the memo's rules rather than the 6–8 maps.</li>
+          <li>About 7 in 10 PPS students attend their neighborhood school. Families using transfers, focus options or charters are not modeled separately.</li>
+          <li>Walk times assume an adult pace on any public street or path, and ignore hills, busy crossings and hazard-based busing.</li>
+          <li>Driving and bus times are free-flow. Bus routes, stops and bell times are not modeled.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>Sources and maps</summary>
+      <div>
+        <ul>
+          <li>PPS, <i>Rightsizing: Comparing three scenarios</i> (Oct 4–5, 2026), the Scenario Release Memo, the 10/06/26 board presentation, and the scenario attendance-area maps, from the <a href="https://meetings.boardbook.org/Public/Agenda/915?meeting=769955">Oct 6, 2026 board agenda</a>.</li>
+          <li><a href="https://ppsdata.info/">ppsdata.info</a> and <a href="https://github.com/meub/pps-data">github.com/meub/pps-data</a>: school roster, enrollment, capacity, immersion counts and boundary extraction.</li>
+          <li>City of Portland, School Boundaries feature service (attendance areas, edited Nov 3, 2025). Portland neighborhood boundaries from PortlandMaps open data.</li>
+          <li>Oregon Department of Education, Fall Membership 2025–26 (grade-level enrollment).</li>
+          <li>US Census Bureau, 2020 redistricting data (P.L. 94-171) and TIGER/Line 2020 blocks.</li>
+          <li>Felt <code>isochrone()</code> (Valhalla on OpenStreetMap) for all travel times.</li>
+          <li>PPS Student Transportation Service Guidelines (rev. 2024) for bus-eligibility distances.</li>
+        </ul>
+        <p id="felt-links">The same hexagon, boundary and school layers are in a Felt map: <a href="https://felt.com/map/PPS-school-closures-travel-time-impact-eRA1FAMvSHSebm5FQg9AcNA">PPS school closures — travel time impact</a>. The isochrones, about 4,100 travel-time contours, are in a separate <a href="https://felt.com/map/PPS-closures-travel-time-workbench-c6as0xMdQ3utb9AoiMhEBcC">workbench map</a>.</p>
+      </div>
+    </details>
+  </section>
+
+  <footer>Independent analysis, not affiliated with Portland Public Schools. Figures are estimates for comparing scenarios, not official projections.</footer>
+</div>
+
+<script>
+(async function () {
+  const D = await (await fetch("data.json")).json();
+  const B = await (await fetch("boundaries.json")).json();
+  const MODES = ["walk", "bike", "drive"];
+  const MODE_LABEL = { walk: "Walk", bike: "Bike", drive: "Drive / bus" };
+  const STRATS = ["pps", "pair", "capacity", "nearest", "single"];
+  const STRAT_LABEL = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Shortest walks within capacity", nearest: "Nearest open school", single: "Whole school to one receiver" };
+  const STRAT_SHORT = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Within capacity", nearest: "Nearest school", single: "One receiver" };
+  const CAP = 120;
+  const S = { tag: "A", level: "k5", mode: "walk", strat: "pps", view: "delta", sel: null, pinHex: null };
+  const SN = D.schools, SI = {}, sidxOf = {}; SN.forEach((n, i) => sidxOf[n] = i);
+  let hoverSel = null; D.school_info.forEach(s => SI[s.name] = s);
+  const key = () => `${S.tag}_${S.strat}`;
+  const kidx = k => D.keys.indexOf(k);
+  const mi = m => MODES.indexOf(m);
+  const fmt1 = v => v == null ? "—" : (Math.abs(v) >= 100 ? Math.round(v) : v.toFixed(1));
+  const fmtMin = v => v == null || v >= CAP ? "60+" : (v < 10 ? v.toFixed(1) : Math.round(v)).toString();
+  const sign = v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmt1(Math.abs(v));
+  const pct = v => Math.round(v * 100) + "%";
+  const nice = n => n === "Cesar Chavez" ? "César Chávez" : n === "Lane" ? "Brentwood (Lane)" : n === "Tubman" ? "Harriet Tubman" : n === "Mt Tabor" ? "Mt. Tabor" : n;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  // ---------- hex accessors ----------
+  const H = D.hexes, G = D.hexgeo;
+  function before(r, lvl, m) { const v = r[(lvl === "k5" ? 7 : 10) + mi(m)]; return v == null ? CAP : v; }
+  function afterT(r, k, lvl, m) { const b = 13 + 8 * kidx(k); const v = r[b + (lvl === "k5" ? 2 : 5) + mi(m)]; return v == null ? CAP : v; }
+  function curS(r, lvl) { return r[lvl === "k5" ? 4 : 5]; }
+  function newS(r, k, lvl) { return r[13 + 8 * kidx(k) + (lvl === "k5" ? 0 : 1)]; }
+  function wt(r, lvl) { return lvl === "k5" ? r[2] : r[3]; }
+
+  // ---------- projection ----------
+  const BM = [-122.86, 45.424641, -122.55, 45.655338];
+  const mx = lon => (lon + 180) / 360;
+  const my = lat => { const s = Math.sin(lat * Math.PI / 180); return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI); };
+  const hexM = G.map(g => { const a = new Float64Array(12); for (let i = 0; i < 6; i++) { a[2 * i] = mx(g[2 + 2 * i]); a[2 * i + 1] = my(g[3 + 2 * i]); } return a; });
+  const hexC = G.map(g => [mx(g[0]), my(g[1])]);
+  function ringsM(geom) {
+    const polys = geom.type === "Polygon" ? [geom.coordinates] : geom.coordinates;
+    return polys.map(p => p.map(ring => ring.map(([x, y]) => [mx(x), my(y)])));
+  }
+  const BL = {}; for (const k in B) { BL[k] = {}; B[k].features.forEach(f => BL[k][f.properties.s] = { rings: ringsM(f.geometry), bbox: bboxOf(f.geometry) }); }
+  function bboxOf(g) { let a = [180, 90, -180, -90]; (g.type === "Polygon" ? [g.coordinates] : g.coordinates).forEach(p => p[0].forEach(([x, y]) => { a[0] = Math.min(a[0], x); a[1] = Math.min(a[1], y); a[2] = Math.max(a[2], x); a[3] = Math.max(a[3], y); })); return a; }
+
+  // spatial grid for hit-testing hex centers
+  const GRID = new Map(), GS = 0.00004;
+  hexC.forEach(([x, y], i) => { const k = Math.floor(x / GS) + ":" + Math.floor(y / GS); if (!GRID.has(k)) GRID.set(k, []); GRID.get(k).push(i); });
+  function nearestHex(x, y) {
+    const gx = Math.floor(x / GS), gy = Math.floor(y / GS); let best = -1, bd = Infinity;
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) (GRID.get((gx + dx) + ":" + (gy + dy)) || []).forEach(i => { const d = (hexC[i][0] - x) ** 2 + (hexC[i][1] - y) ** 2; if (d < bd) { bd = d; best = i; } });
+    return bd < (GS * 0.6) ** 2 ? best : -1;
+  }
+
+  // ---------- canvas map ----------
+  const cv = document.getElementById("map"), ctx = cv.getContext("2d"), box = document.getElementById("mapbox"), tip = document.getElementById("tip");
+  const imgL = new Image(), imgD = new Image(); imgL.src = "basemap.jpg"; imgD.src = "basemap_dark.jpg";
+  imgL.onload = imgD.onload = () => { draw(); if (typeof drawCmp === "function") drawCmp(); };
+  let W = 0, Hh = 0, dpr = 1, view = null;
+  const HOME = [-122.80, 45.44, -122.555, 45.62];
+  function fit(b) {
+    const x0 = mx(b[0]), x1 = mx(b[2]), y0 = my(b[3]), y1 = my(b[1]);
+    const s = Math.min(W / (x1 - x0), Hh / (y1 - y0)) * 0.94;
+    view = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, s };
+    if (!homeS) homeS = s;
+  }
+  let homeS = 0;
+  const clampS = s => Math.min(Math.max(s, homeS * 0.6), homeS * 16);
+  function resize() { const r = box.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; W = r.width; Hh = r.height; cv.width = W * dpr; cv.height = Hh * dpr; if (!view) { fit(HOME); homeS = view.s; } draw(); }
+  const px = x => (x - view.cx) * view.s + W / 2, py = y => (y - view.cy) * view.s + Hh / 2;
+  const ux = X => (X - W / 2) / view.s + view.cx, uy = Y => (Y - Hh / 2) / view.s + view.cy;
+  const isDark = () => { const t = document.documentElement.getAttribute("data-theme"); return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+
+  const BINS = {
+    delta: { walk: [2, 5, 10, 15, 20, 30, 45, 60], bike: [1, 2, 3, 5, 7, 10, 15, 20], drive: [0.5, 1, 1.5, 2, 3, 4, 6, 8] },
+    abs: { walk: [5, 10, 15, 20, 30, 45, 60, 90], bike: [2, 4, 6, 8, 12, 16, 20, 30], drive: [1, 2, 3, 4, 6, 8, 10, 15] }
+  };
+  let PAL = {};
+  function readPal() { PAL = { up: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--up-${i}`)), dn: [css("--dn-1"), css("--dn-2")], abs: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--abs-${i}`)), ink: css("--ink"), muted: css("--muted"), closed: css("--closed"), recv: css("--recv"), surface: css("--surface"), accent: css("--accent") }; }
+  function colorFor(r) {
+    const k = key(), lvl = S.level, m = S.mode;
+    if (S.view === "delta") {
+      if (newS(r, k, lvl) === curS(r, lvl)) return null;
+      const d = afterT(r, k, lvl, m) - before(r, lvl, m), b = BINS.delta[m];
+      if (d < 0) return d <= -b[1] ? PAL.dn[1] : PAL.dn[0];
+      let i = 0; while (i < b.length && d > b[i]) i++;
+      return PAL.up[i];
+    }
+    const t = S.view === "after" ? afterT(r, k, lvl, m) : before(r, lvl, m), b = BINS.abs[m];
+    let i = 0; while (i < b.length && t > b[i]) i++;
+    return PAL.abs[i];
+  }
+  // shared hex edges: [i, j, x1, y1, x2, y2] in mercator
+  const EDGES = (() => {
+    const vk = (x, y) => x.toFixed(5) + "," + y.toFixed(5), own = new Map(), out = [];
+    G.forEach((g, i) => { for (let v = 0; v < 6; v++) { const a = vk(g[2 + 2 * v], g[3 + 2 * v]), b = vk(g[2 + 2 * ((v + 1) % 6)], g[3 + 2 * ((v + 1) % 6)]); const key = a < b ? a + "|" + b : b + "|" + a; const hit = own.get(key); if (hit != null) { const m = hexM[i]; out.push([hit, i, m[2 * v], m[2 * v + 1], m[2 * ((v + 1) % 6)], m[2 * ((v + 1) % 6) + 1]]); } else own.set(key, i); } });
+    return out;
+  })();
+  function strokeEdges(pred) { ctx.beginPath(); EDGES.forEach(e => { if (pred(e[0], e[1])) { ctx.moveTo(px(e[2]), py(e[3])); ctx.lineTo(px(e[4]), py(e[5])); } }); ctx.stroke(); }
+  function pathRings(rings) { rings.forEach(poly => poly.forEach(ring => { ring.forEach(([x, y], j) => j ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y))); ctx.closePath(); })); }
+
+  function draw() {
+    if (!view) return;
+    readPal();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = PAL.surface; ctx.fillRect(0, 0, W, Hh);
+    const img = isDark() ? imgD : imgL;
+    if (img.complete && img.naturalWidth) { const x0 = px(mx(BM[0])), x1 = px(mx(BM[2])), y0 = py(my(BM[3])), y1 = py(my(BM[1])); ctx.drawImage(img, x0, y0, x1 - x0, y1 - y0); }
+    const k = key(), lvl = S.level;
+    // hexes
+    for (let i = 0; i < H.length; i++) {
+      const r = H[i], c = colorFor(r); if (!c) continue;
+      const a = hexM[i]; ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); for (let j = 1; j < 6; j++) ctx.lineTo(px(a[2 * j]), py(a[2 * j + 1])); ctx.closePath();
+      ctx.globalAlpha = r[1] < 1 ? 0.3 : (S.view === "delta" ? 0.86 : 0.7); ctx.fillStyle = c; ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // after boundaries
+    const layer = BL[`${k}_${lvl === "k5" ? "elem" : "mid"}`] || {};
+    const alt = S.strat !== "pps", LV = lvl === "k5" ? "elem" : "mid";
+    ctx.lineWidth = 1; ctx.strokeStyle = PAL.ink; ctx.globalAlpha = 0.45;
+    ctx.beginPath(); for (const s in layer) pathRings(layer[s].rings); ctx.stroke();
+    ctx.globalAlpha = 1;
+    // selection (clicked) or hover preview
+    const sel = S.sel || hoverSel;
+    if (sel) {
+      const ci = sidxOf[sel];
+      ctx.setLineDash([3, 4]); ctx.lineWidth = 2; ctx.strokeStyle = PAL.closed; ctx.globalAlpha = 0.9;
+      strokeEdges((i, j) => curS(H[i], lvl) === ci && curS(H[j], lvl) === ci && newS(H[i], k, lvl) !== newS(H[j], k, lvl));
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+      receiversOf(sel).forEach(([n]) => { const p = layer[n]; if (p) { ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.recv; ctx.beginPath(); pathRings(p.rings); ctx.stroke(); } });
+      const cur = BL[lvl === "k5" ? "cur_elem" : "cur_mid"][sel];
+      if (cur) { ctx.setLineDash([7, 5]); ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.closed; ctx.beginPath(); pathRings(cur.rings); ctx.stroke(); ctx.setLineDash([]); }
+    }
+    if (S.pinHex != null) { const a = hexM[S.pinHex]; ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); for (let j = 1; j < 6; j++) ctx.lineTo(px(a[2 * j]), py(a[2 * j + 1])); ctx.closePath(); ctx.lineWidth = 2; ctx.strokeStyle = PAL.ink; ctx.stroke(); }
+    // schools
+    const recvSet = new Set(sel ? receiversOf(sel).map(r => r[0]) : []);
+    schoolsForLevel().forEach(s => {
+      const X = px(mx(s.lon)), Y = py(my(s.lat)), st = status(s.name);
+      ctx.beginPath(); ctx.arc(X, Y, st === "open" ? 4 : 5.5, 0, 2 * Math.PI);
+      if (st === "open") { ctx.fillStyle = recvSet.has(s.name) ? PAL.recv : PAL.ink; ctx.globalAlpha = recvSet.has(s.name) ? 1 : 0.7; ctx.fill(); ctx.globalAlpha = 1; ctx.lineWidth = 1.5; ctx.strokeStyle = PAL.surface; ctx.stroke(); }
+      else { ctx.fillStyle = PAL.surface; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.closed; ctx.stroke(); ctx.beginPath(); ctx.moveTo(X - 3, Y - 3); ctx.lineTo(X + 3, Y + 3); ctx.moveTo(X + 3, Y - 3); ctx.lineTo(X - 3, Y + 3); ctx.lineWidth = 1.6; ctx.stroke(); }
+      if (s.name === sel || recvSet.has(s.name) || (view.s > homeS * 1.8 && st !== "open")) label(nice(s.name), X, Y);
+    });
+  }
+  function label(t, X, Y) { ctx.font = "600 12px " + css("--body").split(",")[0]; ctx.lineWidth = 3.5; ctx.strokeStyle = PAL.surface; ctx.fillStyle = PAL.ink; ctx.strokeText(t, X + 8, Y + 4); ctx.fillText(t, X + 8, Y + 4); }
+
+  function schoolsForLevel() { return D.school_info.filter(s => S.level === "k5" ? (s.elem && !["Lent", "Rigler"].includes(s.name)) : s.mid); }
+  const K8 = ["Beverly Cleary", "Laurelhurst", "Bridger", "Sunnyside", "Faubion", "Vernon", "Cesar Chavez"];
+  function status(n) {
+    if (S.level === "k5") { const c = D.receivers[S.tag]; return (n in c || n === "Marysville") ? (n === "Cesar Chavez" ? "hub" : "closed") : "open"; }
+    if (n === "Sellwood") return "closed";
+    if (K8.includes(n)) return "k8";
+    return "open";
+  }
+  function closureRow(n) { return (D.closures[key()] || []).find(e => e.school === n); }
+  function receiversOf(n) {
+    if (S.level === "k5") { const e = closureRow(n); return e ? Object.entries(e.receivers) : []; }
+    return (D.middle[key()] || []).filter(e => e.from === n).map(e => [e.to, e.students]);
+  }
+
+  // interaction
+  let drag = null; const pts = new Map();
+  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.offsetX, e.offsetY]); drag = { x: e.offsetX, y: e.offsetY, moved: false, cx: view.cx, cy: view.cy, s: view.s, d0: pinchD() }; });
+  cv.addEventListener("pointermove", e => {
+    if (pts.has(e.pointerId)) pts.set(e.pointerId, [e.offsetX, e.offsetY]);
+    if (drag && pts.size >= 2) { const d = pinchD(); if (drag.d0 && d) { view.s = clampS(drag.s * d / drag.d0); drag.moved = true; draw(); } return; }
+    if (drag) { const dx = e.offsetX - drag.x, dy = e.offsetY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) { drag.moved = true; cv.classList.add("dragging"); } view.cx = drag.cx - dx / view.s; view.cy = drag.cy - dy / view.s; draw(); tip.hidden = true; return; }
+    hover(e.offsetX, e.offsetY);
+  });
+  function pinchD() { if (pts.size < 2) return 0; const [a, b] = [...pts.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  function endPtr(e) { pts.delete(e.pointerId); if (drag && !drag.moved && pts.size === 0) { click(e.offsetX, e.offsetY); if (e.pointerType === "touch") hover(e.offsetX, e.offsetY); } if (pts.size === 0) { drag = null; cv.classList.remove("dragging"); } }
+  cv.addEventListener("pointerup", endPtr); cv.addEventListener("pointercancel", endPtr);
+  cv.addEventListener("pointerleave", e => { if (e.pointerType === "touch") return; tip.hidden = true; setHover(null); });
+  cv.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.offsetX, e.offsetY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  function zoomAt(X, Y, f) { const x = ux(X), y = uy(Y); view.s = clampS(view.s * f); view.cx = x - (X - W / 2) / view.s; view.cy = y - (Y - Hh / 2) / view.s; draw(); }
+  document.getElementById("zin").onclick = () => zoomAt(W / 2, Hh / 2, 1.5);
+  document.getElementById("zout").onclick = () => zoomAt(W / 2, Hh / 2, 1 / 1.5);
+  document.getElementById("zreset").onclick = () => { fit(HOME); draw(); };
+  function schoolAt(X, Y) { let best = null, bd = 100; schoolsForLevel().forEach(s => { const d = (px(mx(s.lon)) - X) ** 2 + (py(my(s.lat)) - Y) ** 2; if (d < bd) { bd = d; best = s; } }); return best; }
+  function setHover(n) { if (n !== hoverSel) { hoverSel = n; if (!S.sel) draw(); } }
+  function hover(X, Y) {
+    const s = schoolAt(X, Y);
+    if (s && status(s.name) !== "open") setHover(s.name);
+    else { const i0 = nearestHex(ux(X), uy(Y)); const c0 = i0 >= 0 ? SN[curS(H[i0], S.level)] : null; setHover(c0 && status(c0) !== "open" ? c0 : null); }
+    if (s) { const st = status(s.name); showTip(X, Y, `<b>${s.full}</b><br>${st === "closed" ? (S.level === "k5" ? "Closes in Scenario " + S.tag : "Closes in both scenarios") : st === "hub" ? "Becomes a Spanish immersion hub" : st === "k8" ? "Becomes K–5; grades 6–8 move" : "Stays open"}${s.enroll ? `<br><span class="num">${s.enroll}</span> students, 2025–26` : ""}`); cv.style.cursor = "pointer"; return; }
+    cv.style.cursor = "";
+    const i = nearestHex(ux(X), uy(Y)); if (i < 0) { tip.hidden = true; return; }
+    showTip(X, Y, hexHTML(i));
+  }
+  function hexHTML(i) {
+    const r = H[i], k = key(), lvl = S.level, c = SN[curS(r, lvl)], n = SN[newS(r, k, lvl)] || "—";
+    const rows = MODES.map(m => { const a = before(r, lvl, m), b = afterT(r, k, lvl, m); return `<tr><td>${MODE_LABEL[m]}</td><td>${fmtMin(a)}</td><td>→</td><td>${fmtMin(b)}</td><td>${c !== n ? sign(b - a) : ""}</td></tr>`; }).join("");
+    return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${c === n ? `Stays at ${nice(c)}` : `${nice(c)} → <b>${nice(n)}</b>`}<table>${rows}</table><span style="color:var(--muted)">minutes · about ${Math.round(r[1])} children live here</span>`;
+  }
+  function showTip(X, Y, html) { tip.innerHTML = html; tip.hidden = false; const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(X + 14, W - tw - 6) + "px"; tip.style.top = Math.min(Y + 14, Hh - th - 6) + "px"; }
+  function click(X, Y) {
+    const s = schoolAt(X, Y);
+    if (s) { select(status(s.name) === "open" ? null : s.name, false); return; }
+    const i = nearestHex(ux(X), uy(Y)); if (i < 0) { select(null); return; }
+    const r = H[i], c = SN[curS(r, S.level)];
+    if (status(c) !== "open") { S.pinHex = i; select(c, false); } else { S.pinHex = i; S.sel = null; renderPanel(); draw(); }
+  }
+  function select(n, zoom) {
+    S.sel = n; if (!n) S.pinHex = null;
+    if (n && zoom) { const p = BL[S.level === "k5" ? "cur_elem" : "cur_mid"][n]; const rs = receiversOf(n).map(([x]) => (BL[`${key()}_${S.level === "k5" ? "elem" : "mid"}`] || {})[x]).filter(Boolean); let b = p ? [...p.bbox] : null; rs.forEach(q => { if (!b) b = [...q.bbox]; b = [Math.min(b[0], q.bbox[0]), Math.min(b[1], q.bbox[1]), Math.max(b[2], q.bbox[2]), Math.max(b[3], q.bbox[3])]; }); if (b) { fit([b[0] - .004, b[1] - .004, b[2] + .004, b[3] + .004]); } }
+    renderPanel(); renderRank(); renderLegend(); draw();
+  }
+
+  // ---------- controls ----------
+  function seg(id, opts, prop) {
+    const el = document.getElementById(id); el.innerHTML = "";
+    opts.forEach(([v, l]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = l; b.setAttribute("aria-pressed", S[prop] === v); b.onclick = () => { S[prop] = v; if (prop === "level" || prop === "tag") { if (S.sel && status(S.sel) === "open") S.sel = null; if (prop === "level") S.sel = null; } refresh(); }; el.appendChild(b); });
+  }
+  const sel = document.getElementById("c-strat"); STRATS.forEach(s => { const o = document.createElement("option"); o.value = s; o.textContent = STRAT_LABEL[s]; sel.appendChild(o); });
+  sel.onchange = () => { S.strat = sel.value; refresh(); };
+  function refresh() {
+    seg("c-tag", [["A", "A · 14 closures"], ["B", "B · 11 closures"]], "tag");
+    seg("c-level", [["k5", "K–5"], ["ms", "Middle 6–8"]], "level");
+    seg("c-mode", MODES.map(m => [m, MODE_LABEL[m]]), "mode");
+    seg("c-view", [["delta", "Change"], ["before", "Today"], ["after", "After"]], "view");
+    sel.value = S.strat; sel.disabled = false;
+    renderTop(); renderOpts(); drawCmp(); renderLegend(); renderPanel(); renderRank(); renderNbhd(); renderTrade(); renderMid(); draw();
+  }
+
+  function renderLegend() {
+    readPal();
+    const m = S.mode, el = document.getElementById("legend");
+    let h = "";
+    if (S.view === "delta") {
+      const b = BINS.delta[m];
+      h = `<div class="t">Added ${MODE_LABEL[m].toLowerCase()} time, minutes</div><div class="row">${PAL.up.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
+      h += `<div class="keys"><span><i style="background:${PAL.dn[1]};border-radius:2px"></i>shorter</span><span>blank: school unchanged</span></div>`;
+    } else {
+      const b = BINS.abs[m];
+      h = `<div class="t">${MODE_LABEL[m]} time to assigned school, minutes (${S.view === "after" ? "after" : "today"})</div><div class="row">${PAL.abs.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
+    }
+    h += `<div class="keys"><span><i style="border:2px solid ${PAL.closed};background:transparent"></i>${S.level === "k5" ? "closing" : "closing or K–8 losing 6–8"}</span><span><i style="background:${PAL.recv}"></i>receiving</span><span><i style="border:2px dashed ${PAL.closed};background:transparent;border-radius:2px"></i>${S.sel ? "area today and how it splits" : (matchMedia("(hover: none)").matches ? "tap" : "hover") + " a closing school to see its area split"}</span></div>`;
+    el.innerHTML = h;
+    const bd = document.getElementById("badge");
+    bd.textContent = `Scenario ${S.tag} · ${S.level === "k5" ? "K–5" : "Grades 6–8"} · ${STRAT_LABEL[S.strat]}`;
+    bd.className = "badge" + (S.strat !== "pps" ? " alt" : "");
+  }
+
+  // ---------- panel ----------
+  function dumbbell(a, b, max) {
+    const w = 300, x = v => 6 + Math.min(v, max) / max * (w - 12);
+    const up = b > a;
+    return `<svg viewBox="0 0 ${w} 26" preserveAspectRatio="none" role="img" aria-label="${fmtMin(a)} to ${fmtMin(b)} minutes"><line x1="6" x2="${w - 6}" y1="13" y2="13" stroke="var(--line)" stroke-width="2"/><line x1="${x(a)}" x2="${x(b)}" y1="13" y2="13" stroke="${up ? "var(--up-4)" : "var(--dn-2)"}" stroke-width="4" stroke-linecap="round"/><circle cx="${x(a)}" cy="13" r="5" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="2"/><circle cx="${x(b)}" cy="13" r="5.5" fill="${up ? "var(--up-4)" : "var(--dn-2)"}" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
+  }
+  const MAX = { walk: 45, bike: 15, drive: 8 };
+  function renderPanel() {
+    const P = document.getElementById("panel"), k = key();
+    if (S.level === "k5" && S.sel) {
+      const e = closureRow(S.sel); if (!e) { P.innerHTML = defaultPanel(); return; }
+      const others = STRATS.map(s => { const x = (D.closures[`${S.tag}_${s}`] || []).find(z => z.school === S.sel); return x ? `<tr class="${s === S.strat ? "on" : ""}"><td>${STRAT_SHORT[s]}<br><span class="hint">${Object.keys(x.receivers).map(nice).join(", ")}</span></td><td>${sign(x[S.mode].delta)} min</td></tr>` : ""; }).join("");
+      P.innerHTML = `<div class="kicker">${S.sel === "Cesar Chavez" ? "Becomes immersion-only" : "Closing"} · Scenario ${S.tag}</div><h3>${nice(S.sel)}</h3>
+        <div class="sub">About <b class="num">${e.students}</b> neighborhood K–5 students${S.sel === "Marysville" ? " (including the Lent area's neighborhood students, who attend Marysville today)" : ""}.</div>
+        <div class="kicker">Reassigned to</div><div class="recv">${Object.entries(e.receivers).map(([n, v]) => `<span class="chip">${nice(n)} · ${pct(v)}</span>`).join("")}</div>
+        <div class="modes">${MODES.map(m => { const pe = (D.closures[`${S.tag}_pps`] || []).find(z => z.school === S.sel); return `<div class="mrow"><div class="lab"><b>${MODE_LABEL[m]}</b><span class="num">${fmtMin(e[m].before)} → ${fmtMin(e[m].after)} min <b>${sign(e[m].delta)}</b></span></div>${dumbbell(e[m].before, e[m].after, MAX[m])}</div>`; }).join("")}</div>
+        <div class="statline"><span>Walk longer than 1 mile (bus-eligible)</span><span class="num">${pct(e.walk_over_1mi_before)} → <b>${pct(e.walk_over_1mi_after)}</b></span></div>
+        <div class="statline"><span>Slowest tenth walk at least</span><span class="num">${fmtMin(e.walk.p90_after)} min</span></div>
+        <div class="kicker" style="margin-top:12px">Added ${MODE_LABEL[S.mode].toLowerCase()} time under each approach</div><table class="strat-mini">${others}</table>
+        ${S.pinHex != null ? `<div class="statline" style="display:block">${hexHTML(S.pinHex)}</div>` : ""}`;
+      return;
+    }
+    if (S.level === "ms" && S.sel) {
+      const rows = (D.middle[k] || []).filter(e => e.from === S.sel);
+      if (!rows.length) { P.innerHTML = defaultPanel(); return; }
+      P.innerHTML = `<div class="kicker">${S.sel === "Sellwood" ? "Closing" : K8.includes(S.sel) ? "Becomes K–5" : "Part of its area moves"} · grades 6–8 · Scenario ${S.tag}</div><h3>${nice(S.sel)}</h3>` + rows.map(e => `
+        <div class="sub" style="margin-top:8px">About <b class="num">${e.students}</b> students go to <b>${nice(e.to)}</b></div>
+        <div class="modes">${MODES.map(m => `<div class="mrow"><div class="lab"><b>${MODE_LABEL[m]}</b><span class="num">${fmtMin(e[m].before)} → ${fmtMin(e[m].after)} min <b>${sign(e[m].delta)}</b></span></div>${dumbbell(e[m].before, e[m].after, m === "walk" ? 75 : m === "bike" ? 25 : 10)}</div>`).join("")}</div>
+        <div class="statline"><span>Walk longer than 1.5 miles</span><span class="num">${pct(e.walk_over_15mi_before)} → <b>${pct(e.walk_over_15mi_after)}</b></span></div>`).join("") + (S.pinHex != null ? `<div class="statline" style="display:block">${hexHTML(S.pinHex)}</div>` : "");
+      return;
+    }
+    P.innerHTML = defaultPanel() + (S.pinHex != null ? `<div class="statline" style="display:block">${hexHTML(S.pinHex)}</div>` : "");
+  }
+  function defaultPanel() {
+    const s = D.summary[key()][S.level], m = S.mode;
+    const lvlName = S.level === "k5" ? "K–5" : "grade 6–8";
+    return `<div class="kicker">Scenario ${S.tag} · ${STRAT_SHORT[S.strat]}</div><h3>${s.students_moving.toLocaleString()} ${lvlName} students change schools</h3>
+      <div class="sub">Estimated neighborhood students whose assigned school changes, out of about ${s.students_total.toLocaleString()} ${lvlName} neighborhood students districtwide.</div>
+      <div class="modes">${MODES.map(x => `<div class="mrow"><div class="lab"><b>${MODE_LABEL[x]}</b><span class="num">${fmtMin(s[x].before)} → ${fmtMin(s[x].after)} min <b>${sign(s[x].delta)}</b></span></div>${dumbbell(s[x].before, s[x].after, S.level === "k5" ? MAX[x] : (x === "walk" ? 75 : x === "bike" ? 25 : 10))}</div>`).join("")}</div>
+      <div class="statline"><span>Newly past ${S.level === "k5" ? "1 mile" : "1.5 miles"} on foot</span><span class="num"><b>${s.newly_over_walk_threshold.toLocaleString()}</b> students</span></div>
+      <p class="hint" style="margin-top:10px">${matchMedia("(hover: none)").matches ? "Tap" : "Hover"} the map for any neighborhood's trip times. Click a closing school (red ring) or its old area to see where its students go.</p>`;
+  }
+
+  // ---------- ranking ----------
+  let sortKey = "walk", sortDir = -1;
+  function renderRank() {
+    const T = document.getElementById("rank"), k = key();
+    const ms = S.level === "ms";
+    document.getElementById("rank-title").textContent = ms ? "Which middle-school moves add the most travel time" : "Which closures add the most travel time";
+    document.getElementById("rank-hint").textContent = ms
+      ? "Grade 6–8 neighborhood students whose middle school changes, grouped by the school they would attend today. That includes Sellwood's closure, the seven K–8 schools that become K–5, and two areas that switch middle schools. Click a row to show it on the map."
+      : "Averages are over the estimated neighborhood K–5 students who live in each closing school's area today. K–8 schools that become K–5 keep their K–5 students, so they appear only in the middle-school view. Click a row to show it on the map. Click a column heading to sort.";
+    let rows = ((ms ? D.middle_src : D.closures)[k] || []).slice();
+    const val = (e, c) => c === "students" ? e.students : c === "over" ? e.walk_over_1mi_after : c === "school" ? e.school : e[c].delta;
+    rows.sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir; });
+    const mx = { walk: Math.max(...rows.map(e => e.walk.delta), 1), bike: Math.max(...rows.map(e => e.bike.delta), 1), drive: Math.max(...rows.map(e => e.drive.delta), 1) };
+    const th = (c, l, cls = "") => `<th class="${cls}" data-k="${c}" ${sortKey === c ? `aria-sort="${sortDir < 0 ? "descending" : "ascending"}"` : ""}>${l}${sortKey === c ? (sortDir < 0 ? " ↓" : " ↑") : ""}</th>`;
+    const KIND = { closes: "closes", k8: "becomes K–5", partial: "part of area moves" };
+    const note = e => ms ? `<br><span class="ba">${KIND[e.kind]}${e.kind === "partial" ? ` · ${e.students} of ${e.students_area}` : ""}</span>` : e.school === "Cesar Chavez" ? '<br><span class="ba">becomes immersion hub</span>' : "";
+    T.innerHTML = `<thead><tr>${th("school", ms ? "Middle school today" : "Closing school")}${th("students", "Students", "r")}<th>Goes to</th>${MODES.map(m => th(m, MODE_LABEL[m])).join("")}${th("over", ms ? "Walk over 1.5 mi" : "Walk over 1 mi", "r")}</tr></thead><tbody>` +
+      rows.map(e => `<tr tabindex="0" data-s="${e.school}" class="${e.school === S.sel ? "sel" : ""}"><td><b>${nice(e.school)}</b>${note(e)}</td><td class="r num">${e.students}</td><td>${Object.entries(e.receivers).map(([n, v]) => nice(n) + (v < 0.99 ? ` <span class="ba">${pct(v)}</span>` : "")).join("<br>")}</td>${MODES.map(m => `<td><div class="delta"><div class="bar ${e[m].delta < 0 ? "neg" : ""}" style="width:${Math.abs(e[m].delta) / mx[m] * 70}px"></div><span class="num">${sign(e[m].delta)}</span></div><div class="ba">${fmtMin(e[m].before)} → ${fmtMin(e[m].after)} min</div></td>`).join("")}<td class="r num">${pct(e.walk_over_1mi_before)} → <b>${pct(e.walk_over_1mi_after)}</b></td></tr>`).join("") + "</tbody>";
+    T.querySelectorAll("th[data-k]").forEach(h => h.onclick = () => { const c = h.dataset.k; if (sortKey === c) sortDir *= -1; else { sortKey = c; sortDir = c === "school" ? 1 : -1; } renderRank(); });
+    T.querySelectorAll("tbody tr").forEach(tr => { const go = () => { S.pinHex = null; select(tr.dataset.s, true); document.getElementById("mapbox").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); }; tr.onclick = go; tr.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
+  }
+
+  function renderNbhd() {
+    const k = key(), lvl = S.level, m = S.mode, agg = {};
+    H.forEach(r => {
+      if (newS(r, k, lvl) === curS(r, lvl)) return;
+      const w = wt(r, lvl); if (!w) return;
+      const n = D.nbhds[r[6]] || "Outside city limits";
+      const a = agg[n] || (agg[n] = { n, w: 0, d: [0, 0, 0], from: {} });
+      a.w += w; MODES.forEach((x, j) => a.d[j] += w * (afterT(r, k, lvl, x) - before(r, lvl, x)));
+      const f = SN[curS(r, lvl)] + " → " + SN[newS(r, k, lvl)]; a.from[f] = (a.from[f] || 0) + w;
+    });
+    const rows = Object.values(agg).filter(a => a.w >= 5).sort((a, b) => b.d[mi(m)] - a.d[mi(m)]).slice(0, 12);
+    const T = document.getElementById("nbhd");
+    const top = rows.length ? rows[0].d[mi(m)] : 1;
+    T.innerHTML = `<thead><tr><th>Neighborhood</th><th class="r">Students moved</th><th>Main change</th>${MODES.map(x => `<th>${MODE_LABEL[x]} (avg)</th>`).join("")}<th>Student-minutes (${MODE_LABEL[m].toLowerCase()})</th></tr></thead><tbody>` + rows.map(a => {
+      const main = Object.entries(a.from).sort((x, y) => y[1] - x[1])[0][0].split(" → ").map(nice).join(" → ");
+      return `<tr style="cursor:default"><td><b>${a.n}</b></td><td class="r num">${Math.round(a.w)}</td><td>${main}</td>${MODES.map((x, j) => `<td class="num">${sign(a.d[j] / a.w)}</td>`).join("")}<td><div class="delta"><div class="bar" style="width:${Math.max(a.d[mi(m)], 0) / top * 120}px"></div><span class="num">${Math.round(a.d[mi(m)]).toLocaleString()}</span></div></td></tr>`;
+    }).join("") + "</tbody>";
+  }
+
+  // ---------- trade-off chart ----------
+  function renderTrade() {
+    const el = document.getElementById("trade"), m = S.mode;
+    document.getElementById("trade-intro").textContent = S.level === "k5"
+      ? "PPS's goal is schools big enough to staff a full program: 360 students for a K–5. Drawing the new lines purely for short trips cuts the added travel, but leaves fewer schools at that size. Each dot is one way to draw the K–5 boundaries for the closures in that scenario."
+      : "For middle schools PPS's size target is 500 students. Each dot is one way to reassign grades 6–8 from Sellwood and the seven K–8 schools that become K–5. PPS's plan also moves two areas that don't have to move (Maplewood to Gray, Irvington to Beaumont); the alternatives leave those alone.";
+    el.innerHTML = ["A", "B"].map(tag => {
+      const lv = S.level, yk = lv === "k5" ? "k5_schools_at_360" : "ms_schools_at_500", nk = lv === "k5" ? "k5_schools_open" : "ms_schools_open";
+      const pts = STRATS.map(s => ({ s, x: D.summary[`${tag}_${s}`][lv][m].delta, y: D.summary[`${tag}_${s}`][yk], n: D.summary[`${tag}_${s}`][nk] }));
+      const xmax = Math.ceil(Math.max(...STRATS.flatMap(s => ["A", "B"].map(t => D.summary[`${t}_${s}`][lv][m].delta))) * 1.15);
+      const ys = STRATS.flatMap(s => ["A", "B"].map(t => D.summary[`${t}_${s}`][yk]));
+      const ymin = Math.floor(Math.min(...ys) / 4) * 4 - 2, ymax = Math.ceil(Math.max(...ys) / 4) * 4 + 2, Wd = 460, Ht = 250, L = 40, R = 16, T = 14, Bt = 40;
+      const X = v => L + v / xmax * (Wd - L - R), Y = v => T + (ymax - v) / (ymax - ymin) * (Ht - T - Bt);
+      const xt = []; const step = xmax > 8 ? 2 : xmax > 4 ? 1 : 0.5; for (let v = 0; v <= xmax + 1e-9; v += step) xt.push(v);
+      const yt = []; for (let v = Math.ceil(ymin / 2) * 2; v <= ymax; v += (ymax - ymin > 12 ? 4 : 2)) yt.push(v);
+      const lab = { pps: [8, -8, "start"], pair: [8, 14, "start"], capacity: [-8, -9, "end"], nearest: [-8, 15, "end"], single: [8, 4, "start"] };
+      return `<figure><figcaption>Scenario ${tag} · ${pts[0].n} ${lv === "k5" ? "K–5" : "middle"} neighborhood schools remain</figcaption><svg viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="Scenario ${tag}: added travel time versus schools reaching 360 students">
+        <g class="grid">${yt.map(v => `<line x1="${L}" x2="${Wd - R}" y1="${Y(v)}" y2="${Y(v)}"/>`).join("")}</g>
+        <g class="axis">${xt.map(v => `<text x="${X(v)}" y="${Ht - Bt + 16}" text-anchor="middle">${v}</text>`).join("")}${yt.map(v => `<text x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`).join("")}
+        <text x="${(L + Wd - R) / 2}" y="${Ht - 6}" text-anchor="middle">Average added ${MODE_LABEL[m].toLowerCase()} minutes for students who move</text>
+        <text x="${L}" y="${T - 2}" text-anchor="start">${lv === "k5" ? "K–5 schools with 360+ students" : "Middle schools with 500+ students in grades 6–8"}</text></g>
+        ${pts.map(p => { const [dx, dy, an] = lab[p.s]; const on = p.s === "pps", cur = p.s === S.strat; return `<g class="pt">${cur ? `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="12" fill="none" stroke="var(--ink)" stroke-width="1.5"/>` : ""}<title>${STRAT_LABEL[p.s]}: +${p.x} min, ${p.y} of ${p.n} schools at ${lv === "k5" ? 360 : 500}+</title><circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${on ? 7 : 5.5}" fill="${on ? "var(--closed)" : "var(--accent)"}" stroke="var(--surface)" stroke-width="2"/><text x="${X(p.x) + dx}" y="${Y(p.y) + dy}" text-anchor="${an}" style="fill:var(--ink);font-weight:${on || cur ? 650 : 400}">${STRAT_SHORT[p.s]} · ${p.y}</text></g>`; }).join("")}
+      </svg><div class="hint">${lv === "k5" ? `Today about ${D.summary.now.k5_schools_at_360} of ${D.summary.now.k5_schools_open} K–5 neighborhood schools have 360+ K–5 students (estimate).` : `Today about ${D.summary.now.ms_schools_at_500} of ${D.summary.now.ms_schools_open} middle and K–8 schools have 500+ students in grades 6–8 (estimate).`}</div></figure>`;
+    }).join("");
+  }
+
+  function renderMid() {
+    const rows = D.middle[key()] || [], T = document.getElementById("mid");
+    T.innerHTML = `<thead><tr><th>From</th><th>To</th><th class="r">Students</th>${MODES.map(m => `<th>${MODE_LABEL[m]}</th>`).join("")}<th class="r">Walk over 1.5 mi</th></tr></thead><tbody>` + rows.map(e => `<tr tabindex="0" data-s="${e.from}"><td><b>${nice(e.from)}</b><br><span class="ba">${e.from === "Sellwood" ? "closes" : ["Jackson", "Tubman"].includes(e.from) ? "boundary moves" : "becomes K–5"}</span></td><td>${nice(e.to)}</td><td class="r num">${e.students}</td>${MODES.map(m => `<td><div class="delta"><span class="num">${sign(e[m].delta)}</span></div><div class="ba">${fmtMin(e[m].before)} → ${fmtMin(e[m].after)} min</div></td>`).join("")}<td class="r num">${pct(e.walk_over_15mi_before)} → <b>${pct(e.walk_over_15mi_after)}</b></td></tr>`).join("") + "</tbody>";
+    T.querySelectorAll("tbody tr").forEach(tr => { const go = () => { S.level = "ms"; refresh(); select(tr.dataset.s, true); document.getElementById("mapbox").scrollIntoView({ block: "center" }); }; tr.onclick = go; tr.onkeydown = ev => { if (ev.key === "Enter") go(); }; });
+  }
+
+  // ---------- findings + compare ----------
+  function renderTop() {
+    const st = S.strat, alt = st !== "pps";
+    const a = D.summary[`A_${st}`], b = D.summary[`B_${st}`];
+    const worst = D.closures[`A_${st}`].slice().sort((x, y) => y.walk.delta - x.walk.delta)[0];
+    const bigMs = (D.middle[`A_${st}`] || []).filter(e => e.students >= 50).sort((x, y) => y.walk.delta - x.walk.delta).slice(0, 2);
+    const name = alt ? `with the “${STRAT_LABEL[st]}” adjustments` : "under PPS's plan";
+    // most impacted neighborhood, Scenario A, K-5 and 6-8 combined, by added walking student-minutes
+    const nb = {}, ka = `A_${st}`;
+    H.forEach(r => ["k5", "ms"].forEach(lvl => {
+      if (newS(r, ka, lvl) === curS(r, lvl)) return; const w = wt(r, lvl); if (!w) return;
+      const n = D.nbhds[r[6]]; if (!n) return;
+      const o = nb[n] || (nb[n] = { n, sm: 0, w: { k5: 0, ms: 0 }, d: { k5: 0, ms: 0 }, b: { k5: 0, ms: 0 }, a: { k5: 0, ms: 0 }, mv: {} });
+      const t0 = before(r, lvl, "walk"), t1 = afterT(r, ka, lvl, "walk");
+      o.sm += w * (t1 - t0); o.w[lvl] += w; o.d[lvl] += w * (t1 - t0); o.b[lvl] += w * t0; o.a[lvl] += w * t1;
+      const mv = `${lvl}|${SN[curS(r, lvl)]}|${SN[newS(r, ka, lvl)]}`; o.mv[mv] = (o.mv[mv] || 0) + w;
+    }));
+    const topN = Object.values(nb).sort((x, y) => y.sm - x.sm)[0];
+    const nbCard = (() => {
+      if (!topN) return "";
+      const parts = ["ms", "k5"].filter(l => topN.w[l] >= 5).sort((x, y) => topN.d[y] - topN.d[x]);
+      const lvlTxt = l => l === "k5" ? "K–5" : "middle-school";
+      const desc = parts.map(l => { const mv = Object.entries(topN.mv).filter(([k]) => k.startsWith(l)).sort((x, y) => y[1] - x[1])[0][0].split("|"); const t0 = fmtMin(topN.b[l] / topN.w[l]), t1 = fmtMin(topN.a[l] / topN.w[l]); return topN.d[l] >= 0 ? `~${Math.round(topN.w[l])} ${lvlTxt(l)} students (${nice(mv[1])} → ${nice(mv[2])}) go from about ${t0} to ${t1} minutes on foot` : `~${Math.round(topN.w[l])} ${lvlTxt(l)} students (${nice(mv[1])} → ${nice(mv[2])}) get a shorter walk, ${t0} to ${t1} minutes`; }).join(", while ");
+      const lead = parts[0];
+      return `<div class="finding"><div class="big">${topN.n} <small>+${Math.round(topN.d[lead] / topN.w[lead])} min</small></div><p>The neighborhood with the most added walking in Scenario A: ${desc}. Net, that is about ${Math.round(topN.sm).toLocaleString()} added student-minutes each way, every school day.</p></div>`;
+    })();
+    document.getElementById("findings").innerHTML = `
+      <div class="finding"><div class="big">+${a.k5.walk.delta} <small>min walk</small></div><p>Average added walk for the ~${a.k5.students_moving.toLocaleString()} K–5 neighborhood students reassigned in Scenario A ${name} (+${b.k5.walk.delta} for ~${b.k5.students_moving.toLocaleString()} in B). By bike +${a.k5.bike.delta} min, by car or bus +${a.k5.drive.delta} min.</p></div>
+      <div class="finding"><div class="big">${a.k5.newly_over_walk_threshold.toLocaleString()} <small>students</small></div><p>K–5 students in Scenario A who would newly live more than a mile's walk from school, PPS's yellow-bus threshold (${b.k5.newly_over_walk_threshold.toLocaleString()} in B).</p></div>
+      <div class="finding"><div class="big">${nice(worst.school)} <small>+${worst.walk.delta} min</small></div><p>The largest added walk among K–5 closures (Scenario A ${name}, to ${Object.keys(worst.receivers).map(nice).join(", ")}). The share walking more than a mile goes from ${pct(worst.walk_over_1mi_before)} to ${pct(worst.walk_over_1mi_after)}.</p></div>
+      ${nbCard}
+      <div class="finding"><div class="big">+${a.ms.walk.delta} <small>min walk</small></div><p>Middle-school moves are steeper: ~${a.ms.students_moving.toLocaleString()} students in grades 6–8 change schools in Scenario A ${name}. The longest new walks: ${bigMs.map(e => `${nice(e.from)} to ${nice(e.to)}, ${fmtMin(e.walk.before)} to ${fmtMin(e.walk.after)} minutes on foot`).join("; ")}.</p></div>`;
+    const row = (l, f, g) => `<tr><td>${l}</td><td class="num">${f(a)}</td><td class="num">${f(b)}</td></tr>`;
+    document.getElementById("compare").innerHTML = `<thead><tr><th>${STRAT_LABEL[st]}</th><th>Scenario A</th><th>Scenario B</th></tr></thead><tbody>
+      ${row("Schools or sites closing", x => x === a ? 14 : 11, false)}
+      ${row("K–5 neighborhood students reassigned (est.)", x => x.k5.students_moving.toLocaleString(), false)}
+      ${MODES.map(m => row(`K–5 ${MODE_LABEL[m].toLowerCase()} time for those students, minutes`, x => `${fmtMin(x.k5[m].before)} → ${fmtMin(x.k5[m].after)} (${sign(x.k5[m].delta)})`, true)).join("")}
+      ${row("K–5 students newly past a 1-mile walk", x => x.k5.newly_over_walk_threshold.toLocaleString(), true)}
+      ${row("K–5 schools at 360+ students (est.)", x => `${x.k5_schools_at_360} of ${x.k5_schools_open}`, true)}
+      ${row("K–5 schools over building capacity (est.)", x => x.k5_over_capacity.length ? x.k5_over_capacity.map(nice).join(", ") : "none", true)}
+      ${row("Grade 6–8 students reassigned (est.)", x => x.ms.students_moving.toLocaleString(), true)}
+      ${row("Grade 6–8 walk time for those students, minutes", x => `${fmtMin(x.ms.walk.before)} → ${fmtMin(x.ms.walk.after)} (${sign(x.ms.walk.delta)})`, true)}
+      ${row("Middle schools at 500+ students (est.)", x => `${x.ms_schools_at_500} of ${x.ms_schools_open}`, true)}
+      ${row("Middle schools over building capacity (est.)", x => x.ms_over_capacity.length ? x.ms_over_capacity.map(nice).join(", ") : "none", true)}</tbody>`;
+  }
+
+
+  // ---------- approaches section ----------
+  const RATIONALE = {
+    pps: "The district's proposal. Each closing school's area goes to one or two named receiving schools, chosen to bring schools up to the size needed for a full program, favor buildings in better condition, and keep immersion pathways together.",
+    pair: "Keeps PPS's own rules (no more than two receiving schools per closure, buildings stay under capacity) but picks the receivers that make walks shortest.",
+    capacity: "Every home goes to the shortest walk that keeps each building under 95% of its capacity, even if a closing school's area is split among three or more schools.",
+    nearest: "Every home goes to the nearest open school on foot. This is the floor on added travel. It ignores capacity and school size.",
+    single: "Each closing school's whole area moves to the one open school with the shortest average walk, so classmates stay together."
+  };
+  function renderOpts() {
+    const el = document.getElementById("opts"), m = S.mode, lv = S.level;
+    el.innerHTML = STRATS.map(st => {
+      const x = D.summary[`${S.tag}_${st}`], on = st === S.strat;
+      const size = lv === "k5" ? `${x.k5_schools_at_360} of ${x.k5_schools_open}` : `${x.ms_schools_at_500} of ${x.ms_schools_open}`;
+      const over = (lv === "k5" ? x.k5_over_capacity : x.ms_over_capacity).length;
+      return `<button type="button" class="opt" role="radio" aria-checked="${on}" data-s="${st}">${on ? '<span class="on">Showing</span>' : '<span class="on" style="visibility:hidden">Showing</span>'}<b class="nm">${STRAT_LABEL[st]}</b><p>${RATIONALE[st]}</p>
+        <dl><dt>Added ${MODE_LABEL[m].toLowerCase()}, ${lv === "k5" ? "K–5" : "6–8"}</dt><dd>${sign(x[lv][m].delta)} min</dd>
+        <dt>Students moving</dt><dd>${x[lv].students_moving.toLocaleString()}</dd>
+        <dt>Schools at ${lv === "k5" ? "360" : "500"}+</dt><dd>${size}</dd>
+        <dt>Over capacity</dt><dd>${over}</dd></dl></button>`;
+    }).join("");
+    el.querySelectorAll(".opt").forEach(b => b.onclick = () => { S.strat = b.dataset.s; refresh(); });
+    const lvName = S.level === "k5" ? "K–5" : "grade 6–8";
+    document.getElementById("bc-lede").innerHTML = `Every number and map on this page uses <b>Scenario ${S.tag}</b> with <b>${STRAT_LABEL[S.strat]}</b> attendance areas for ${lvName} students${S.strat === "pps" ? ", rebuilt from PPS's published scenario maps" : ", an alternative drawn for comparison"}. Expand below to see what changes, compare with today, or try other ways of drawing the lines for the same closures.`;
+    const PDF = { A_k5: 14505796, B_k5: 14505800, A_ms: 14505794, B_ms: 14505798 }, mk = `${S.tag}_${S.level}`;
+    const pdf = `https://meetings.boardbook.org/Documents/DownloadPDF/${PDF[mk]}?org=915`;
+    const memo = "https://meetings.boardbook.org/Documents/DownloadPDF/14509719?org=915", agenda = "https://meetings.boardbook.org/Public/Agenda/915?meeting=769955";
+    const title = `Grade ${S.level === "k5" ? "K–5" : "6–8"} Attendance Areas, School Year 2027–28, Scenario ${S.tag}`;
+    document.getElementById("pps-src").innerHTML = S.strat === "pps"
+      ? `<a href="${pdf}" target="_blank" rel="noopener"><img src="pps_${mk}.jpg" alt="PPS map: ${title}" loading="lazy"></a><figcaption><b>Source: PPS, “${title}”</b><span>From the Oct 6, 2026 board packet. The lines in this page's PPS plan were traced from this map; receiving schools come from the superintendent's memo.</span><span><a href="${pdf}" target="_blank" rel="noopener">Open the map (PDF)</a> · <a href="${memo}" target="_blank" rel="noopener">Superintendent's memo (PDF)</a> · <a href="${agenda}" target="_blank" rel="noopener">Board agenda</a></span></figcaption>`
+      : `<div class="alt"><b>${STRAT_LABEL[S.strat]} is not a PPS proposal.</b> It closes the same schools as Scenario ${S.tag} and redraws the lines by the rule above, so you can see how much of the added travel comes from where the lines go.<br><br>PPS's own map for this scenario: <a href="${pdf}" target="_blank" rel="noopener">${title} (PDF)</a>.</div>`;
+    document.getElementById("cmp-hint").textContent = `Drag the divider to compare today with the chosen plan. Each school keeps its color on both sides, so a closing school's area (red dashed outline) takes on its receivers' colors. ${S.level === "k5" ? "K–5" : "Grades 6–8"}, Scenario ${S.tag}; switch grades or scenario above.`;
+  }
+
+  // zone colors: greedy coloring so neighboring schools never share a color in any layer
+  const ZONE = { k5: {}, ms: {} };
+  ["k5", "ms"].forEach(lv => {
+    const adj = new Map(), add = (a, b) => { if (a === b || a < 0 || b < 0) return; (adj.get(a) || adj.set(a, new Set()).get(a)).add(b); (adj.get(b) || adj.set(b, new Set()).get(b)).add(a); };
+    const col = lv === "k5" ? 4 : 5;
+    EDGES.forEach(([i, j]) => { add(H[i][col], H[j][col]); D.keys.forEach(k => add(newS(H[i], k, lv), newS(H[j], k, lv))); });
+    const order = [...adj.keys()].sort((a, b) => adj.get(b).size - adj.get(a).size);
+    order.forEach(n => { const used = new Set([...adj.get(n)].map(x => ZONE[lv][x])); let c = 1; while (used.has(c) && c < 8) c++; ZONE[lv][n] = c; });
+  });
+
+  const cc = document.getElementById("cmp"), cx2 = cc.getContext("2d"), cw = document.getElementById("cmpwrap"), ctip = document.getElementById("ctip");
+  let CW = 0, CH = 0, cview = null, split = 0.5;
+  function cfit() { const x0 = mx(HOME[0]), x1 = mx(HOME[2]), y0 = my(HOME[3]), y1 = my(HOME[1]); const sc = Math.min(CW / (x1 - x0), CH / (y1 - y0)) * 0.94; cview = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, s: sc, s0: sc }; }
+  let cdpr = 1;
+  function cresize() { const r = cw.getBoundingClientRect(); cdpr = window.devicePixelRatio || 1; CW = r.width; CH = r.height; if (!CW || !CH) return; cc.width = Math.round(CW * cdpr); cc.height = Math.round(CH * cdpr); if (!cview) cfit(); drawCmp(); }
+  const cpx = x => (x - cview.cx) * cview.s + CW / 2, cpy = y => (y - cview.cy) * cview.s + CH / 2;
+  const cux = X => (X - CW / 2) / cview.s + cview.cx, cuy = Y => (Y - CH / 2) / cview.s + cview.cy;
+  function cRings(rings) { rings.forEach(poly => poly.forEach(ring => { ring.forEach(([x, y], j) => j ? cx2.lineTo(cpx(x), cpy(y)) : cx2.moveTo(cpx(x), cpy(y))); cx2.closePath(); })); }
+  function cmpLayers() {
+    const LV = S.level === "k5" ? "elem" : "mid";
+    const left = { key: null, layer: BL[`cur_${LV}`], name: "Today" };
+    return { left, right: { key: key(), layer: BL[`${key()}_${LV}`], name: `${STRAT_LABEL[S.strat]} · Scenario ${S.tag}` } };
+  }
+  function drawSide(layer, isLeft, x0, x1) {
+    cx2.save(); cx2.beginPath(); cx2.rect(x0, 0, x1 - x0, CH); cx2.clip();
+    const zl = ZONE[S.level];
+    for (const n in layer) { cx2.beginPath(); cRings(layer[n].rings); cx2.fillStyle = css(`--z${zl[sidxOf[n]] || 1}`); cx2.globalAlpha = 0.82; cx2.fill("evenodd"); }
+    cx2.globalAlpha = 0.7; cx2.lineWidth = 1; cx2.strokeStyle = PAL.ink; cx2.beginPath(); for (const n in layer) cRings(layer[n].rings); cx2.stroke(); cx2.globalAlpha = 1;
+    if (!isLeft) {
+      const cur = BL[S.level === "k5" ? "cur_elem" : "cur_mid"];
+      cx2.setLineDash([5, 4]); cx2.lineWidth = 2; cx2.strokeStyle = PAL.closed; cx2.beginPath();
+      schoolsForLevel().forEach(sc => { if (status(sc.name) !== "open" && cur[sc.name]) cRings(cur[sc.name].rings); });
+      cx2.stroke(); cx2.setLineDash([]);
+    }
+    // schools: closed ones marked on the left, receivers dotted on the right
+    const names = new Set(Object.keys(layer));
+    schoolsForLevel().forEach(sc => {
+      const X = cpx(mx(sc.lon)), Y = cpy(my(sc.lat)); if (X < x0 - 20 || X > x1 + 20) return;
+      const closed = status(sc.name) !== "open";
+      if (!isLeft && closed && !names.has(sc.name)) { cx2.beginPath(); cx2.arc(X, Y, 3, 0, 7); cx2.fillStyle = PAL.muted; cx2.fill(); return; }
+      cx2.beginPath(); cx2.arc(X, Y, closed ? 5 : 3.5, 0, 7);
+      if (closed && isLeft) { cx2.fillStyle = PAL.surface; cx2.fill(); cx2.lineWidth = 2.2; cx2.strokeStyle = PAL.closed; cx2.stroke(); }
+      else { cx2.fillStyle = PAL.ink; cx2.fill(); }
+      if (cview.s > cview.s0 * 1.7) { cx2.font = "600 11.5px " + css("--body").split(",")[0]; cx2.lineWidth = 3; cx2.strokeStyle = PAL.surface; cx2.fillStyle = PAL.ink; cx2.strokeText(nice(sc.name), X + 7, Y + 4); cx2.fillText(nice(sc.name), X + 7, Y + 4); }
+    });
+    cx2.restore();
+  }
+  function drawCmp() {
+    if (!cview || !CW) return; readPal();
+    cx2.setTransform(cdpr, 0, 0, cdpr, 0, 0); cx2.fillStyle = PAL.surface; cx2.fillRect(0, 0, CW, CH);
+    const img = isDark() ? imgD : imgL;
+    if (img.complete && img.naturalWidth) { const x0 = cpx(mx(BM[0])), x1 = cpx(mx(BM[2])), y0 = cpy(my(BM[3])), y1 = cpy(my(BM[1])); cx2.drawImage(img, x0, y0, x1 - x0, y1 - y0); }
+    const { left, right } = cmpLayers(), sx = CW * split;
+    drawSide(left.layer || {}, true, 0, sx); drawSide(right.layer || {}, false, sx, CW);
+    document.getElementById("cmpL").textContent = left.name; document.getElementById("cmpR").textContent = right.name;
+    document.getElementById("cmpH").style.left = sx + "px";
+  }
+  let cdrag = null;
+  cc.addEventListener("pointerdown", e => { cc.setPointerCapture(e.pointerId); const onHandle = Math.abs(e.offsetX - CW * split) < 22; cdrag = { handle: onHandle, x: e.offsetX, y: e.offsetY, cx: cview.cx, cy: cview.cy }; });
+  cc.addEventListener("pointermove", e => {
+    if (cdrag) { if (cdrag.handle) split = Math.min(Math.max(e.offsetX / CW, 0.02), 0.98); else { cview.cx = cdrag.cx - (e.offsetX - cdrag.x) / cview.s; cview.cy = cdrag.cy - (e.offsetY - cdrag.y) / cview.s; } ctip.hidden = true; drawCmp(); return; }
+    cc.style.cursor = Math.abs(e.offsetX - CW * split) < 22 ? "ew-resize" : "grab";
+    const i = nearestHex(cux(e.offsetX), cuy(e.offsetY)); if (i < 0) { ctip.hidden = true; return; }
+    const r = H[i], lv = S.level, { left } = cmpLayers();
+    const a = left.key ? SN[newS(r, left.key, lv)] : SN[curS(r, lv)], b = SN[newS(r, key(), lv)];
+    ctip.innerHTML = `<b>${D.nbhds[r[6]] || "Portland"}</b><br>Today: ${nice(a)}<br>${STRAT_SHORT[S.strat]}: <b>${nice(b)}</b>`;
+    ctip.hidden = false; ctip.style.left = Math.min(e.offsetX + 14, CW - ctip.offsetWidth - 6) + "px"; ctip.style.top = Math.min(e.offsetY + 14, CH - ctip.offsetHeight - 6) + "px";
+  });
+  const cend = () => { cdrag = null; };
+  cc.addEventListener("pointerup", cend); cc.addEventListener("pointercancel", cend); cc.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") ctip.hidden = true; });
+  cc.addEventListener("wheel", e => { e.preventDefault(); const f = Math.exp(-e.deltaY * 0.0015), X = e.offsetX, Y = e.offsetY, x = cux(X), y = cuy(Y); cview.s = Math.min(Math.max(cview.s * f, cview.s0 * 0.6), cview.s0 * 16); cview.cx = x - (X - CW / 2) / cview.s; cview.cy = y - (Y - CH / 2) / cview.s; drawCmp(); }, { passive: false });
+  new ResizeObserver(cresize).observe(cw);
+
+  new ResizeObserver(resize).observe(box);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { renderLegend(); draw(); drawCmp(); });
+  new MutationObserver(() => { renderLegend(); draw(); drawCmp(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  refresh();
+})();
+</script>
+
+</body>
+</html>
