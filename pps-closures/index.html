@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Estimated walk, bike and drive time changes for every Portland Public Schools closure proposed in Scenarios A and B.">
 <style>[hidden]{display:none!important} img{max-width:100%}</style>
 <title>PPS Closure Commutes</title>
@@ -111,13 +111,17 @@ select { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var
 .vs { color: var(--muted); font-family: var(--mono); font-size: 11.5px; font-weight: 400; }
 .felt-mark { display: inline-block; vertical-align: middle; color: currentColor; }
 .made { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-2); text-decoration: none; }
-.made:hover, .made:focus-visible { color: #f33f75; }
+.made:focus-visible { color: #f33f75; }
+@media (hover: hover) { .made:hover { color: #f33f75; } }
 .mapcredit { position: absolute; right: 8px; bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--muted); }
 .mapcredit .made { background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line); border-radius: 4px; padding: 3px 7px; font-size: 11px; font-weight: 600; color: var(--ink); }
 .mapcredit .made:hover { color: #f33f75; border-color: #f33f75; }
 .eyebrow .made { color: var(--muted); text-transform: none; letter-spacing: 0; }
 .eyebrow .made:hover { color: #f33f75; }
 footer .made { font-weight: 600; color: var(--ink); }
+.contact { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 14px; }
+.contact a { font-weight: 600; }
+#emcopy { font: inherit; font-size: 12px; padding: 4px 10px; margin-left: 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
 .tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.12); max-width: 260px; z-index: 3; }
 .tip b { font-weight: 650; }
 .tip table { border-collapse: collapse; margin-top: 4px; }
@@ -144,7 +148,7 @@ footer .made { font-weight: 600; color: var(--ink); }
 section.block { margin-top: 44px; }
 .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 16px 0; }
 .opt { text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; cursor: pointer; display: grid; gap: 6px; align-content: start; min-width: 0; }
-.opt:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); }
+@media (hover: hover) { .opt:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); } }
 .opt[aria-checked="true"] { border: 2px solid var(--accent); padding: 11px 13px; background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
 .opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .opt .on { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
@@ -213,6 +217,54 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   .legend .keys { gap: 8px; margin-top: 4px; }
     .badge { font-size: 11.5px; }
 }
+.fsbtn { font: inherit; font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; margin-left: auto; }
+.fsclose { display: none; position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer; z-index: 6; box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+.mapbox.fs { position: fixed; inset: 0; z-index: 100; height: 100vh; height: 100dvh; min-height: 0; border: 0; border-radius: 0; }
+.mapbox.fs .fsclose { display: block; }
+.mapbox.fs #zfs { display: none; }
+.mapbox.fs .mapbtns { top: 62px; }
+body.fs-open { overflow: hidden; }
+.mapcard { position: absolute; left: 10px; right: 64px; top: 62px; max-width: 420px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 34px 10px 12px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.14); z-index: 5; }
+.mapcard table { border-collapse: collapse; margin-top: 4px; } .mapcard td { padding: 1px 8px 1px 0; font-family: var(--mono); font-size: 12px; }
+.cardx { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; border: 0; background: transparent; color: var(--ink-2); font-size: 22px; cursor: pointer; }
+.touchhint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(20, 28, 27, 0.82); color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 14px; font-weight: 600; pointer-events: none; text-align: center; max-width: 80%; z-index: 4; }
+.legend-toggle { display: none; font: inherit; font-size: 11px; font-weight: 600; margin-left: 8px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+.bc .short { display: none; }
+.ph-short { display: none; }
+@media (pointer: coarse) {
+  .mapbox, .cmpwrap { touch-action: pan-y; }
+  #map, #cmp { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .seg button { min-height: 38px; padding: 8px 12px; }
+  select { font-size: 16px; min-height: 38px; }
+  .chk { font-size: 15px; } .chk input { width: 20px; height: 20px; }
+  .mapbtns button { width: 40px; height: 40px; }
+  .legend-toggle { padding: 6px 10px; }
+  details > summary { padding-block: 8px; }
+  button, a, select, label, summary { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+}
+@media (max-width: 600px) {
+  .lede { font-size: 15.5px; margin-top: 10px; }
+  .controls { gap: 8px 14px; }
+  .ctl-strat { display: none; }
+  .bc { padding: 12px 14px; }
+  .bc h2 { font-size: 20px; }
+  .bc .long { display: none; } .bc .short { display: inline; }
+  .ph-long { display: none; } p.ph-short { display: block; } span.ph-short { display: inline; }
+  h1 { font-size: 34px; }
+  .legend-toggle { display: inline-block; }
+  .legend:not(.open) .keys, .legend:not(.open) .hint { display: none; }
+  .mapbox { height: 62vh; height: 62svh; }
+  .cmpwrap { height: 58vh; height: 58svh; }
+}
+@media (max-height: 560px) {
+  .controls { position: static; }
+  .legend-toggle { display: inline-block; }
+  .legend:not(.open) .keys, .legend:not(.open) .hint { display: none; }
+  .legend { font-size: 11px; padding: 6px 8px; }
+  .legend .sw, .legend .lbls span { width: 22px; }
+  .mapbox { height: calc(100vh - 20px); height: calc(100svh - 20px); min-height: 280px; }
+  .cmpwrap { height: calc(100vh - 20px); height: calc(100svh - 20px); min-height: 280px; }
+}
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 <script data-goatcounter="https://chrisloer.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -224,7 +276,8 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   <header class="top">
     <div class="eyebrow">Portland Public Schools · rightsizing scenarios released Oct 5, 2026 · <a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener">Made with <svg class="felt-mark" style="height:10px;width:18px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
     <h1>How much farther is school?</h1>
-    <p class="lede prose">PPS has proposed closing 14 schools (Scenario A) or 11 (Scenario B). This page estimates how each closure changes the trip to school for the families who live in its attendance area, walking, biking, and by car or bus. It covers K–5 closures and the middle-school moves that come with them.</p>
+    <p class="lede prose ph-short">How walk, bike and drive times change for families in each school PPS proposes closing: 14 in Scenario A, 11 in B.</p>
+    <p class="lede prose ph-long">PPS has proposed closing 14 schools (Scenario A) or 11 (Scenario B). This page estimates how each closure changes the trip to school for the families who live in its attendance area, walking, biking, and by car or bus. It covers K–5 closures and the middle-school moves that come with them.</p>
   </header>
 
 
@@ -232,14 +285,14 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     <div class="ctl"><span>Scenario</span><div class="seg" id="c-tag"></div></div>
     <div class="ctl"><span>Grades</span><div class="seg" id="c-level"></div></div>
     <div class="ctl"><span>Travel</span><div class="seg" id="c-mode"></div></div>
-    <div class="ctl"><span>Boundary adjustments</span><select id="c-strat" aria-label="Boundary adjustments"></select></div>
+    <div class="ctl ctl-strat"><span>Boundary adjustments</span><select id="c-strat" aria-label="Boundary adjustments"></select></div>
   </div>
 
   <section class="bc" id="approaches">
     <h2>Boundary changes</h2>
     <p class="prose" id="bc-lede"></p>
     <details id="bc-details">
-      <summary id="bc-sum">See what changes, PPS's source map, and other ways to draw the lines</summary>
+      <summary id="bc-sum"><span class="ph-long">See what changes, PPS's source map, and other ways to draw the lines</span><span class="ph-short">Details, PPS's map, other models</span></summary>
       <div class="bc-body">
         <p class="prose">Every option closes the same schools in the selected scenario. They differ only in which open schools absorb each closing school's neighborhood, for K–5 and for grades 6–8. The PPS plan is the district's proposal; the others are alternative boundary adjustments for comparison, not anything PPS has proposed. Choosing one updates every number and map on the page.</p>
         <div class="opts" id="opts" role="radiogroup" aria-label="Boundary adjustments"></div>
@@ -252,6 +305,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
               <div class="cmplab" id="cmpR" style="right:10px"></div>
               <div class="cmphandle" id="cmpH"></div>
               <div class="tip" id="ctip" hidden></div>
+              <div class="touchhint" id="ctouchhint" hidden>Drag the divider, or use two fingers to move the map</div>
               <div class="mapcredit"><span class="osm">Basemap © OpenStreetMap</span><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener" aria-label="Made with Felt">Made with <svg class="felt-mark" style="height:12px;width:21px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
             </div>
           </div>
@@ -261,14 +315,17 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     </details>
   </section>
 
-  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div><label class="chk"><input type="checkbox" id="c-weight" checked> Weight by number of students (student-minutes)</label></div>
+  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div><label class="chk"><input type="checkbox" id="c-weight" checked> <span class="ph-long">Weight by number of students (student-minutes)</span><span class="ph-short">Weight by students</span></label><button type="button" class="fsbtn" id="fsbtn">⤢ Explore map full screen</button></div>
   <div class="bench" style="margin-top:8px">
     <div class="mapbox" id="mapbox">
       <canvas id="map" aria-label="Map of travel time changes by neighborhood"></canvas>
-      <div class="mapbtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Reset view" style="font-size:13px">⤢</button></div>
+      <div class="mapbtns"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zreset" aria-label="Reset view" style="font-size:13px">⟲</button><button id="zfs" aria-label="Explore map full screen" style="font-size:15px">⤢</button></div>
+      <button type="button" class="fsclose" id="fsclose" aria-label="Close full-screen map">×</button>
+      <div class="mapcard" id="mapcard" hidden><button type="button" class="cardx" id="cardx" aria-label="Close">×</button><div id="cardbody"></div></div>
       <div class="badge" id="badge"></div>
       <div class="legend" id="legend"></div>
       <div class="tip" id="tip" hidden></div>
+      <div class="touchhint" id="touchhint" hidden>Use two fingers to move or zoom the map</div>
       <div class="mapcredit"><span class="osm">Basemap © OpenStreetMap</span><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener" aria-label="Made with Felt">Made with <svg class="felt-mark" style="height:12px;width:21px" aria-hidden="true"><use href="#felt-logo"/></svg></a></div>
     </div>
     <aside class="panel" id="panel" aria-live="polite"></aside>
@@ -402,10 +459,19 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     </details>
   </section>
 
-  <footer><p><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener">Made with <svg class="felt-mark" style="height:14px;width:25px" aria-hidden="true"><use href="#felt-logo"/></svg></a>. The maps, travel times and boundary tracing were produced with Felt: Felt maps and its <code>isochrone()</code> SQL function, driven by Claude through the Felt MCP server.</p><p>Independent analysis, not affiliated with Portland Public Schools. Figures are estimates for comparing scenarios, not official projections.</p></footer>
+  <footer><p><a class="made" href="https://felt.com/?utm_source=pps-closures&amp;utm_medium=referral&amp;utm_campaign=made-with-felt" target="_blank" rel="noopener">Made with <svg class="felt-mark" style="height:14px;width:25px" aria-hidden="true"><use href="#felt-logo"/></svg></a>. The maps, travel times and boundary tracing were produced with Felt: Felt maps and its <code>isochrone()</code> SQL function, driven by Claude through the Felt MCP server.</p><p>Independent analysis, not affiliated with Portland Public Schools. Figures are estimates for comparing scenarios, not official projections.</p>
+    <p class="contact">Questions, corrections or ideas? Email <span id="em">(turn on JavaScript to see the address)</span> <button type="button" id="emcopy" hidden>Copy</button></p></footer>
 </div>
 
 <script>
+// the address is assembled here so it never appears as plain text in the page source
+(function () {
+  const addr = ["chris", "loer"].join(".") + "\u0040" + ["gmail", "com"].join(".");
+  const em = document.getElementById("em"), bt = document.getElementById("emcopy");
+  em.innerHTML = ""; const a = document.createElement("a"); a.href = "mailto:" + addr; a.textContent = addr; em.appendChild(a);
+  bt.hidden = false;
+  bt.onclick = () => navigator.clipboard.writeText(addr).then(() => { bt.textContent = "Copied"; setTimeout(() => { bt.textContent = "Copy"; }, 1600); }, () => { const r = document.createRange(); r.selectNodeContents(a); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); });
+})();
 (async function () {
   const D = await (await fetch("data.json?v=3a14a5e7a9")).json();
   const B = await (await fetch("boundaries.json?v=97360759be")).json();
@@ -493,7 +559,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   }
   let homeS = 0;
   const clampS = s => Math.min(Math.max(s, homeS * 0.6), homeS * 16);
-  function resize() { const r = box.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; W = r.width; Hh = r.height; cv.width = W * dpr; cv.height = Hh * dpr; if (!view) { fit(HOME); homeS = view.s; } draw(); }
+  function resize() { const r = box.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2); W = r.width; Hh = r.height; cv.width = W * dpr; cv.height = Hh * dpr; if (!view) { fit(HOME); homeS = view.s; } draw(); }
   const px = x => (x - view.cx) * view.s + W / 2, py = y => (y - view.cy) * view.s + Hh / 2;
   const ux = X => (X - W / 2) / view.s + view.cx, uy = Y => (Y - Hh / 2) / view.s + view.cy;
   const isDark = () => { const t = document.documentElement.getAttribute("data-theme"); return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
@@ -534,7 +600,9 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   function strokeEdges(pred) { ctx.beginPath(); EDGES.forEach(e => { if (pred(e[0], e[1])) { ctx.moveTo(px(e[2]), py(e[3])); ctx.lineTo(px(e[4]), py(e[5])); } }); ctx.stroke(); }
   function pathRings(rings) { rings.forEach(poly => poly.forEach(ring => { ring.forEach(([x, y], j) => j ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y))); ctx.closePath(); })); }
 
-  function draw() {
+  let rafMain = 0;
+  function draw() { if (!rafMain) rafMain = requestAnimationFrame(() => { rafMain = 0; drawNow(); }); }
+  function drawNow() {
     if (!view) return;
     readPal();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -596,18 +664,74 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
 
   // interaction
   let drag = null; const pts = new Map();
-  cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.offsetX, e.offsetY]); drag = { x: e.offsetX, y: e.offsetY, moved: false, cx: view.cx, cy: view.cy, s: view.s, d0: pinchD() }; });
+  cv.addEventListener("pointerdown", e => { if (e.pointerType === "touch") return; cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.offsetX, e.offsetY]); drag = { x: e.offsetX, y: e.offsetY, moved: false, cx: view.cx, cy: view.cy, s: view.s, d0: pinchD() }; });
   cv.addEventListener("pointermove", e => {
+    if (e.pointerType === "touch") return;
     if (pts.has(e.pointerId)) pts.set(e.pointerId, [e.offsetX, e.offsetY]);
     if (drag && pts.size >= 2) { const d = pinchD(); if (drag.d0 && d) { view.s = clampS(drag.s * d / drag.d0); drag.moved = true; draw(); } return; }
     if (drag) { const dx = e.offsetX - drag.x, dy = e.offsetY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) { drag.moved = true; cv.classList.add("dragging"); } view.cx = drag.cx - dx / view.s; view.cy = drag.cy - dy / view.s; draw(); tip.hidden = true; return; }
     hover(e.offsetX, e.offsetY);
   });
   function pinchD() { if (pts.size < 2) return 0; const [a, b] = [...pts.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); }
-  function endPtr(e) { pts.delete(e.pointerId); if (drag && !drag.moved && pts.size === 0) { click(e.offsetX, e.offsetY); if (e.pointerType === "touch") hover(e.offsetX, e.offsetY); } if (pts.size === 0) { drag = null; cv.classList.remove("dragging"); } }
+  function endPtr(e) { if (e.pointerType === "touch") return; pts.delete(e.pointerId); if (drag && !drag.moved && pts.size === 0) { click(e.offsetX, e.offsetY); if (e.pointerType === "touch") hover(e.offsetX, e.offsetY); } if (pts.size === 0) { drag = null; cv.classList.remove("dragging"); } }
   cv.addEventListener("pointerup", endPtr); cv.addEventListener("pointercancel", endPtr);
   cv.addEventListener("pointerleave", e => { if (e.pointerType === "touch") return; tip.hidden = true; setHover(null); });
   cv.addEventListener("wheel", e => { e.preventDefault(); zoomAt(e.offsetX, e.offsetY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  // touch: one finger scrolls the page, two fingers move and zoom the map, a tap selects
+  const tpos = (t, el) => { const r = el.getBoundingClientRect(); return [t.clientX - r.left, t.clientY - r.top]; };
+  function flashHint(el) { el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 1400); }
+  function twoStart(e, el, v, w, h) {
+    const a = tpos(e.touches[0], el), b = tpos(e.touches[1], el);
+    return { mode: "two", mx: (a[0] + b[0]) / 2, my: (a[1] + b[1]) / 2, d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, cx: v.cx, cy: v.cy, s: v.s };
+  }
+  function twoMove(e, el, t, v, w, h, clamp) {
+    const a = tpos(e.touches[0], el), b = tpos(e.touches[1], el), mX = (a[0] + b[0]) / 2, mY = (a[1] + b[1]) / 2, d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    const s2 = clamp(t.s * d / t.d), x0 = t.cx + (t.mx - w / 2) / t.s, y0 = t.cy + (t.my - h / 2) / t.s;
+    v.s = s2; v.cx = x0 - (mX - w / 2) / s2; v.cy = y0 - (mY - h / 2) / s2;
+  }
+  const hintMain = document.getElementById("touchhint"), card = document.getElementById("mapcard"), cardBody = document.getElementById("cardbody");
+  let tch = null, lastTwo = 0, tapTimer = 0, touchTips = false;
+  const isFS = () => box.classList.contains("fs");
+  function openFS() {
+    if (isFS()) return;
+    box.classList.add("fs"); document.body.classList.add("fs-open"); tip.hidden = true;
+    try { history.pushState({ ppsFs: 1 }, ""); } catch (_) {}
+  }
+  function closeFS(fromPop) {
+    if (!isFS()) return;
+    box.classList.remove("fs"); document.body.classList.remove("fs-open"); card.hidden = true; tip.hidden = true;
+    if (!fromPop) { try { if (history.state && history.state.ppsFs) history.back(); } catch (_) {} }
+  }
+  document.getElementById("fsbtn").onclick = openFS; document.getElementById("zfs").onclick = openFS;
+  document.getElementById("fsclose").onclick = () => closeFS(false);
+  document.getElementById("cardx").onclick = () => { card.hidden = true; };
+  addEventListener("popstate", () => closeFS(true));
+  addEventListener("keydown", e => { if (e.key === "Escape") closeFS(false); });
+  function doTap(x, y) { touchTips = true; click(x, y); hover(x, y); touchTips = false; }
+  // in the page: one finger scrolls, two fingers move the map; full screen: one finger pans too.
+  // Taps wait briefly and are dropped right after a two-finger gesture, so starting a pan never opens a popup.
+  cv.addEventListener("touchstart", e => {
+    clearTimeout(tapTimer);
+    if (e.touches.length === 1) { const [x, y] = tpos(e.touches[0], cv); tch = { mode: "tap", x, y, t: Date.now(), cx: view.cx, cy: view.cy }; if (isFS()) e.preventDefault(); }
+    else if (e.touches.length === 2) { e.preventDefault(); tch = twoStart(e, cv, view, W, Hh); tip.hidden = true; hintMain.hidden = true; lastTwo = Date.now(); }
+  }, { passive: false });
+  cv.addEventListener("touchmove", e => {
+    if (!tch) return;
+    if (tch.mode === "two" && e.touches.length === 2) { e.preventDefault(); twoMove(e, cv, tch, view, W, Hh, clampS); lastTwo = Date.now(); draw(); return; }
+    const [x, y] = tpos(e.touches[0], cv), dx = x - tch.x, dy = y - tch.y;
+    if (tch.mode === "pan") { e.preventDefault(); view.cx = tch.cx - dx / view.s; view.cy = tch.cy - dy / view.s; draw(); return; }
+    if (tch.mode === "tap" && Math.hypot(dx, dy) > 10) {
+      if (isFS()) { e.preventDefault(); tch.mode = "pan"; tip.hidden = true; }
+      else { tch.mode = "scroll"; if (Math.abs(dx) > Math.abs(dy)) flashHint(hintMain); }
+    }
+  }, { passive: false });
+  cv.addEventListener("touchend", e => {
+    if (tch && tch.mode === "tap" && e.touches.length === 0 && Date.now() - tch.t < 600 && Date.now() - lastTwo > 400) {
+      e.preventDefault(); const { x, y } = tch; tapTimer = setTimeout(() => doTap(x, y), 180);
+    }
+    if (e.touches.length === 0) tch = null;
+  }, { passive: false });
+  cv.addEventListener("touchcancel", () => { tch = null; });
   function zoomAt(X, Y, f) { const x = ux(X), y = uy(Y); view.s = clampS(view.s * f); view.cx = x - (X - W / 2) / view.s; view.cy = y - (Y - Hh / 2) / view.s; draw(); }
   document.getElementById("zin").onclick = () => zoomAt(W / 2, Hh / 2, 1.5);
   document.getElementById("zout").onclick = () => zoomAt(W / 2, Hh / 2, 1 / 1.5);
@@ -630,7 +754,9 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     const smLine = S.weight && tm != null && st >= 0.05 ? `<br><b>≈ ${st >= 10 ? Math.round(st) : st.toFixed(1)} students × ${sign(tm).replace("+", S.view === "delta" ? "+" : "")} min = ${fmtSM(Math.abs(st * tm))} ${S.view === "delta" ? (tm < 0 ? "fewer " : "added ") : ""}student-minutes</b> (${MODE_LABEL[S.mode].toLowerCase()})` : "";
     return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${c === n ? `Stays at ${nice(c)}` : `${nice(c)} → <b>${nice(n)}</b>`}<table>${rows}</table><span style="color:var(--muted)">minutes · about ${st >= 1 ? Math.round(st) : st > 0.05 ? "<1" : "no"} ${lvl === "k5" ? "K–5" : "grade 6–8"} neighborhood student${Math.round(st) === 1 ? "" : "s"} live here</span>${smLine}`;
   }
-  function showTip(X, Y, html) { tip.innerHTML = html; tip.hidden = false; const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(X + 14, W - tw - 6) + "px"; tip.style.top = Math.min(Y + 14, Hh - th - 6) + "px"; }
+  function showTip(X, Y, html) {
+    if (touchTips && isFS()) { cardBody.innerHTML = html; card.hidden = false; tip.hidden = true; return; }
+    tip.innerHTML = html; tip.hidden = false; const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(X + 14, W - tw - 6) + "px"; tip.style.top = Math.min(Y + 14, Hh - th - 6) + "px"; }
   function click(X, Y) {
     const s = schoolAt(X, Y);
     if (s) { select(status(s.name) === "open" ? null : s.name, false); return; }
@@ -682,7 +808,9 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
       h = `<div class="t">${MODE_LABEL[m]} time to assigned school, minutes (${S.view === "after" ? "after" : "today"})</div><div class="row">${PAL.abs.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
     }
     h += `<div class="keys"><span><i style="border:2px solid ${PAL.closed};background:transparent"></i>${S.level === "k5" ? "closing" : "closing or K–8 losing 6–8"}</span><span><i style="background:${PAL.recv}"></i>receiving</span><span><i style="border:2px dashed ${PAL.closed};background:transparent;border-radius:2px"></i>${S.sel ? "area today and how it splits" : (matchMedia("(hover: none)").matches ? "tap" : "hover") + " a closing school to see its area split"}</span></div>`;
+    h = h.replace('<div class="t">', '<div class="t">').replace(/<\/div>/, `<button type="button" class="legend-toggle" aria-expanded="${el.classList.contains("open")}">${el.classList.contains("open") ? "Less" : "Key"}</button></div>`);
     el.innerHTML = h;
+    const tg = el.querySelector(".legend-toggle"); if (tg) tg.onclick = () => { el.classList.toggle("open"); renderLegend(); };
     const bd = document.getElementById("badge");
     bd.textContent = `Scenario ${S.tag} · ${S.level === "k5" ? "K–5" : "Grades 6–8"} · ${STRAT_LABEL[S.strat]}`;
     bd.className = "badge" + (S.strat !== "pps" ? " alt" : "");
@@ -873,7 +1001,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     }).join("");
     el.querySelectorAll(".opt").forEach(b => b.onclick = () => { S.strat = b.dataset.s; refresh(); });
     const lvName = S.level === "k5" ? "K–5" : "grade 6–8";
-    document.getElementById("bc-lede").innerHTML = `Every number and map on this page uses <b>Scenario ${S.tag}</b> with <b>${STRAT_LABEL[S.strat]}</b> attendance areas for ${lvName} students${S.strat === "pps" ? ", rebuilt from PPS's published scenario maps" : ", an alternative drawn for comparison"}. Expand below to see what changes, compare with today, or try other ways of drawing the lines for the same closures.`;
+    document.getElementById("bc-lede").innerHTML = `<span class="short">Showing <b>Scenario ${S.tag} · ${STRAT_LABEL[S.strat]} · ${S.level === "k5" ? "K–5" : "grades 6–8"}</b>.</span><span class="long">Every number and map on this page uses <b>Scenario ${S.tag}</b> with <b>${STRAT_LABEL[S.strat]}</b> attendance areas for ${lvName} students${S.strat === "pps" ? ", rebuilt from PPS's published scenario maps" : ", an alternative drawn for comparison"}. Expand below to see what changes, compare with today, or try other ways of drawing the lines for the same closures.</span>`;
     const PDF = { A_k5: 14505796, B_k5: 14505800, A_ms: 14505794, B_ms: 14505798 }, mk = `${S.tag}_${S.level}`;
     const pdf = `https://meetings.boardbook.org/Documents/DownloadPDF/${PDF[mk]}?org=915`;
     const memo = "https://meetings.boardbook.org/Documents/DownloadPDF/14509719?org=915", agenda = "https://meetings.boardbook.org/Public/Agenda/915?meeting=769955";
@@ -898,7 +1026,7 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
   let CW = 0, CH = 0, cview = null, split = 0.5;
   function cfit() { const x0 = mx(HOME[0]), x1 = mx(HOME[2]), y0 = my(HOME[3]), y1 = my(HOME[1]); const sc = Math.min(CW / (x1 - x0), CH / (y1 - y0)) * 0.94; cview = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, s: sc, s0: sc }; }
   let cdpr = 1;
-  function cresize() { const r = cw.getBoundingClientRect(); cdpr = window.devicePixelRatio || 1; CW = r.width; CH = r.height; if (!CW || !CH) return; cc.width = Math.round(CW * cdpr); cc.height = Math.round(CH * cdpr); if (!cview) cfit(); drawCmp(); }
+  function cresize() { const r = cw.getBoundingClientRect(); cdpr = Math.min(window.devicePixelRatio || 1, 2); CW = r.width; CH = r.height; if (!CW || !CH) return; cc.width = Math.round(CW * cdpr); cc.height = Math.round(CH * cdpr); if (!cview) cfit(); drawCmp(); }
   const cpx = x => (x - cview.cx) * cview.s + CW / 2, cpy = y => (y - cview.cy) * cview.s + CH / 2;
   const cux = X => (X - CW / 2) / cview.s + cview.cx, cuy = Y => (Y - CH / 2) / cview.s + cview.cy;
   function cRings(rings) { rings.forEach(poly => poly.forEach(ring => { ring.forEach(([x, y], j) => j ? cx2.lineTo(cpx(x), cpy(y)) : cx2.moveTo(cpx(x), cpy(y))); cx2.closePath(); })); }
@@ -931,7 +1059,9 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     });
     cx2.restore();
   }
-  function drawCmp() {
+  let rafCmp = 0;
+  function drawCmp() { if (!rafCmp) rafCmp = requestAnimationFrame(() => { rafCmp = 0; drawCmpNow(); }); }
+  function drawCmpNow() {
     if (!cview || !CW) return; readPal();
     cx2.setTransform(cdpr, 0, 0, cdpr, 0, 0); cx2.fillStyle = PAL.surface; cx2.fillRect(0, 0, CW, CH);
     const img = isDark() ? imgD : imgL;
@@ -942,18 +1072,43 @@ footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
     document.getElementById("cmpH").style.left = sx + "px";
   }
   let cdrag = null;
-  cc.addEventListener("pointerdown", e => { cc.setPointerCapture(e.pointerId); const onHandle = Math.abs(e.offsetX - CW * split) < 22; cdrag = { handle: onHandle, x: e.offsetX, y: e.offsetY, cx: cview.cx, cy: cview.cy }; });
+  function cTipAt(X, Y) {
+    const i = nearestHex(cux(X), cuy(Y)); if (i < 0) { ctip.hidden = true; return; }
+    const r = H[i], lv = S.level;
+    ctip.innerHTML = `<b>${D.nbhds[r[6]] || "Portland"}</b><br>Today: ${nice(SN[curS(r, lv)])}<br>${STRAT_SHORT[S.strat]}: <b>${nice(SN[newS(r, key(), lv)])}</b>`;
+    ctip.hidden = false; ctip.style.left = Math.min(X + 14, CW - ctip.offsetWidth - 6) + "px"; ctip.style.top = Math.min(Y + 14, CH - ctip.offsetHeight - 6) + "px";
+  }
+  cc.addEventListener("pointerdown", e => { if (e.pointerType === "touch") return; cc.setPointerCapture(e.pointerId); const onHandle = Math.abs(e.offsetX - CW * split) < 22; cdrag = { handle: onHandle, x: e.offsetX, y: e.offsetY, cx: cview.cx, cy: cview.cy }; });
   cc.addEventListener("pointermove", e => {
+    if (e.pointerType === "touch") return;
     if (cdrag) { if (cdrag.handle) split = Math.min(Math.max(e.offsetX / CW, 0.02), 0.98); else { cview.cx = cdrag.cx - (e.offsetX - cdrag.x) / cview.s; cview.cy = cdrag.cy - (e.offsetY - cdrag.y) / cview.s; } ctip.hidden = true; drawCmp(); return; }
     cc.style.cursor = Math.abs(e.offsetX - CW * split) < 22 ? "ew-resize" : "grab";
-    const i = nearestHex(cux(e.offsetX), cuy(e.offsetY)); if (i < 0) { ctip.hidden = true; return; }
-    const r = H[i], lv = S.level, { left } = cmpLayers();
-    const a = left.key ? SN[newS(r, left.key, lv)] : SN[curS(r, lv)], b = SN[newS(r, key(), lv)];
-    ctip.innerHTML = `<b>${D.nbhds[r[6]] || "Portland"}</b><br>Today: ${nice(a)}<br>${STRAT_SHORT[S.strat]}: <b>${nice(b)}</b>`;
-    ctip.hidden = false; ctip.style.left = Math.min(e.offsetX + 14, CW - ctip.offsetWidth - 6) + "px"; ctip.style.top = Math.min(e.offsetY + 14, CH - ctip.offsetHeight - 6) + "px";
+    cTipAt(e.offsetX, e.offsetY);
   });
-  const cend = () => { cdrag = null; };
+  const cend = e => { if (e.pointerType !== "touch") cdrag = null; };
   cc.addEventListener("pointerup", cend); cc.addEventListener("pointercancel", cend); cc.addEventListener("pointerleave", e => { if (e.pointerType !== "touch") ctip.hidden = true; });
+  // touch: drag the divider (or tap to place it), two fingers move the map, one finger elsewhere scrolls the page
+  const hintCmp = document.getElementById("ctouchhint");
+  let ctch = null;
+  const cclamp = v => Math.min(Math.max(v, cview.s0 * 0.6), cview.s0 * 16);
+  cc.addEventListener("touchstart", e => {
+    if (e.touches.length === 1) {
+      const [x, y] = tpos(e.touches[0], cc);
+      if (Math.abs(x - CW * split) < 30) { e.preventDefault(); ctch = { mode: "handle" }; ctip.hidden = true; }
+      else ctch = { mode: "tap", x, y, t: Date.now() };
+    } else if (e.touches.length === 2) { e.preventDefault(); ctch = twoStart(e, cc, cview, CW, CH); ctip.hidden = true; hintCmp.hidden = true; }
+  }, { passive: false });
+  cc.addEventListener("touchmove", e => {
+    if (!ctch) return;
+    if (ctch.mode === "handle") { e.preventDefault(); const [x] = tpos(e.touches[0], cc); split = Math.min(Math.max(x / CW, 0.02), 0.98); drawCmp(); return; }
+    if (ctch.mode === "two" && e.touches.length === 2) { e.preventDefault(); twoMove(e, cc, ctch, cview, CW, CH, cclamp); drawCmp(); return; }
+    if (ctch.mode === "tap") { const [x, y] = tpos(e.touches[0], cc), dx = x - ctch.x, dy = y - ctch.y; if (Math.hypot(dx, dy) > 10) { ctch.mode = "scroll"; if (Math.abs(dx) > Math.abs(dy)) flashHint(hintCmp); } }
+  }, { passive: false });
+  cc.addEventListener("touchend", e => {
+    if (ctch && ctch.mode === "tap" && e.touches.length === 0 && Date.now() - ctch.t < 600) { e.preventDefault(); split = Math.min(Math.max(ctch.x / CW, 0.02), 0.98); drawCmp(); cTipAt(ctch.x, ctch.y); }
+    if (e.touches.length === 0) ctch = null;
+  }, { passive: false });
+  cc.addEventListener("touchcancel", () => { ctch = null; });
   cc.addEventListener("wheel", e => { e.preventDefault(); const f = Math.exp(-e.deltaY * 0.0015), X = e.offsetX, Y = e.offsetY, x = cux(X), y = cuy(Y); cview.s = Math.min(Math.max(cview.s * f, cview.s0 * 0.6), cview.s0 * 16); cview.cx = x - (X - CW / 2) / cview.s; cview.cy = y - (Y - CH / 2) / cview.s; drawCmp(); }, { passive: false });
   new ResizeObserver(cresize).observe(cw);
 
