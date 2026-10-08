@@ -378,7 +378,7 @@ body.fs-open { overflow: hidden; }
           <li><b>Receivers.</b> The memo names every receiving school, at most two per closure. Each piece of a closing school's area goes to one of those receivers: the only one, or, for a two-way split, whichever receiver is the shorter average walk for that piece.</li>
           <li><b>Checks against the memo.</b> The memo gives split percentages for three closures. The rebuilt splits, weighted by children living in each piece: Maplewood <b>66 / 34</b> to Hayhurst / Rieke (memo: 70 / 30); Stephenson <b>72 / 28</b> to Markham / Capitol Hill (memo: 70 / 30); Buckman <b>56 / 44</b> to Abernethy / Sunnyside (memo: 50 / 50).</li>
           <li><b>Other shifts.</b> Two boundary moves between schools that stay open are described in writing and included: Duniway's southern edge to Llewellyn (A) and part of Whitman to Lewis (B). Both scenarios list more than 30 other "boundary change" schools. Those smaller adjustments could not be read reliably from the maps and are not modeled.</li>
-          <li><b>Special cases.</b> Lent and Rigler enroll only immersion students. Neighborhood students from the Lent area attend Marysville today, and the slides send them to Kelly. Those from the Rigler area attend Scott. César Chávez becomes a Spanish immersion hub, so its neighborhood K–5 students go to Rosa Parks.</li>
+          <li><b>Special cases.</b> Lent enrolls only Spanish immersion students; non-immersion students from the Lent area attend Marysville today (115 of them in October 2025), and the slides send them to Kelly. Rigler is also a whole-school Spanish immersion program, but most of its students live in its neighborhood, so it is treated as that neighborhood's school. César Chávez becomes a Spanish immersion hub, so its neighborhood K–5 students go to Rosa Parks.</li>
         </ol>
       </div>
     </details>
@@ -391,7 +391,7 @@ body.fs-open { overflow: hidden; }
           <li><b>Walking</b> uses Valhalla's default adult pace, about 5.1 km/h. Young children walk slower, so real walking times are likely longer.</li>
           <li><b>Biking</b> uses Valhalla's default bicycle profile, which favors bike-friendly streets.</li>
           <li><b>Driving</b> is free-flow time with no traffic, parking or drop-off line. It also stands in for the school bus here. Real bus rides are longer because routes make stops.</li>
-          <li><b>Cross-check.</b> ppsdata.info computed driving times between 119 pairs of schools with a different routing engine (OSRM). The two sets agree closely (correlation 0.96). Valhalla's times run about 19% shorter, a typical gap between free-flow engines.</li>
+          <li><b>Cross-checks.</b> ppsdata.info computed driving times between 119 pairs of schools with a different routing engine (OSRM). The two sets agree closely (correlation 0.96), with Valhalla's times about 19% shorter. Walking and biking times for 48 randomly chosen home–school trips were rerouted with OSRM's foot and bike profiles: correlation 0.996 and 0.994, with Valhalla about 14% shorter. The minutes here therefore lean low, not high.</li>
           <li><b>One mile</b> of walking is about 19 minutes at this pace. PPS buses K–5 students who live more than 1 mile from school and middle schoolers beyond 1.5 miles (about 28 minutes). The "over 1 mile" figures use those minute thresholds as a proxy for bus eligibility.</li>
         </ul>
       </div>
@@ -399,7 +399,10 @@ body.fs-open { overflow: hidden; }
     <details>
       <summary>Who counts as a student here</summary>
       <div>
-        <p>Where school-age children live comes from the 2020 Census Demographic and Housing Characteristics file, table P12, at the census-block level: ages 5–9 plus a fifth of ages 10–14 for K–5, and three fifths of ages 10–14 for grades 6–8. Block counts are split into the hexagons by area. Each school's 2025–26 K–5 enrollment (or grades 6–8 for middle schools), minus its immersion enrollment, is spread over its area in proportion to those children. With "Weight by number of students" on, each hexagon's opacity follows that estimate, so long trips where few students live fade out. Block-level Census counts include deliberate statistical noise for privacy, which mostly averages out at the hexagon scale. That estimates where each school's neighborhood students live. Immersion students are not in the travel averages, because their homes can be anywhere in the city. The program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) will lengthen many of their trips too.</p>
+        <p><b>How many students.</b> PPS's October 2025 enrollment summary counts, for every school, the students who live in its own neighborhood and attend its neighborhood program. Those counts are the student numbers here: they leave out students who transfer in from other neighborhoods and students in immersion programs. For K–8 schools they are split between K–5 and grades 6–8 by grade enrollment.</p>
+        <p><b>Where they live.</b> Each school's count is spread over its attendance area in proportion to school-age children from the 2020 Census Demographic and Housing Characteristics file (table P12, census blocks): ages 5–9 plus a fifth of ages 10–14 for K–5, and three fifths of ages 10–14 for grades 6–8. Block counts are split into the hexagons by area. Block-level Census counts include deliberate statistical noise for privacy, which mostly averages out at the hexagon scale.</p>
+        <p><b>Student-minutes.</b> With "Weight by number of students" on, each hexagon shows its students × their minutes of travel, one way. Summed over the map, those match the headline averages.</p>
+        <p><b>Immersion students are not in the travel numbers.</b> Their trips depend on program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) as well as where they live. At the closing schools alone, 238 immersion students live in the school's own neighborhood (73 at Beach, 96 at James John, 69 at Rose City Park), and many of their trips will get longer too.</p>
         <p>Building loads in the trade-off chart add each school's immersion students, following the program moves, to its neighborhood students. Capacity is the 2021 Long-Range Facility Plan's functional capacity. These are 2025–26 estimates; PPS's own figures use 2031–32 projections and will differ.</p>
       </div>
     </details>
@@ -436,7 +439,7 @@ body.fs-open { overflow: hidden; }
         <ul>
           <li>The rebuilt K–5 lines follow PPS's maps closely where closures are involved, but are drawn on a ~0.1 km² hexagon grid. Homes within a block or two of a new line may be assigned to the wrong side.</li>
           <li>About 30 smaller boundary changes at open schools are not modeled, and the middle-school lines follow the memo's rules rather than the 6–8 maps.</li>
-          <li>About 7 in 10 PPS students attend their neighborhood school. Families using transfers, focus options or charters are not modeled separately.</li>
+          <li>About 7 in 10 PPS students attend their neighborhood school. Students who transfer, attend focus options or charters, or are in immersion programs are not in the counts.</li>
           <li>Walk times assume an adult pace on any public street or path, and ignore hills, busy crossings and hazard-based busing.</li>
           <li>Driving and bus times are free-flow. Bus routes, stops and bell times are not modeled.</li>
         </ul>
@@ -473,8 +476,8 @@ body.fs-open { overflow: hidden; }
   bt.onclick = () => navigator.clipboard.writeText(addr).then(() => { bt.textContent = "Copied"; setTimeout(() => { bt.textContent = "Copy"; }, 1600); }, () => { const r = document.createRange(); r.selectNodeContents(a); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); });
 })();
 (async function () {
-  const D = await (await fetch("data.json?v=3a14a5e7a9")).json();
-  const B = await (await fetch("boundaries.json?v=97360759be")).json();
+  const D = await (await fetch("data.json?v=be69d8aaf5")).json();
+  const B = await (await fetch("boundaries.json?v=0011a3bd8f")).json();
   const MODES = ["walk", "bike", "drive"];
   const MODE_LABEL = { walk: "Walk", bike: "Bike", drive: "Drive / bus" };
   const STRATS = ["pps", "pair", "capacity", "nearest", "single"];
@@ -648,7 +651,7 @@ body.fs-open { overflow: hidden; }
   }
   function label(t, X, Y) { ctx.font = "600 12px " + css("--body").split(",")[0]; ctx.lineWidth = 3.5; ctx.strokeStyle = PAL.surface; ctx.fillStyle = PAL.ink; ctx.strokeText(t, X + 8, Y + 4); ctx.fillText(t, X + 8, Y + 4); }
 
-  function schoolsForLevel() { return D.school_info.filter(s => S.level === "k5" ? (s.elem && !["Lent", "Rigler"].includes(s.name)) : s.mid); }
+  function schoolsForLevel() { return D.school_info.filter(s => S.level === "k5" ? (s.elem && s.name !== "Lent") : s.mid); }
   const K8 = ["Beverly Cleary", "Laurelhurst", "Bridger", "Sunnyside", "Faubion", "Vernon", "Cesar Chavez"];
   function status(n) {
     if (S.level === "k5") { const c = D.receivers[S.tag]; return (n in c || n === "Marysville") ? (n === "Cesar Chavez" ? "hub" : "closed") : "open"; }
