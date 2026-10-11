@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Why out-of-focus dewy spiderwebs break into colored stripes: interactive wave-optics demos and a simulator of droplet interference under partially coherent sunlight.">
+<style>[hidden]{display:none!important} img{max-width:100%} body{margin:0}</style>
+<title>Spiderweb Stripes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: photographic black field; the simulator is the hero, prose runs below in one readable column. */
+:root {
+  --bg: #0b0c0e;
+  --panel: #15171b;
+  --line: #2a2e35;
+  --fg: #e7e4dc;
+  --muted: #9a978f;
+  --accent: #9fd6e6;
+  --warm: #f0c48a;
+  --display: "Young Serif", Georgia, serif;
+  --body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--bg); }
+body { background: var(--bg); color: var(--fg); font: 17px/1.6 var(--body); padding: 0 16px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 80px; }
+header h1 { font: 400 clamp(32px, 5vw, 52px)/1.1 var(--display); margin: 0 0 12px; text-wrap: balance; }
+header p { color: var(--muted); max-width: 62ch; margin: 0; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+
+.sim { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; margin-top: 32px; }
+@media (max-width: 860px) { .sim { grid-template-columns: minmax(0, 1fr); } }
+.stage { min-width: 0; }
+canvas#view { width: 100%; aspect-ratio: 3 / 1.15; display: block; background: #000; border: 1px solid var(--line); border-radius: 4px; }
+.readouts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 12px; font: 13px/1.5 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.readouts b { color: var(--fg); font-weight: 500; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.presets button { font: 14px var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.presets button:hover { border-color: var(--accent); }
+.presets button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.controls { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 14px; align-content: start; }
+.controls h2 { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.ctl { display: grid; gap: 4px; }
+.ctl label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.ctl label output { font: 13px var(--mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+.ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+.ctl small { color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.check input { accent-color: var(--accent); }
+
+article { max-width: 680px; margin: 64px auto 0; }
+article h2 { font: 400 28px/1.2 var(--display); margin: 48px 0 12px; text-wrap: balance; }
+article p, article li { color: var(--fg); }
+article .muted { color: var(--muted); }
+.formula { font: 15px/1.7 var(--mono); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 12px 16px; overflow-x: auto; color: var(--warm); }
+figure { margin: 24px 0; }
+.photos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .photos { grid-template-columns: 1fr; } }
+.photos img { width: 100%; border-radius: 3px; display: block; }
+figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; }
+a { color: var(--accent); }
+.err { color: var(--warm); font-size: 14px; }
+.demo { max-width: 1120px; margin: 72px auto 0; display: grid; gap: 16px; }
+.demo-text { max-width: 680px; }
+.demo-text h2 { font: 400 28px/1.2 var(--display); margin: 0 0 12px; text-wrap: balance; }
+.demo-text p { margin: 0 0 12px; }
+.demo-body { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .demo-body { grid-template-columns: minmax(0, 1fr); } }
+.demo-canvas { width: 100%; aspect-ratio: 16 / 8; display: block; background: #000; border: 1px solid var(--line); border-radius: 4px; touch-action: none; }
+.demo-canvas.tall { aspect-ratio: 16 / 9.5; }
+.demo-controls { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 12px; align-content: start; }
+.demo-controls .readouts { margin-top: 0; flex-direction: column; gap: 4px; }
+.demo-note { max-width: 680px; color: var(--muted); font-size: 15.5px; margin: 0; }
+.demo .formula { max-width: 680px; }
+.pill { justify-self: start; font: 14px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; cursor: pointer; }
+.pill:hover { border-color: var(--accent); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg label { font-size: 13.5px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; cursor: pointer; display: flex; gap: 6px; align-items: center; }
+.seg label:has(input:checked) { border-color: var(--accent); color: var(--accent); }
+.seg input { accent-color: var(--accent); margin: 0; }
+.refs li { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Wave optics · partially coherent sunlight</div>
+    <h1>Why a blurry spiderweb turns into a barcode</h1>
+    <p>Each tiny glue droplet on a sticky thread sends back a pinpoint of sunlight. Out of focus, every pinpoint becomes a disc. Where neighboring discs overlap, their light interferes, because sunlight is still coherent over a few droplet spacings. The simulator below computes that interference directly.</p>
+  </header>
+
+  <section class="sim" aria-label="Simulator">
+    <div class="stage">
+      <canvas id="view" aria-label="Simulated out-of-focus image of a droplet-covered thread"></canvas>
+      <p class="err" id="err" hidden></p>
+      <div class="readouts" id="readouts"></div>
+      <div class="presets" id="presets">
+        <button type="button" data-p="glue">Sticky thread in sunlight</button>
+        <button type="button" data-p="incoherent">Same, light made incoherent</button>
+        <button type="button" data-p="dew">Big dew drops</button>
+        <button type="button" data-p="single">One droplet</button>
+        <button type="button" data-p="pair">Two droplets</button>
+        <button type="button" data-p="periodic">Perfectly even spacing</button>
+        <button type="button" data-p="point">Point light instead of sun</button>
+      </div>
+    </div>
+    <div class="controls">
+      <h2>Thread</h2>
+      <div class="ctl"><label for="n">Droplets <output id="n_o"></output></label><input id="n" type="range" min="1" max="120" step="1"></div>
+      <div class="ctl"><label for="sp">Mean spacing <output id="sp_o"></output></label><input id="sp" type="range" min="8" max="400" step="1"></div>
+      <div class="ctl"><label for="jit">Spacing irregularity <output id="jit_o"></output></label><input id="jit" type="range" min="0" max="0.8" step="0.01"></div>
+      <div class="ctl"><label for="sz">Brightness variation <output id="sz_o"></output></label><input id="sz" type="range" min="0" max="0.8" step="0.01"></div>
+      <div class="ctl"><label for="seed">Random layout <output id="seed_o"></output></label><input id="seed" type="range" min="1" max="50" step="1"></div>
+      <h2>Camera</h2>
+      <div class="ctl"><label for="rho">Blur disc radius <output id="rho_o"></output></label><input id="rho" type="range" min="40" max="500" step="1"><small>How far out of focus, measured at the web.</small></div>
+      <div class="ctl"><label for="na">Lens aperture (NA) <output id="na_o"></output></label><input id="na" type="range" min="0.005" max="0.15" step="0.001"><small>Half the lens width divided by distance to the web. f/2.8 at 15 cm is about 0.05.</small></div>
+      <h2>Light</h2>
+      <div class="ctl"><label for="sun">Light source angular radius <output id="sun_o"></output></label><input id="sun" type="range" min="0" max="20" step="0.05"><small>The sun is 4.65 mrad. Smaller means more coherent.</small></div>
+      <label class="check"><input id="incoh" type="checkbox"> Force fully incoherent light</label>
+      <div class="ctl"><label for="exp">Exposure <output id="exp_o"></output></label><input id="exp" type="range" min="-3" max="3" step="0.05"></div>
+    </div>
+  </section>
+
+  <article>
+    <h2>What the photos show</h2>
+    <figure>
+      <div class="photos">
+        <img src="threads.jpg" alt="Out-of-focus sticky spider threads showing bands of colored vertical stripes">
+        <img src="dew.jpg" alt="Out-of-focus dew-covered threads where each drop is a separate plain disc">
+      </div>
+      <figcaption>Left: fine sticky threads, out of focus, break into colored stripes across the thread. Right: threads with large, widely spaced dew drops just make a row of plain discs. Photos by Dick Cline.</figcaption>
+    </figure>
+    <p>Dick's own caption for the photo of a single thread was the key clue: "the transition from ball to interference as the images overlap." A lone droplet gives a plain disc. The stripes only show up where the blurred discs of neighboring droplets overlap. That points to interference <em>between</em> droplets, not inside one droplet.</p>
+    <p>Three ideas explain the stripes. Each one has its own demo below: what a single droplet does to light, why sunlight can interfere at all, and how two droplets make stripes.</p>
+  </article>
+
+  <section class="demo" id="droplet">
+    <div class="demo-text">
+      <div class="eyebrow">Demo 1 · One droplet</div>
+      <h2>A droplet is a tiny fixed lens</h2>
+      <p>Light comes in from the left as a flat wave. The dots mark wave crests, one wavelength apart, drawn to true scale for a 12 µm droplet. Light slows down inside the droplet, so the crests bunch up and the wavefront bends. The light that passes through comes to a rough focus just behind the drop. Seen from far away, that focus is a single bright pinpoint, the glint.</p>
+      <p>A droplet does not scramble the light. The same wave in always gives the same wave out, with every crest in a fixed place. Two droplets lit by the same wave therefore give two glints whose crests stay in step. Any loss of coherence has to come from the light that arrives, not from the droplets.</p>
+    </div>
+    <div class="demo-body">
+      <canvas id="dropCanvas" class="demo-canvas" aria-label="Ray and wavefront diagram of light passing through a droplet"></canvas>
+      <div class="demo-controls">
+        <div class="ctl"><label for="dn">Refractive index <output id="dn_o"></output></label><input id="dn" type="range" min="1.2" max="1.7" step="0.01" value="1.40"><small>Water is 1.33. Spider glue is around 1.4 to 1.5.</small></div>
+        <label class="check"><input id="dT" type="checkbox" checked> Straight through</label>
+        <label class="check"><input id="dR" type="checkbox"> Reflected off the surface</label>
+        <label class="check"><input id="dB" type="checkbox"> One bounce inside (rainbow path)</label>
+        <button type="button" class="pill" id="dPlay">Pause</button>
+      </div>
+    </div>
+    <p class="demo-note">Line brightness follows the Fresnel equations. Only about 2 to 4% of the light reflects off the surface, and the rainbow path carries a few percent more. Dick's idea is that those two paths interfere with each other. They do, and that is how glories and supernumerary rainbows form. But a 12 µm drop's own fringes are about 0.05 rad wide, so only one or two fit across a camera lens. They also show up in a lone drop's disc, which the photos don't show.</p>
+  </section>
+
+  <section class="demo" id="coherence">
+    <div class="demo-text">
+      <div class="eyebrow">Demo 2 · Coherence</div>
+      <h2>Why sunlight interferes, but only over short distances</h2>
+      <p>Interference needs the light at two places to keep a steady timing relationship, so that crests from one keep landing on crests or troughs from the other. That steadiness is called coherence.</p>
+      <p>Every point on the sun shines on its own, out of step with every other point. Light from one point on the sun arrives as a flat wave, tilted slightly by where that point sits on the disc. A single tilted wave hitting two droplets gives a perfectly steady fringe pattern, shifted sideways by an amount that depends on the tilt and on how far apart the droplets are.</p>
+      <p>The camera adds up the patterns from every point on the sun. When the droplets are close, all the patterns line up and the fringes survive. When the droplets are far apart, the patterns land in different places and blur into flat light. Each colored curve below is one point on the sun. The white curve is what the camera records.</p>
+    </div>
+    <div class="demo-body">
+      <canvas id="cohCanvas" class="demo-canvas tall" aria-label="Fringe patterns from each point on the sun and their sum, with a coherence curve"></canvas>
+      <div class="demo-controls">
+        <div class="ctl"><label for="cd">Droplet separation <output id="cd_o"></output></label><input id="cd" type="range" min="2" max="200" step="1" value="30"></div>
+        <div class="ctl"><label for="ca">Light source angular radius <output id="ca_o"></output></label><input id="ca" type="range" min="0" max="15" step="0.05" value="4.65"><small>Sun 4.65 mrad. Zero is a point source, like a star or a laser.</small></div>
+        <div class="ctl"><label for="cl">Wavelength <output id="cl_o"></output></label><input id="cl" type="range" min="400" max="700" step="5" value="550"></div>
+        <div class="readouts" id="cohRead"></div>
+      </div>
+    </div>
+    <div class="formula">coherence(d) = 2·J₁(u) / u,   u = 2π·α·d / λ<br>first zero at d₀ = 0.61 λ / α ≈ 72 µm for the sun at 550 nm</div>
+    <p class="demo-note">This is the van Cittert–Zernike theorem. Michelson used the same effect in 1920 to measure the size of Betelgeuse: a star's light stays coherent over meters, and the distance at which its fringes vanish gives its angular size. A second kind of coherence matters too. Sunlight mixes all colors, and each color has its own fringe spacing, so only the first few fringes stay sharp before the colors drift apart. That color drift is what makes the bars colored instead of gray.</p>
+  </section>
+
+  <section class="demo" id="stripes">
+    <div class="demo-text">
+      <div class="eyebrow">Demo 3 · Two glints, one sensor</div>
+      <h2>How overlapping blur discs make stripes</h2>
+      <p>Here the camera lens is on the left and the light runs to the right. Each glint's light leaves the lens as a cone that narrows to a sharp image point at the focus. The sensor sits in front of the focus, so each glint lands as a blurry disc. Where two cones overlap, their waves cross at a slight angle. Crests meet crests along some lines and troughs along others, which makes straight bright and dark bands. Drag the sensor line to see the pattern it records.</p>
+      <p>Turn coherence down and the two waves drift in and out of step. The bands then wander, and the time-averaged strip at the bottom fades to flat. Switch to white light and the bands split into colors, because red light has wider bands than blue.</p>
+    </div>
+    <div class="demo-body">
+      <canvas id="waveCanvas" class="demo-canvas tall" aria-label="Wave field of two converging light cones behind a lens, with a movable sensor"></canvas>
+      <div class="demo-controls">
+        <div class="seg" role="radiogroup" aria-label="View">
+          <label><input type="radio" name="wmode" value="wave" checked> Waves</label>
+          <label><input type="radio" name="wmode" value="mono"> Brightness</label>
+          <label><input type="radio" name="wmode" value="white"> White light</label>
+        </div>
+        <div class="ctl"><label for="wn">Glints <output id="wn_o"></output></label><input id="wn" type="range" min="1" max="4" step="1" value="2"></div>
+        <div class="ctl"><label for="ws">Glint separation <output id="ws_o"></output></label><input id="ws" type="range" min="4" max="110" step="1" value="60"></div>
+        <div class="ctl"><label for="wg">Coherence <output id="wg_o"></output></label><input id="wg" type="range" min="0" max="1" step="0.01" value="1"></div>
+        <div class="ctl"><label for="wl">Wavelength (drawn huge) <output id="wl_o"></output></label><input id="wl" type="range" min="5" max="20" step="0.5" value="7"></div>
+        <div class="ctl"><label for="wx">Sensor position <output id="wx_o"></output></label><input id="wx" type="range" min="0.15" max="1.2" step="0.005" value="0.5"><small>You can also drag the dashed line.</small></div>
+        <button type="button" class="pill" id="wPlay">Pause</button>
+      </div>
+    </div>
+    <p class="demo-note">The wavelength and angles are greatly enlarged so the waves are visible. The real geometry has the same structure: the number of bands across one disc is about 2·NA·d/λ, whatever the defocus.</p>
+  </section>
+
+  <article>
+    <h2>Putting it together</h2>
+    <p>Each droplet on a capture thread is 10 to 15 µm across. It acts as a tiny ball lens and sends a pinpoint of sunlight toward the camera. With the camera focused somewhere else, each pinpoint spreads into a disc the shape of the lens opening. Neighboring droplets closer together than the sun's coherence width, about 70 µm, make Young's fringes where their discs overlap. Dew drops sit hundreds of microns apart, far outside that width. That is why the sticky threads stripe and the dew-laden ones don't.</p>
+    <p>The stripes run across the thread because each pair of droplets makes straight fringes perpendicular to the line joining them. Every droplet lies on the same line, so all the fringe sets line up. How many fringes fit across one blur disc depends only on the lens and the droplet spacing d:</p>
+    <div class="formula">fringes per disc ≈ 2·NA·d / λ</div>
+    <p>With f/2.8 at 15 cm and 30 µm spacing that is about five, which matches the photos. The spacing is irregular, so the fringe sets from different pairs add up to an irregular barcode. Each color has its own fringe period, so the bars come out colored. This is one-dimensional speckle in white light.</p>
+    <p class="muted">Defocus does not change the number of stripes per disc. It changes the disc size, so more defocus gives wider bands with wider stripes. Stopping the lens down gives fewer, wider stripes.</p>
+    <p>Dick's magnifier observation fits the same picture. Looking through a 10× loupe focused just off the thread, you see the thread and, a short distance away, the colored band. That distance is the blur-disc radius, and the band runs all the way along the thread because every droplet has neighbors.</p>
+
+    <h2>Where this could be wrong</h2>
+    <p>The explanation depends on droplet spacing. Zawischa counted 12 to 13 droplets per millimeter on a garden spider's thread, about 80 µm apart. That is just past the sun's first coherence zero, where the theory predicts stripes with only about 10% contrast. Inoue and colleagues saw spacings near 0.1 mm on a joro spider and 10 to 20 µm on other species. Measuring the spacing on the threads in these photos is the most useful next step.</p>
+    <p>A single droplet can also make more than one glint. Zawischa describes extra highlights at the droplet's "neck" where it meets the thread. Those glints sit on the thread's axis a few microns apart, so they would also make stripes across the thread, though fewer and wider ones.</p>
+
+    <h2>Quantum effects?</h2>
+    <p>None are needed. Classical wave optics plus the partial coherence of sunlight accounts for everything here. A quantum treatment gives the same answer, because each photon interferes only with itself, and partial coherence is the averaging over where on the sun it came from.</p>
+
+    <h2>Tests that would settle it</h2>
+    <ul>
+      <li>Use a laser pointer or a pinhole-filtered light. The light becomes fully coherent, so stripes should appear even between widely spaced dew drops.</li>
+      <li>Change the aperture. Stopping down from f/2.8 to f/8 should cut the stripes per disc to about a third.</li>
+      <li>Photograph the same thread in focus, measure the droplet spacing, and compare the stripe count against 2·NA·d/λ.</li>
+      <li>Shoot under thin cloud or a larger light source. The coherence width shrinks and the stripes should fade, while the bokeh band stays.</li>
+    </ul>
+
+    <h2>Other research</h2>
+    <ul class="refs">
+      <li><a href="https://farbeinf.de/static_html/Spinnennetz.html">Dietrich Zawischa, “Optische Erscheinungen an Spinnennetzen”</a> (in German). This is the closest match. Zawischa attributes the colors to interference of light from the nearly evenly spaced glue droplets. He notes they show best slightly out of focus, because they form where light from neighboring droplets overlaps, and he rules out rainbows for these colors. He doesn't discuss the coherence of sunlight.</li>
+      <li><a href="https://tsuyama-nit.repo.nii.ac.jp/record/1771/files/kiyou2019r01.pdf">Inoue, Imamura &amp; Sato, “Why does the spider silk shine with rainbow colors?”</a> (Bulletin of NIT Tsuyama College 61, 2019, in Japanese, PDF). They treat each droplet as a light source and compute the interference, and they photographed defocused threads with colors spread across the thread. Their model predicts too much blue compared with the pink and green actually seen, which they leave open.</li>
+      <li><a href="https://researchers.mq.edu.au/en/publications/optics-of-spider-sticky-orb-webs/">Kane, Staib, Naidoo, Little &amp; Herberstein, “Optics of spider ‘sticky’ orb webs”</a> (Proc. SPIE 7975, 2011). This is the opposing view. From white-light and laser experiments they conclude the main color source is rainbows from the droplets, explained by geometric optics. This is closest to Dick's idea. A follow-up, <a href="https://opticalengineering.spiedigitallibrary.org/conference-proceedings-of-spie/8428/84280T/Micro-optical-elements-and-optical-materials-of-certain-spider-webs/10.1117/12.922327.full">“Micro-optical elements and optical materials of certain spider webs”</a> (SPIE 8428, 2012), describes the glue droplets as near-elliptical micro-lenses.</li>
+      <li><a href="https://atoptics.co.uk/fz726.htm">Atmospheric Optics, “Spider Silk”</a>. This short note says out-of-focus colors on capture threads come at least partly from scattering by the arrays of globules, and colors on dry threads come from diffraction.</li>
+      <li><a href="https://van.physics.illinois.edu/ask/listing/64568">Illinois Physics Van, “Colored Spider Webs”</a>. A photographer's question, answered by pointing to Zawischa's droplet-interference explanation.</li>
+    </ul>
+
+    <h2>What the big simulator does</h2>
+    <p class="muted">Droplets are point scatterers at quasi-random positions along a line. Each one produces a defocused spherical wave clipped to the blur disc. For each of 16 wavelengths from 400 to 700 nm, the field from each droplet pair is multiplied by the sun's mutual coherence 2J₁(kαd)/(kαd) and summed. The result is converted to color with the CIE 1931 color-matching functions. It leaves out Mie scattering from each droplet, lens aberrations and the thread itself. Adding those is the obvious next step.</p>
+  </article>
+</div>
+
+<script>
+(() => {
+const canvas = document.getElementById('view');
+const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true });
+const errEl = document.getElementById('err');
+if (!gl) { errEl.hidden = false; errEl.textContent = 'This browser has WebGL2 turned off, so the simulator cannot run.'; return; }
+const MAXD = 160;
+
+const vs = `#version 300 es
+in vec2 p; out vec2 uv; void main(){ uv = p*0.5+0.5; gl_Position = vec4(p,0.,1.); }`;
+const fs = `#version 300 es
+precision highp float;
+in vec2 uv; out vec4 o;
+uniform vec2 drops[${MAXD}];
+uniform int nd;
+uniform float rho, na, alpha, L, mag, expo;
+uniform vec4 view;
+uniform bool incoh;
+const float X[16] = float[16](.0143,.1344,.3483,.2908,.0956,.0049,.0633,.2904,.5945,.9163,1.0622,.8544,.4479,.1649,.0468,.0114);
+const float Y[16] = float[16](.0004,.0040,.0230,.0600,.1390,.3230,.7100,.9540,.9950,.8700,.6310,.3810,.1750,.0610,.0170,.0041);
+const float Z[16] = float[16](.0679,.6456,1.7471,1.6692,.8130,.2720,.0782,.0203,.0039,.0017,.0008,.0002,0.,0.,0.,0.);
+float j1(float x){
+  float ax = abs(x);
+  if (ax < 8.0) {
+    float y = x*x;
+    float a1 = x*(72362614232.0+y*(-7895059235.0+y*(242396853.1+y*(-2972611.439+y*(15704.48260+y*(-30.16036606))))));
+    float a2 = 144725228442.0+y*(2300535178.0+y*(18583304.74+y*(99447.43394+y*(376.9991397+y))));
+    return a1/a2;
+  }
+  float z = 8.0/ax, y = z*z, xx = ax-2.356194491;
+  float a1 = 1.0+y*(0.183105e-2+y*(-0.3516396496e-4+y*(0.2457520174e-5+y*(-0.240337019e-6))));
+  float a2 = 0.04687499995+y*(-0.2002690873e-3+y*(0.8449199096e-5+y*(-0.88228987e-6+y*0.105787412e-6)));
+  float r = sqrt(0.636619772/ax)*(cos(xx)*a1-z*sin(xx)*a2);
+  return x < 0.0 ? -r : r;
+}
+float coh(float u){ return u < 1e-4 ? 1.0 : 2.0*j1(u)/u; }
+void main(){
+  float sx = mix(view.x, view.y, uv.x);
+  float sy = mix(view.z, view.w, uv.y);
+  float hw2 = rho*rho - sy*sy;
+  if (hw2 <= 0.0) { o = vec4(0,0,0,1); return; }
+  float hw = sqrt(hw2);
+  int idx[96]; int c = 0;
+  for (int j = 0; j < ${MAXD}; j++) {
+    if (j >= nd) break;
+    if (abs(sx - drops[j].x) < hw && c < 96) { idx[c] = j; c++; }
+  }
+  vec3 xyz = vec3(0);
+  vec2 E[96];
+  for (int l = 0; l < 16; l++) {
+    float lam = 0.4 + 0.02*float(l);
+    float k = 6.2831853/lam;
+    float kap = k*na/(2.0*rho);
+    float I = 0.0;
+    for (int a = 0; a < 96; a++) {
+      if (a >= c) break;
+      vec2 d = drops[idx[a]];
+      float ph = -kap*(sx-d.x)*(sx-d.x) + k*d.x*d.x*(1.0+mag)/(2.0*L);
+      E[a] = d.y*vec2(cos(ph), sin(ph));
+      I += dot(E[a], E[a]);
+    }
+    if (!incoh) {
+      for (int a = 0; a < 96; a++) {
+        if (a >= c) break;
+        for (int b = 0; b < 96; b++) {
+          if (b >= a) break;
+          float g = coh(k*alpha*abs(drops[idx[a]].x - drops[idx[b]].x));
+          I += 2.0*g*dot(E[a], E[b]);
+        }
+      }
+    }
+    xyz += I*vec3(X[l], Y[l], Z[l]);
+  }
+  vec3 rgb = mat3(3.2406,-0.9689,0.0557, -1.5372,1.8758,-0.2040, -0.4986,0.0415,1.0570) * xyz;
+  rgb /= vec3(6.4334, 5.0773, 4.8297);
+  rgb = max(rgb, 0.0) * expo;
+  rgb = 1.0 - exp(-rgb);
+  o = vec4(pow(rgb, vec3(1.0/2.2)), 1.0);
+}`;
+function sh(t, s){ const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(x)); return x; }
+let prog;
+try {
+  prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+} catch (e) { errEl.hidden = false; errEl.textContent = 'The simulator shader failed to compile: ' + e.message; return; }
+gl.useProgram(prog);
+const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const U = n => gl.getUniformLocation(prog, n);
+
+const ids = ['n','sp','jit','sz','seed','rho','na','sun','exp'];
+const el = Object.fromEntries(ids.map(i => [i, document.getElementById(i)]));
+const incohEl = document.getElementById('incoh');
+const fmt = {
+  n: v => v, sp: v => v + ' µm', jit: v => Math.round(v*100) + '%', sz: v => Math.round(v*100) + '%', seed: v => '#' + v,
+  rho: v => v + ' µm', na: v => (+v).toFixed(3), sun: v => (+v).toFixed(2) + ' mrad', exp: v => (v > 0 ? '+' : '') + (+v).toFixed(1) + ' EV'
+};
+const PRESETS = {
+  glue:       { n: 40, sp: 30, jit: 0.35, sz: 0.3, seed: 3, rho: 250, na: 0.05, sun: 4.65, exp: 0, incoh: false },
+  incoherent: { n: 40, sp: 30, jit: 0.35, sz: 0.3, seed: 3, rho: 250, na: 0.05, sun: 4.65, exp: 0, incoh: true },
+  dew:        { n: 8, sp: 320, jit: 0.15, sz: 0.1, seed: 4, rho: 150, na: 0.05, sun: 4.65, exp: 0.5, incoh: false },
+  single:     { n: 1, sp: 30, jit: 0, sz: 0, seed: 1, rho: 250, na: 0.05, sun: 4.65, exp: 2, incoh: false },
+  pair:       { n: 2, sp: 30, jit: 0, sz: 0, seed: 1, rho: 250, na: 0.05, sun: 4.65, exp: 1.5, incoh: false },
+  periodic:   { n: 40, sp: 30, jit: 0, sz: 0, seed: 3, rho: 250, na: 0.05, sun: 4.65, exp: 0, incoh: false },
+  point:      { n: 8, sp: 320, jit: 0.15, sz: 0.1, seed: 4, rho: 150, na: 0.05, sun: 0, exp: 0.5, incoh: false },
+};
+
+function rng(seed){ let s = seed >>> 0 || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return ((s >>> 0) / 4294967296); }; }
+function gauss(r){ return Math.sqrt(-2*Math.log(r() + 1e-12)) * Math.cos(6.2831853*r()); }
+function layout(p){
+  const r = rng(p.seed * 7919);
+  const xs = [0];
+  for (let i = 1; i < p.n; i++) xs.push(xs[i-1] + p.sp * Math.max(0.3, 1 + p.jit*gauss(r)));
+  const mid = (xs[0] + xs[xs.length-1]) / 2;
+  return xs.map(x => [x - mid, Math.max(0.3, 1 + p.sz*gauss(r)) ** 2]);
+}
+
+let scale = 1, pending = false, fullTimer = 0;
+function params(){
+  const p = Object.fromEntries(ids.map(i => [i, +el[i].value]));
+  p.incoh = incohEl.checked;
+  return p;
+}
+function draw(){
+  pending = false;
+  const p = params();
+  for (const i of ids) document.getElementById(i + '_o').textContent = fmt[i](el[i].value);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.round(canvas.clientWidth * dpr * scale), h = Math.round(canvas.clientHeight * dpr * scale);
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  gl.viewport(0, 0, w, h);
+  const d = layout(p);
+  const flat = new Float32Array(MAXD * 2); d.forEach((v, i) => { flat[2*i] = v[0]; flat[2*i+1] = v[1]; });
+  const span = d.length > 1 ? d[d.length-1][0] - d[0][0] : 0;
+  const halfH = p.rho * 1.25;
+  let halfW = Math.max(span/2 + p.rho*1.15, halfH * w / h);
+  const vh = halfW * h / w;
+  gl.uniform2fv(U('drops'), flat);
+  gl.uniform1i(U('nd'), d.length);
+  gl.uniform1f(U('rho'), p.rho);
+  gl.uniform1f(U('na'), p.na);
+  gl.uniform1f(U('alpha'), p.sun * 1e-3);
+  gl.uniform1f(U('L'), 1.5e5);
+  gl.uniform1f(U('mag'), 0.5);
+  const cover = Math.min(96, Math.max(1, 2*p.rho/p.sp));
+  gl.uniform1f(U('expo'), 2 ** p.exp * 0.9 / Math.max(1, d.length > 1 ? cover : 1));
+  gl.uniform4f(U('view'), -halfW, halfW, -vh, vh);
+  gl.uniform1i(U('incoh'), p.incoh ? 1 : 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  const alpha = p.sun * 1e-3;
+  const d0 = alpha > 0 ? 0.61 * 0.55 / alpha : Infinity;
+  const fr = 2 * p.na * p.sp / 0.55;
+  document.getElementById('readouts').innerHTML =
+    `<span>Coherence width <b>${isFinite(d0) ? Math.round(d0) + ' µm' : 'unlimited'}</b></span>` +
+    `<span>Neighbor fringes per disc <b>${fr.toFixed(1)}</b></span>` +
+    `<span>Droplets per disc <b>${(2*p.rho/p.sp).toFixed(1)}</b></span>` +
+    `<span>Field of view <b>${Math.round(2*halfW)} µm</b> wide</span>`;
+}
+function schedule(fast){
+  scale = fast ? 0.5 : 1;
+  if (!pending) { pending = true; requestAnimationFrame(draw); }
+  clearTimeout(fullTimer);
+  if (fast) fullTimer = setTimeout(() => schedule(false), 180);
+}
+function setPressed(name){ document.querySelectorAll('#presets button').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === name ? 'true' : 'false')); }
+function apply(name){
+  const p = PRESETS[name];
+  for (const i of ids) el[i].value = p[i];
+  incohEl.checked = p.incoh;
+  setPressed(name);
+  try { localStorage.setItem('web-preset', name); } catch (e) {}
+  schedule(false);
+}
+ids.forEach(i => el[i].addEventListener('input', () => { setPressed(null); schedule(true); }));
+incohEl.addEventListener('change', () => { setPressed(null); schedule(false); });
+document.getElementById('presets').addEventListener('click', e => { const b = e.target.closest('button'); if (b) apply(b.dataset.p); });
+new ResizeObserver(() => schedule(false)).observe(canvas);
+let start = 'glue';
+try { const s = localStorage.getItem('web-preset'); if (s && PRESETS[s]) start = s; } catch (e) {}
+apply(start);
+})();
+</script>
+<script>
+(() => {
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css = getComputedStyle(document.documentElement);
+const C = {
+  fg: css.getPropertyValue('--fg').trim() || '#e7e4dc',
+  muted: css.getPropertyValue('--muted').trim() || '#9a978f',
+  line: css.getPropertyValue('--line').trim() || '#2a2e35',
+  accent: css.getPropertyValue('--accent').trim() || '#9fd6e6',
+  warm: css.getPropertyValue('--warm').trim() || '#f0c48a',
+  pink: '#e59ad0',
+};
+const FONT = '"JetBrains Mono", ui-monospace, Menlo, monospace';
+
+function fit(canvas) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(10, Math.round(canvas.clientWidth * dpr)), h = Math.max(10, Math.round(canvas.clientHeight * dpr));
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  return { ctx: canvas.getContext('2d'), w, h, dpr };
+}
+function bind(id, fmt, cb) {
+  const el = document.getElementById(id), out = document.getElementById(id + '_o');
+  const upd = () => { if (out) out.textContent = fmt(+el.value); cb && cb(); };
+  el.addEventListener('input', upd); if (out) out.textContent = fmt(+el.value);
+  return el;
+}
+function j1(x) {
+  const ax = Math.abs(x);
+  if (ax < 8) {
+    const y = x * x;
+    const a1 = x * (72362614232.0 + y * (-7895059235.0 + y * (242396853.1 + y * (-2972611.439 + y * (15704.48260 + y * (-30.16036606))))));
+    const a2 = 144725228442.0 + y * (2300535178.0 + y * (18583304.74 + y * (99447.43394 + y * (376.9991397 + y))));
+    return a1 / a2;
+  }
+  const z = 8 / ax, y = z * z, xx = ax - 2.356194491;
+  const a1 = 1 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
+  const a2 = 0.04687499995 + y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+  const r = Math.sqrt(0.636619772 / ax) * (Math.cos(xx) * a1 - z * Math.sin(xx) * a2);
+  return x < 0 ? -r : r;
+}
+const jinc = u => Math.abs(u) < 1e-6 ? 1 : 2 * j1(u) / u;
+function wlRGB(nm) {
+  let r = 0, g = 0, b = 0;
+  if (nm < 440) { r = (440 - nm) / 60; b = 1; }
+  else if (nm < 490) { g = (nm - 440) / 50; b = 1; }
+  else if (nm < 510) { g = 1; b = (510 - nm) / 20; }
+  else if (nm < 580) { r = (nm - 510) / 70; g = 1; }
+  else if (nm < 645) { r = 1; g = (645 - nm) / 65; }
+  else { r = 1; }
+  const f = nm < 420 ? 0.3 + 0.7 * (nm - 380) / 40 : nm > 680 ? 0.3 + 0.7 * (750 - nm) / 70 : 1;
+  return [r * f, g * f, b * f];
+}
+
+/* ---------- Demo 1: droplet ---------- */
+{
+  const canvas = document.getElementById('dropCanvas');
+  const nEl = bind('dn', v => v.toFixed(2), () => still());
+  const T = document.getElementById('dT'), R = document.getElementById('dR'), B = document.getElementById('dB');
+  [T, R, B].forEach(e => e.addEventListener('change', () => still()));
+  const btn = document.getElementById('dPlay');
+  let playing = !reduceMotion, off = 0, last = 0;
+  btn.textContent = playing ? 'Pause' : 'Play';
+  btn.addEventListener('click', () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; if (playing) { last = 0; requestAnimationFrame(loop); } });
+
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1]], add = (a, b) => [a[0] + b[0], a[1] + b[1]], mul = (a, s) => [a[0] * s, a[1] * s];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
+  function fresnel(cosi, cost, n1, n2) {
+    const rs = (n1 * cosi - n2 * cost) / (n1 * cosi + n2 * cost), rp = (n2 * cosi - n1 * cost) / (n2 * cosi + n1 * cost);
+    return (rs * rs + rp * rp) / 2;
+  }
+  function refract(d, N, eta) {
+    const cosi = -dot(N, d), k = 1 - eta * eta * (1 - cosi * cosi);
+    if (k < 0) return null;
+    return { t: add(mul(d, eta), mul(N, eta * cosi - Math.sqrt(k))), cosi, cost: Math.sqrt(k) };
+  }
+  const reflect = (d, N) => sub(d, mul(N, 2 * dot(d, N)));
+
+  function paths(cx, cy, Rp, n, h, far) {
+    const P = [cx - Math.sqrt(Rp * Rp - h * h), cy + h], N1 = mul(sub(P, [cx, cy]), 1 / Rp), d = [1, 0];
+    const start = [0, cy + h];
+    const r1 = refract(d, N1, 1 / n);
+    const R1 = fresnel(r1.cosi, r1.cost, 1, n);
+    const out = {};
+    out.R = { segs: [[start, P, 1], [P, add(P, mul(reflect(d, N1), far)), 1]], w: R1 };
+    const t = r1.t, L = -2 * dot(sub(P, [cx, cy]), t), P2 = add(P, mul(t, L));
+    const N2 = mul(sub(P2, [cx, cy]), 1 / Rp), inN = mul(N2, -1);
+    const r2 = refract(t, inN, n);
+    if (!r2) return out;
+    const R2 = fresnel(r2.cosi, r2.cost, n, 1);
+    out.T = { segs: [[start, P, 1], [P, P2, n], [P2, add(P2, mul(r2.t, far)), 1]], w: (1 - R1) * (1 - R2) };
+    const b = reflect(t, N2), L2 = -2 * dot(sub(P2, [cx, cy]), b), P3 = add(P2, mul(b, L2));
+    const N3 = mul(sub(P3, [cx, cy]), 1 / Rp), r3 = refract(b, mul(N3, -1), n);
+    if (r3) {
+      const R3 = fresnel(r3.cosi, r3.cost, n, 1);
+      out.B = { segs: [[start, P, 1], [P, P2, n], [P2, P3, n], [P3, add(P3, mul(r3.t, far)), 1]], w: (1 - R1) * R2 * (1 - R3) };
+    }
+    return out;
+  }
+
+  function draw() {
+    const { ctx, w, h, dpr } = fit(canvas);
+    const n = +nEl.value;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    const Rp = h * 0.3, cx = w * 0.27, cy = h * 0.5;
+    const lam = Rp * (0.55 / 6);
+    ctx.fillStyle = 'rgba(159,214,230,0.07)'; ctx.strokeStyle = 'rgba(159,214,230,0.45)'; ctx.lineWidth = 1.2 * dpr;
+    ctx.beginPath(); ctx.arc(cx, cy, Rp, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    const far = w * 2, rays = 37;
+    const kinds = [['T', T.checked, C.accent], ['R', R.checked, C.warm], ['B', B.checked, C.pink]];
+    for (const [key, on, col] of kinds) {
+      if (!on) continue;
+      for (let i = 0; i < rays; i++) {
+        const hh = Rp * (-0.97 + 1.94 * i / (rays - 1));
+        const p = paths(cx, cy, Rp, n, hh, far)[key];
+        if (!p) continue;
+        const a = Math.min(1, Math.sqrt(p.w));
+        ctx.strokeStyle = col; ctx.globalAlpha = 0.18 * a + 0.04; ctx.lineWidth = 1 * dpr;
+        ctx.beginPath(); ctx.moveTo(...p.segs[0][0]); for (const s of p.segs) ctx.lineTo(...s[1]); ctx.stroke();
+        ctx.globalAlpha = 0.35 + 0.65 * a; ctx.fillStyle = col;
+        let opl = 0;
+        for (const [A, Bp, m] of p.segs) {
+          const v = sub(Bp, A), Lg = Math.hypot(v[0], v[1]), u = mul(v, 1 / Lg);
+          let s = ((((off - opl) % lam) + lam) % lam) / m;
+          const step = lam / m;
+          for (; s < Lg; s += step) {
+            const q = add(A, mul(u, s));
+            if (q[0] < 0 || q[0] > w || q[1] < 0 || q[1] > h) { if (q[0] > w) break; continue; }
+            ctx.fillRect(q[0] - dpr, q[1] - dpr, 2 * dpr, 2 * dpr);
+          }
+          opl += m * Lg;
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+    const fx = cx + n * Rp / (2 * (n - 1));
+    ctx.font = `${11 * dpr}px ${FONT}`; ctx.fillStyle = C.muted;
+    if (T.checked && fx < w - 10 * dpr) {
+      ctx.strokeStyle = C.fg; ctx.lineWidth = dpr; ctx.setLineDash([3 * dpr, 3 * dpr]);
+      ctx.beginPath(); ctx.moveTo(fx, cy - Rp * 0.9); ctx.lineTo(fx, cy - Rp * 0.25); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = C.fg; ctx.textAlign = 'center'; ctx.fillText('glint (rough focus)', fx, cy - Rp * 0.95);
+    }
+    ctx.textAlign = 'left'; ctx.fillStyle = C.muted;
+    ctx.fillText('sunlight in →', 8 * dpr, 16 * dpr);
+    ctx.fillText('12 µm droplet, dots = crests 0.55 µm apart', 8 * dpr, h - 10 * dpr);
+  }
+  function still() { if (!playing) draw(); }
+  function loop(t) {
+    if (!playing) return;
+    if (last) off += (t - last) * 0.004 * (canvas.height * 0.3 * 0.55 / 6) / 4;
+    last = t; draw(); requestAnimationFrame(loop);
+  }
+  new ResizeObserver(() => draw()).observe(canvas);
+  if (playing) requestAnimationFrame(loop); else draw();
+}
+
+/* ---------- Demo 2: coherence ---------- */
+{
+  const canvas = document.getElementById('cohCanvas');
+  const K = 60, pts = [];
+  for (let i = 0; i < K; i++) {
+    const r = Math.sqrt((i + 0.5) / K), th = i * 2.399963;
+    pts.push([r * Math.cos(th), r * Math.sin(th)]);
+  }
+  const dEl = bind('cd', v => v + ' µm', () => draw());
+  const aEl = bind('ca', v => v.toFixed(2) + ' mrad', () => draw());
+  const lEl = bind('cl', v => v + ' nm', () => draw());
+  const read = document.getElementById('cohRead');
+  const ptCol = p => `hsl(${Math.round(20 + (p[0] + 1) * 110)}, 75%, 66%)`;
+
+  function draw() {
+    const { ctx, w, h, dpr } = fit(canvas);
+    const d = +dEl.value, alpha = +aEl.value * 1e-3, lam = +lEl.value / 1000;
+    const k = 2 * Math.PI / lam;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    ctx.font = `${11 * dpr}px ${FONT}`; ctx.textBaseline = 'alphabetic';
+    const pad = 14 * dpr, topH = h * 0.56, box = Math.min(topH - 2 * pad, w * 0.2);
+    const phis = pts.map(p => k * alpha * p[0] * d);
+
+    // sun
+    const sx = pad + box / 2, sy = pad + 16 * dpr + box / 2 - 8 * dpr, sr = box * 0.4 * Math.min(1, alpha / 0.01) + 2 * dpr;
+    ctx.fillStyle = C.muted; ctx.textAlign = 'center'; ctx.fillText('the sun, from the web', sx, pad + 4 * dpr);
+    ctx.fillStyle = 'rgba(240,196,138,0.12)'; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
+    for (const p of pts) { ctx.fillStyle = ptCol(p); ctx.beginPath(); ctx.arc(sx + p[0] * sr, sy + p[1] * sr, 1.8 * dpr, 0, Math.PI * 2); ctx.fill(); }
+
+    // phasors
+    const px = pad * 2 + box * 1.5, py = sy, pr = box * 0.4;
+    ctx.fillStyle = C.muted; ctx.fillText('fringe shift per point', px, pad + 4 * dpr);
+    ctx.strokeStyle = C.line; ctx.lineWidth = dpr; ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.stroke();
+    let mx = 0, my = 0;
+    ctx.globalAlpha = 0.6;
+    pts.forEach((p, i) => {
+      const c = Math.cos(phis[i]), s = Math.sin(phis[i]); mx += c / K; my += s / K;
+      ctx.strokeStyle = ptCol(p); ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + c * pr, py - s * pr); ctx.stroke();
+    });
+    ctx.globalAlpha = 1; ctx.strokeStyle = C.fg; ctx.lineWidth = 3 * dpr;
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + mx * pr, py - my * pr); ctx.stroke();
+    const vis = Math.hypot(mx, my);
+    ctx.fillStyle = C.fg; ctx.fillText(`average: ${(vis * 100).toFixed(0)}%`, px, py + pr + 16 * dpr);
+
+    // fringes
+    const fx0 = pad * 3 + box * 2, fx1 = w - pad, fy0 = pad + 10 * dpr, fy1 = topH - 18 * dpr;
+    ctx.textAlign = 'left'; ctx.fillStyle = C.muted;
+    ctx.fillText('brightness across the overlap of two blur discs', fx0, pad + 4 * dpr);
+    const N = 5, steps = 240;
+    const Y = v => fy1 - (v / 2) * (fy1 - fy0);
+    ctx.lineWidth = dpr; ctx.globalAlpha = 0.35;
+    pts.forEach((p, i) => {
+      ctx.strokeStyle = ptCol(p); ctx.beginPath();
+      for (let j = 0; j <= steps; j++) { const u = -1 + 2 * j / steps, x = fx0 + (fx1 - fx0) * j / steps, v = 1 + Math.cos(Math.PI * N * u + phis[i]); j ? ctx.lineTo(x, Y(v)) : ctx.moveTo(x, Y(v)); }
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1; ctx.strokeStyle = C.fg; ctx.lineWidth = 3 * dpr; ctx.beginPath();
+    for (let j = 0; j <= steps; j++) {
+      const u = -1 + 2 * j / steps, x = fx0 + (fx1 - fx0) * j / steps;
+      let v = 0; for (let i = 0; i < K; i++) v += 1 + Math.cos(Math.PI * N * u + phis[i]); v /= K;
+      j ? ctx.lineTo(x, Y(v)) : ctx.moveTo(x, Y(v));
+    }
+    ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.fillText('each thin line: one point on the sun · white: what the camera records', fx0, topH - 2 * dpr);
+
+    // coherence curve
+    const gx0 = pad + 34 * dpr, gx1 = w - pad, gy0 = topH + 22 * dpr, gy1 = h - 30 * dpr;
+    const dmax = 200, X = dd => gx0 + (gx1 - gx0) * dd / dmax, G = g => gy1 - (g + 0.2) / 1.2 * (gy1 - gy0);
+    ctx.fillStyle = 'rgba(159,214,230,0.10)'; ctx.fillRect(X(10), gy0, X(100) - X(10), gy1 - gy0);
+    ctx.fillStyle = C.accent; ctx.fillText('reported glue-droplet spacings, 10–100 µm', X(12), gy0 + 13 * dpr);
+    ctx.strokeStyle = C.line; ctx.lineWidth = dpr;
+    ctx.beginPath(); ctx.moveTo(gx0, G(0)); ctx.lineTo(gx1, G(0)); ctx.moveTo(gx0, gy0); ctx.lineTo(gx0, gy1); ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.textAlign = 'right';
+    for (const g of [0, 0.5, 1]) ctx.fillText(g.toFixed(1), gx0 - 6 * dpr, G(g) + 4 * dpr);
+    ctx.textAlign = 'center';
+    for (let dd = 0; dd <= dmax; dd += 50) { ctx.textAlign = dd === dmax ? 'right' : dd === 0 ? 'left' : 'center'; ctx.fillText(dd + ' µm', X(dd), gy1 + 16 * dpr); }
+    ctx.textAlign = 'left'; ctx.fillText('coherence vs droplet separation  (below zero = fringes flipped)', gx0 + 6 * dpr, topH + 12 * dpr);
+    ctx.strokeStyle = C.warm; ctx.lineWidth = 2 * dpr; ctx.beginPath();
+    for (let j = 0; j <= 300; j++) { const dd = dmax * j / 300, g = jinc(k * alpha * dd); j ? ctx.lineTo(X(dd), G(g)) : ctx.moveTo(X(dd), G(g)); }
+    ctx.stroke();
+    const g = jinc(k * alpha * d);
+    ctx.fillStyle = C.fg; ctx.beginPath(); ctx.arc(X(d), G(g), 5 * dpr, 0, Math.PI * 2); ctx.fill();
+    const d0 = alpha > 0 ? 0.61 * lam / alpha : Infinity;
+    read.innerHTML = `<span>Fringe contrast <b>${(Math.abs(g) * 100).toFixed(0)}%</b></span>` +
+      `<span>Coherence width d₀ <b>${isFinite(d0) ? Math.round(d0) + ' µm' : 'unlimited'}</b></span>`;
+  }
+  new ResizeObserver(() => draw()).observe(canvas);
+  draw();
+}
+
+/* ---------- Demo 3: wave field ---------- */
+{
+  const canvas = document.getElementById('waveCanvas');
+  const off = document.createElement('canvas'), octx = off.getContext('2d');
+  const nEl = bind('wn', v => v, () => reset());
+  const sEl = bind('ws', v => v, () => reset());
+  const gEl = bind('wg', v => Math.round(v * 100) + '%', () => reset());
+  const lEl = bind('wl', v => v, () => reset());
+  const xEl = bind('wx', v => v <= 1 ? Math.round(v * 100) + '% of the way to focus' : 'past focus', () => reset());
+  const modes = [...document.querySelectorAll('input[name=wmode]')];
+  modes.forEach(m => m.addEventListener('change', () => reset()));
+  const btn = document.getElementById('wPlay');
+  let playing = !reduceMotion, t = 0, last = 0, psi = [0, 0, 0, 0], prof = null, raf = 0;
+  btn.textContent = playing ? 'Pause' : 'Play';
+  btn.addEventListener('click', () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; kick(); });
+  const mode = () => modes.find(m => m.checked).value;
+  const gauss = () => Math.sqrt(-2 * Math.log(Math.random() + 1e-12)) * Math.cos(6.2831853 * Math.random());
+  function reset() { prof = null; psi = [0, 0, 0, 0]; kick(); }
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+
+  let geo;
+  function geometry(W, Hf) {
+    const fw = Math.min(520, Math.round(W)), fh = Math.round(fw * Hf / W);
+    const u = fh / 300;
+    const n = +nEl.value, sep = +sEl.value * u;
+    const x0 = fw * 0.06, xf = fw * 0.8, cy = fh / 2, a = fh * 0.4;
+    const ys = Array.from({ length: n }, (_, j) => cy + (j - (n - 1) / 2) * sep);
+    return { fw, fh, u, n, x0, xf, cy, a, ys, xs: x0 + (+xEl.value) * (xf - x0), lam: +lEl.value * u };
+  }
+  function fieldAt(g, x, y, lam, out) {
+    const k = 2 * Math.PI / lam, tt = (x - g.x0) / (g.xf - g.x0);
+    let cnt = 0;
+    for (let j = 0; j < g.n; j++) {
+      const yj = g.ys[j];
+      const yA = (g.cy - g.a) + (yj - (g.cy - g.a)) * tt, yB = (g.cy + g.a) + (yj - (g.cy + g.a)) * tt;
+      if (x < g.x0 || y < Math.min(yA, yB) || y > Math.max(yA, yB)) { out[j * 3] = 0; continue; }
+      const r = Math.hypot(x - g.xf, y - yj);
+      const A = Math.min(3, Math.sqrt((g.xf - g.x0) / Math.max(r, lam)));
+      out[j * 3] = A; out[j * 3 + 1] = x < g.xf ? k * r : -k * r + Math.PI / 2; cnt++;
+    }
+    return cnt;
+  }
+  const WL = [430, 460, 490, 520, 550, 580, 610, 640, 670];
+  const WLC = WL.map(wlRGB), WLS = WLC.reduce((s, c) => [s[0] + c[0], s[1] + c[1], s[2] + c[2]], [0, 0, 0]);
+  const tmp = new Float64Array(12);
+  const tone = v => 1 - Math.exp(-1.3 * Math.max(0, v));
+  function brightness(g, x, y, gam, white) {
+    const lams = white ? WL.map(nm => g.lam * nm / 550) : [g.lam];
+    let rgb = [0, 0, 0], any = 0;
+    for (let l = 0; l < lams.length; l++) {
+      const cnt = fieldAt(g, x, y, lams[l], tmp);
+      if (!cnt) continue; any = cnt;
+      let inc = 0, cross = 0;
+      for (let j = 0; j < g.n; j++) {
+        const Aj = tmp[j * 3]; if (!Aj) continue; inc += Aj * Aj;
+        for (let m = 0; m < j; m++) { const Am = tmp[m * 3]; if (Am) cross += 2 * Aj * Am * Math.cos(tmp[j * 3 + 1] - tmp[m * 3 + 1]); }
+      }
+      const b = 0.5 * (inc + gam * cross) / (inc / cnt);
+      if (white) { const c = WLC[l]; rgb[0] += b * c[0] / WLS[0]; rgb[1] += b * c[1] / WLS[1]; rgb[2] += b * c[2] / WLS[2]; }
+      else rgb = [b * 0.62, b * 0.84, b * 0.9];
+    }
+    return any ? rgb : null;
+  }
+
+  function frame(time) {
+    raf = 0;
+    const { ctx, w, h, dpr } = fit(canvas);
+    const Hf = h * 0.76;
+    const g = geo = geometry(w / dpr, Hf / dpr);
+    if (off.width !== g.fw || off.height !== g.fh) { off.width = g.fw; off.height = g.fh; }
+    const img = octx.createImageData(g.fw, g.fh), D = img.data;
+    const m = mode(), gam = +gEl.value;
+    if (m === 'wave' && playing) {
+      if (last) t += (time - last) * 0.006;
+      for (let j = 1; j < 4; j++) psi[j] += (1 - gam) * 0.35 * gauss();
+    }
+    last = playing ? time : 0;
+    const prof1 = new Float64Array(g.fh * 3);
+    if (m === 'wave') {
+      const k = 2 * Math.PI / g.lam;
+      for (let y = 0; y < g.fh; y++) for (let x = 0; x < g.fw; x++) {
+        const cnt = fieldAt(g, x, y, g.lam, tmp);
+        const i = (y * g.fw + x) * 4; D[i + 3] = 255;
+        if (!cnt) continue;
+        let v = 0;
+        for (let j = 0; j < g.n; j++) if (tmp[j * 3]) v += tmp[j * 3] * Math.cos(tmp[j * 3 + 1] + t + psi[j]);
+        const b = Math.max(0, Math.min(1, 0.5 + 0.5 * v / Math.sqrt(cnt) / 1.6));
+        D[i] = 159 * b; D[i + 1] = 214 * b; D[i + 2] = 230 * b;
+      }
+      for (let y = 0; y < g.fh; y++) {
+        const cnt = fieldAt(g, g.xs, y, g.lam, tmp);
+        if (!cnt) continue;
+        let re = 0, im = 0, inc = 0;
+        for (let j = 0; j < g.n; j++) if (tmp[j * 3]) { const A = tmp[j * 3], p = tmp[j * 3 + 1] + psi[j]; re += A * Math.cos(p); im += A * Math.sin(p); inc += A * A; }
+        const b = 0.5 * (re * re + im * im) / (inc / cnt);
+        prof1[y * 3] = b * 0.62; prof1[y * 3 + 1] = b * 0.84; prof1[y * 3 + 2] = b * 0.9;
+      }
+      if (!prof || prof.length !== prof1.length) prof = prof1;
+      else for (let i = 0; i < prof.length; i++) prof[i] = 0.93 * prof[i] + 0.07 * prof1[i];
+    } else {
+      const white = m === 'white';
+      for (let y = 0; y < g.fh; y++) for (let x = 0; x < g.fw; x++) {
+        const i = (y * g.fw + x) * 4; D[i + 3] = 255;
+        const c = brightness(g, x, y, gam, white);
+        if (!c) continue;
+        D[i] = 255 * tone(c[0]); D[i + 1] = 255 * tone(c[1]); D[i + 2] = 255 * tone(c[2]);
+      }
+      for (let y = 0; y < g.fh; y++) { const c = brightness(g, g.xs, y, gam, white); if (c) { prof1[y * 3] = c[0]; prof1[y * 3 + 1] = c[1]; prof1[y * 3 + 2] = c[2]; } }
+      prof = prof1;
+    }
+    octx.putImageData(img, 0, 0);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    ctx.imageSmoothingEnabled = true; ctx.drawImage(off, 0, 0, w, Hf);
+    const S = w / g.fw;
+
+    ctx.strokeStyle = C.fg; ctx.lineWidth = 2 * dpr; ctx.globalAlpha = 0.8;
+    ctx.beginPath(); ctx.ellipse(g.x0 * S, g.cy * S, 5 * dpr, g.a * S, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.setLineDash([5 * dpr, 4 * dpr]); ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = C.warm;
+    ctx.beginPath(); ctx.moveTo(g.xs * S, 0); ctx.lineTo(g.xs * S, Hf); ctx.stroke();
+    ctx.strokeStyle = 'rgba(231,228,220,0.35)'; ctx.lineWidth = dpr;
+    ctx.beginPath(); ctx.moveTo(g.xf * S, 0); ctx.lineTo(g.xf * S, Hf); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = `${11 * dpr}px ${FONT}`; ctx.fillStyle = C.muted; ctx.textAlign = 'left';
+    ctx.fillText('lens', g.x0 * S + 10 * dpr, 16 * dpr);
+    ctx.fillText('focus', g.xf * S + 6 * dpr, 16 * dpr);
+    ctx.fillStyle = C.warm; ctx.fillText('sensor', g.xs * S + 6 * dpr, Hf - 8 * dpr);
+
+    const sy0 = Hf + 8 * dpr, sy1 = h - 20 * dpr, mid = sy0 + (sy1 - sy0) * 0.45;
+    const nP = g.fh;
+    for (let y = 0; y < nP; y++) {
+      const x = y / nP * w, ww = w / nP + 1;
+      const r = tone(prof[y * 3]), gg = tone(prof[y * 3 + 1]), b = tone(prof[y * 3 + 2]);
+      ctx.fillStyle = `rgb(${r * 255 | 0},${gg * 255 | 0},${b * 255 | 0})`; ctx.fillRect(x, mid, ww, sy1 - mid);
+    }
+    ctx.strokeStyle = C.fg; ctx.lineWidth = 1.5 * dpr; ctx.beginPath();
+    for (let y = 0; y < nP; y++) {
+      const v = (prof[y * 3] + prof[y * 3 + 1] + prof[y * 3 + 2]) / (m === 'white' ? 3 : 2.36);
+      const yy = mid - 3 * dpr - Math.min(2.2, v) / 2.2 * (mid - sy0 - 6 * dpr);
+      y ? ctx.lineTo(y / nP * w, yy) : ctx.moveTo(0, yy);
+    }
+    ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.fillText(m === 'wave' ? 'what the sensor records, averaged over time, along the dashed line' : 'what the sensor records along the dashed line', 6 * dpr, h - 6 * dpr);
+
+    if (playing && m === 'wave') raf = requestAnimationFrame(frame);
+  }
+  let dragging = false;
+  function setX(e) {
+    if (!geo) return;
+    const r = canvas.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width * geo.fw;
+    xEl.value = Math.max(0.15, Math.min(1.2, (fx - geo.x0) / (geo.xf - geo.x0)));
+    xEl.dispatchEvent(new Event('input'));
+  }
+  canvas.addEventListener('pointerdown', e => { dragging = true; canvas.setPointerCapture(e.pointerId); setX(e); });
+  canvas.addEventListener('pointermove', e => { if (dragging) setX(e); });
+  canvas.addEventListener('pointerup', () => { dragging = false; });
+  new ResizeObserver(() => kick()).observe(canvas);
+  kick();
+}
+})();
+</script>
+</body>
+</html>
