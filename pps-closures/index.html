@@ -64,7 +64,7 @@ a { color: var(--accent); }
 header.top { display: grid; gap: 4px; padding-bottom: 14px; }
 
 /* key findings */
-.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-block: 12px 0; }
+.findings { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-block: 12px 0; }
 .finding { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; min-width: 0; }
 .finding .big { font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 34px; line-height: 1; }
 .finding .big small { font-size: 16px; font-weight: 600; color: var(--ink-2); font-stretch: 100%; }
@@ -163,6 +163,11 @@ section.block { margin-top: 44px; }
 .cmphandle::after { content: "⇆"; position: absolute; top: 50%; left: -16px; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ink); display: grid; place-items: center; font-size: 14px; color: var(--ink); }
 .chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); cursor: pointer; }
 .chk input { accent-color: var(--accent); width: 16px; height: 16px; }
+#c-prog { max-width: 280px; }
+.dli-more { margin-top: 14px; }
+.dli-more > div { max-width: none; }
+.dli-more .prose { max-width: 78ch; }
+.dli-more summary { cursor: pointer; font-weight: 600; }
 .mapbar { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .bc { margin-top: 18px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
 .bc h2 { margin-bottom: 6px; }
@@ -315,7 +320,7 @@ body.fs-open { overflow: hidden; }
     </details>
   </section>
 
-  <div class="mapbar"><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div><label class="chk"><input type="checkbox" id="c-weight" checked> <span class="ph-long">Weight by number of students (student-minutes)</span><span class="ph-short">Weight by students</span></label><button type="button" class="fsbtn" id="fsbtn">⤢ Explore map full screen</button></div>
+  <div class="mapbar"><div class="ctl"><span>Families</span><div class="seg" id="c-pop"></div></div><select id="c-prog" aria-label="Immersion program" hidden></select><div class="ctl"><span>Map shows</span><div class="seg" id="c-view"></div></div><label class="chk"><input type="checkbox" id="c-weight" checked> <span class="ph-long">Weight by number of students (student-minutes)</span><span class="ph-short">Weight by students</span></label><button type="button" class="fsbtn" id="fsbtn">⤢ Explore map full screen</button></div>
   <div class="bench" style="margin-top:8px">
     <div class="mapbox" id="mapbox">
       <canvas id="map" aria-label="Map of travel time changes by neighborhood"></canvas>
@@ -340,6 +345,19 @@ body.fs-open { overflow: hidden; }
     <h2 id="rank-title">Which closures add the most travel time</h2>
     <p class="hint prose" id="rank-hint">Averages are over the estimated neighborhood students who live in each closing school's area today. Click a row to show it on the map. Click a column heading to sort.</p>
     <div class="scroll-x"><table class="rank" id="rank"></table></div>
+  </section>
+
+  <section class="block" id="dli-sec">
+    <h2>Immersion programs that move</h2>
+    <p class="prose" id="dli-intro"></p>
+    <div class="scroll-x"><table class="rank" id="dli"></table></div>
+    <details class="dli-more">
+      <summary>Is each new site central for its program?</summary>
+      <div>
+        <p class="prose" id="dli-central-intro"></p>
+        <div class="scroll-x"><table class="rank" id="dli-central"></table></div>
+      </div>
+    </details>
   </section>
 
   <section class="block">
@@ -397,12 +415,22 @@ body.fs-open { overflow: hidden; }
       </div>
     </details>
     <details>
+      <summary>Immersion students: where they live and how far they go</summary>
+      <div>
+        <p><b>Which programs.</b> The scenarios move ten immersion programs: Spanish from Atkinson to Lent, from Beach, James John and Sitton to César Chávez, and from Scott to Rigler; Mandarin from Clark to Woodstock and from MLK Jr to Boise-Eliot/Humboldt; Vietnamese from Rose City Park to Vestal (Scenario A only); and at middle school, Spanish from Beaumont to Roseway Heights and from Ockley Green to George. César Chávez's own grades 6–8 also move to George, but PPS's counts don't separate its 6–8 immersion students, so they are not included.</p>
+        <p><b>How many, and from where.</b> PPS's October 2025 enrollment summary splits each program's students into those from the school's own neighborhood and those from each high-school area. Students from outside PPS or with an unknown address are left out of the map.</p>
+        <p><b>Where in each area.</b> Own-neighborhood students are spread over the school's attendance area by school-age children, as for neighborhood students. Students from a high-school area are spread over that area by school-age children, weighted toward homes closer to the program: each added minute of driving from the program cuts a home's weight by about a third. That rate was fitted to the high-school-area split of all 23 elementary and middle immersion programs, and it matches where students come from much better than spreading them evenly. These are estimates for whole areas, not addresses.</p>
+        <p><b>Travel times.</b> Same method as the rest of the page, with longer isochrones (walks to 2 hours, bike rides to 90 minutes, drives to 40 minutes) from the 18 schools involved. Felt's routing stops at 2 hours, so longer walks are estimated from bike times at each school's own walk-to-bike ratio and marked “≈”. The times are door to door; they don't include any school bus PPS may provide for immersion students.</p>
+        <p><b>Not modeled.</b> Families who leave a program rather than follow it, and building capacity at the new sites.</p>
+      </div>
+    </details>
+    <details>
       <summary>Who counts as a student here</summary>
       <div>
         <p><b>How many students.</b> PPS's October 2025 enrollment summary counts, for every school, the students who live in its own neighborhood and attend its neighborhood program. Those counts are the student numbers here: they leave out students who transfer in from other neighborhoods and students in immersion programs. For K–8 schools they are split between K–5 and grades 6–8 by grade enrollment.</p>
         <p><b>Where they live.</b> Each school's count is spread over its attendance area in proportion to school-age children from the 2020 Census Demographic and Housing Characteristics file (table P12, census blocks): ages 5–9 plus a fifth of ages 10–14 for K–5, and three fifths of ages 10–14 for grades 6–8. Block counts are split into the hexagons by area. Block-level Census counts include deliberate statistical noise for privacy, which mostly averages out at the hexagon scale.</p>
         <p><b>Student-minutes.</b> With "Weight by number of students" on, each hexagon shows its students × their minutes of travel, one way. Summed over the map, those match the headline averages.</p>
-        <p><b>Immersion students are not in the travel numbers.</b> Their trips depend on program moves (Spanish to César Chávez, Mandarin to Woodstock and Boise-Eliot/Humboldt, Vietnamese to Vestal in A) as well as where they live. At the closing schools alone, 238 immersion students live in the school's own neighborhood (73 at Beach, 96 at James John, 69 at Rose City Park), and many of their trips will get longer too.</p>
+        <p><b>Immersion students are counted separately.</b> The neighborhood numbers leave them out. Switch the map to “Immersion” families, or see “Immersion programs that move,” for the students in programs that change sites.</p>
         <p>Building loads in the trade-off chart add each school's immersion students, following the program moves, to its neighborhood students. Capacity is the 2021 Long-Range Facility Plan's functional capacity. These are 2025–26 estimates; PPS's own figures use 2031–32 projections and will differ.</p>
       </div>
     </details>
@@ -478,13 +506,14 @@ body.fs-open { overflow: hidden; }
 (async function () {
   const D = await (await fetch("data.json?v=be69d8aaf5")).json();
   const B = await (await fetch("boundaries.json?v=0011a3bd8f")).json();
+  const DL = await (await fetch("dli.json?v=ec85dff9b5")).json();
   const MODES = ["walk", "bike", "drive"];
   const MODE_LABEL = { walk: "Walk", bike: "Bike", drive: "Drive / bus" };
   const STRATS = ["pps", "pair", "capacity", "nearest", "single"];
   const STRAT_LABEL = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Shortest walks within capacity", nearest: "Nearest open school", single: "Whole school to one receiver" };
   const STRAT_SHORT = { pps: "PPS plan", pair: "PPS rules, shortest trips", capacity: "Within capacity", nearest: "Nearest school", single: "One receiver" };
   const CAP = 120;
-  const S = { tag: "A", level: "k5", mode: "walk", strat: "pps", view: "delta", sel: null, pinHex: null, weight: true };
+  const S = { tag: "A", level: "k5", mode: "walk", strat: "pps", view: "delta", sel: null, pinHex: null, weight: true, pop: "nbhd", prog: null };
   const SN = D.schools, SI = {}, sidxOf = {}; SN.forEach((n, i) => sidxOf[n] = i);
   let hoverSel = null; D.school_info.forEach(s => SI[s.name] = s);
   const key = () => `${S.tag}_${S.strat}`;
@@ -524,6 +553,48 @@ body.fs-open { overflow: hidden; }
     while (b.length < 8) b.push(niceUp(b[b.length - 1] * 1.3) > b[b.length - 1] ? niceUp(b[b.length - 1] * 1.3) : b[b.length - 1] + 1);
     return (WB[id] = b);
   }
+  // ---------- immersion programs ----------
+  const LANG = { Spanish: "Spanish", Mandarin: "Mandarin", Vietnamese: "Vietnamese" };
+  DL.programs.forEach((p, j) => { p.id = j; p.wv = new Float32Array(H.length); p.w.forEach(([i, w]) => p.wv[i] = w); p.n = p.total - p.ood; });
+  const EXT = {}; for (const n in DL.ext) EXT[n] = new Set(DL.ext[n]);
+  const progs = () => DL.programs.filter(p => p.level === S.level && p.tags.includes(S.tag));
+  const prog = () => DL.programs[S.prog];
+  const progName = p => `${nice(p.school)} ${p.lang}`;
+  const dT = (n, m, i) => { const v = DL.tt[n][m][i]; return v == null ? null : v; };
+  function dMin(p, i, m, view) {
+    const a = dT(p.school, m, i), b = dT(p.to, m, i); if (a == null || b == null) return null;
+    return view === "delta" ? b - a : view === "after" ? b : a;
+  }
+  function dSM(p, i, m, view) { const t = dMin(p, i, m, view), w = p.wv[i]; return t == null || w < 0.02 ? null : w * t; }
+  const fmtHM = v => { if (v == null) return "—"; const r = Math.round(Math.abs(v)); return r < 60 ? `${r} min` : `${Math.floor(r / 60)} h ${String(r % 60).padStart(2, "0")}`; };
+  const DBINS = {
+    delta: { walk: [5, 10, 20, 30, 45, 60, 75, 90], bike: [2, 4, 6, 8, 12, 16, 20, 25], drive: [1, 2, 3, 4, 5, 6, 8, 10] },
+    abs: { walk: [10, 20, 30, 45, 60, 75, 90, 120], bike: [4, 8, 12, 16, 20, 25, 30, 40], drive: [2, 4, 6, 8, 10, 12, 15, 20] }
+  };
+  const DWB = {};
+  function dliWeightedBins(m, view) {
+    const id = `${m}_${view}`; if (DWB[id]) return DWB[id];
+    const v = [];
+    DL.programs.forEach(p => p.w.forEach(([i]) => { const x = dSM(p, i, m, view); if (x != null && x > 0) v.push(x); }));
+    v.sort((a, b) => a - b);
+    const q = f => v[Math.min(v.length - 1, Math.floor(v.length * f))] || 1;
+    let b = [0.3, 0.5, 0.65, 0.78, 0.87, 0.93, 0.97, 0.99].map(f => niceUp(q(f)));
+    b = b.filter((x, i) => i === 0 || x > b[i - 1]);
+    while (b.length < 8) b.push(b[b.length - 1] * 2);
+    return (DWB[id] = b);
+  }
+  function pickProg() {
+    const ps = progs();
+    if (!ps.some(p => p.id === S.prog)) S.prog = ps.length ? ps.slice().sort((a, b) => b.walk.sm - a.walk.sm)[0].id : null;
+  }
+  function fitProg(p) {
+    let b = [Math.min(SI[p.school].lon, SI[p.to].lon), Math.min(SI[p.school].lat, SI[p.to].lat), Math.max(SI[p.school].lon, SI[p.to].lon), Math.max(SI[p.school].lat, SI[p.to].lat)];
+    p.w.forEach(([i, w]) => { if (w >= 0.05) { const g = G[i]; b = [Math.min(b[0], g[0]), Math.min(b[1], g[1]), Math.max(b[2], g[0]), Math.max(b[3], g[1])]; } });
+    const dx = Math.max(b[2] - b[0], .02) * 0.12, dy = Math.max(b[3] - b[1], .015);
+    fit([b[0] - dx, b[1] - dy * 0.4, b[2] + dx, b[3] + dy * 0.12]);
+    view.s = Math.min(view.s, homeS * 1.4);
+  }
+  function setProg(id, zoom) { S.pop = "dli"; S.prog = id; S.sel = null; S.pinHex = null; if (zoom) fitProg(DL.programs[id]); refresh(); }
   const fmtSM = v => v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k" : Math.round(v).toString();
 
   // ---------- projection ----------
@@ -573,7 +644,24 @@ body.fs-open { overflow: hidden; }
   };
   let PAL = {};
   function readPal() { PAL = { up: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--up-${i}`)), dn: [css("--dn-1"), css("--dn-2")], abs: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => css(`--abs-${i}`)), ink: css("--ink"), muted: css("--muted"), closed: css("--closed"), recv: css("--recv"), surface: css("--surface"), accent: css("--accent") }; }
-  function colorFor(r) {
+  function colorForDli(i) {
+    const p = prog(), m = S.mode; if (!p) return null;
+    if (S.weight) {
+      const x = dSM(p, i, m, S.view); if (x == null) return null;
+      const b = dliWeightedBins(m, S.view);
+      if (S.view === "delta" && x < 0) return x <= -b[1] ? PAL.dn[1] : PAL.dn[0];
+      if (S.view === "delta" && x === 0) return null;
+      let j = 0; while (j < b.length && x > b[j]) j++;
+      return (S.view === "delta" ? PAL.up : PAL.abs)[j];
+    }
+    const t = dMin(p, i, m, S.view); if (t == null) return null;
+    const b = DBINS[S.view === "delta" ? "delta" : "abs"][m];
+    if (S.view === "delta" && t < 0) return t <= -b[1] ? PAL.dn[1] : PAL.dn[0];
+    let j = 0; while (j < b.length && t > b[j]) j++;
+    return (S.view === "delta" ? PAL.up : PAL.abs)[j];
+  }
+  function colorFor(r, hi) {
+    if (S.pop === "dli") return colorForDli(hi);
     const k = key(), lvl = S.level, m = S.mode;
     if (S.weight) {
       const x = studentMinutes(r, k, lvl, m, S.view); if (x == null) return null;
@@ -615,12 +703,13 @@ body.fs-open { overflow: hidden; }
     const k = key(), lvl = S.level;
     // hexes
     for (let i = 0; i < H.length; i++) {
-      const r = H[i], c = colorFor(r); if (!c) continue;
+      const r = H[i], c = colorFor(r, i); if (!c) continue;
       const a = hexM[i]; ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); for (let j = 1; j < 6; j++) ctx.lineTo(px(a[2 * j]), py(a[2 * j + 1])); ctx.closePath();
       const base = S.view === "delta" ? 0.88 : 0.75;
       ctx.globalAlpha = S.weight || r[1] >= 1 ? base : 0.3; ctx.fillStyle = c; ctx.fill();
     }
     ctx.globalAlpha = 1;
+    if (S.pop === "dli") { drawDliOverlay(); return; }
     // after boundaries
     const layer = BL[`${k}_${lvl === "k5" ? "elem" : "mid"}`] || {};
     const alt = S.strat !== "pps", LV = lvl === "k5" ? "elem" : "mid";
@@ -648,6 +737,24 @@ body.fs-open { overflow: hidden; }
       else { ctx.fillStyle = PAL.surface; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.closed; ctx.stroke(); ctx.beginPath(); ctx.moveTo(X - 3, Y - 3); ctx.lineTo(X + 3, Y + 3); ctx.moveTo(X + 3, Y - 3); ctx.lineTo(X - 3, Y + 3); ctx.lineWidth = 1.6; ctx.stroke(); }
       if (s.name === sel || recvSet.has(s.name) || (view.s > homeS * 1.8 && st !== "open")) label(nice(s.name), X, Y);
     });
+  }
+  function drawDliOverlay() {
+    const p = prog();
+    if (S.pinHex != null) { const a = hexM[S.pinHex]; ctx.beginPath(); ctx.moveTo(px(a[0]), py(a[1])); for (let j = 1; j < 6; j++) ctx.lineTo(px(a[2 * j]), py(a[2 * j + 1])); ctx.closePath(); ctx.lineWidth = 2; ctx.strokeStyle = PAL.ink; ctx.stroke(); }
+    schoolsForLevel().forEach(s => { const X = px(mx(s.lon)), Y = py(my(s.lat)); ctx.beginPath(); ctx.arc(X, Y, 3, 0, 7); ctx.fillStyle = PAL.ink; ctx.globalAlpha = 0.45; ctx.fill(); ctx.globalAlpha = 1; });
+    if (!p) return;
+    const a = SI[p.school], b = SI[p.to], X0 = px(mx(a.lon)), Y0 = py(my(a.lat)), X1 = px(mx(b.lon)), Y1 = py(my(b.lat));
+    const ang = Math.atan2(Y1 - Y0, X1 - X0), L = Math.hypot(X1 - X0, Y1 - Y0);
+    if (L > 24) {
+      const ex = X1 - Math.cos(ang) * 10, ey = Y1 - Math.sin(ang) * 10;
+      ctx.setLineDash([6, 5]); ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.ink; ctx.globalAlpha = 0.85;
+      ctx.beginPath(); ctx.moveTo(X0 + Math.cos(ang) * 8, Y0 + Math.sin(ang) * 8); ctx.lineTo(ex, ey); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex - Math.cos(ang - 0.45) * 11, ey - Math.sin(ang - 0.45) * 11); ctx.lineTo(ex - Math.cos(ang + 0.45) * 11, ey - Math.sin(ang + 0.45) * 11); ctx.closePath(); ctx.fillStyle = PAL.ink; ctx.fill(); ctx.globalAlpha = 1;
+    }
+    ctx.beginPath(); ctx.arc(X0, Y0, 6, 0, 7); ctx.fillStyle = PAL.surface; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = PAL.closed; ctx.stroke();
+    ctx.beginPath(); ctx.arc(X1, Y1, 6.5, 0, 7); ctx.fillStyle = PAL.recv; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = PAL.surface; ctx.stroke();
+    label(`${nice(p.school)} (${p.lang} today)`, X0, Y0);
+    if (L < 160 && X1 <= X0) { const t = `${nice(p.to)} (after)`; ctx.textAlign = "right"; label(t, X1 - 16, Y1); ctx.textAlign = "left"; } else label(`${nice(p.to)} (after)`, X1, Y1);
   }
   function label(t, X, Y) { ctx.font = "600 12px " + css("--body").split(",")[0]; ctx.lineWidth = 3.5; ctx.strokeStyle = PAL.surface; ctx.fillStyle = PAL.ink; ctx.strokeText(t, X + 8, Y + 4); ctx.fillText(t, X + 8, Y + 4); }
 
@@ -742,6 +849,13 @@ body.fs-open { overflow: hidden; }
   function schoolAt(X, Y) { let best = null, bd = 100; schoolsForLevel().forEach(s => { const d = (px(mx(s.lon)) - X) ** 2 + (py(my(s.lat)) - Y) ** 2; if (d < bd) { bd = d; best = s; } }); return best; }
   function setHover(n) { if (n !== hoverSel) { hoverSel = n; if (!S.sel) draw(); } }
   function hover(X, Y) {
+    if (S.pop === "dli") {
+      const s = schoolAt(X, Y), src = s && progs().find(p => p.school === s.name);
+      if (s) { const into = progs().filter(p => p.to === s.name); showTip(X, Y, `<b>${s.full}</b>${src ? `<br>${src.lang} immersion moves to ${nice(src.to)}${src.id === S.prog ? "" : " · click to show"}` : ""}${into.length ? `<br>Receives ${into.map(progName).join(", ")}` : ""}`); cv.style.cursor = src ? "pointer" : ""; return; }
+      cv.style.cursor = "";
+      const i = nearestHex(ux(X), uy(Y)); if (i < 0) { tip.hidden = true; return; }
+      showTip(X, Y, dliHexHTML(i)); return;
+    }
     const s = schoolAt(X, Y);
     if (s && status(s.name) !== "open") setHover(s.name);
     else { const i0 = nearestHex(ux(X), uy(Y)); const c0 = i0 >= 0 ? SN[curS(H[i0], S.level)] : null; setHover(c0 && status(c0) !== "open" ? c0 : null); }
@@ -757,10 +871,22 @@ body.fs-open { overflow: hidden; }
     const smLine = S.weight && tm != null && st >= 0.05 ? `<br><b>≈ ${st >= 10 ? Math.round(st) : st.toFixed(1)} students × ${sign(tm).replace("+", S.view === "delta" ? "+" : "")} min = ${fmtSM(Math.abs(st * tm))} ${S.view === "delta" ? (tm < 0 ? "fewer " : "added ") : ""}student-minutes</b> (${MODE_LABEL[S.mode].toLowerCase()})` : "";
     return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${c === n ? `Stays at ${nice(c)}` : `${nice(c)} → <b>${nice(n)}</b>`}<table>${rows}</table><span style="color:var(--muted)">minutes · about ${st >= 1 ? Math.round(st) : st > 0.05 ? "<1" : "no"} ${lvl === "k5" ? "K–5" : "grade 6–8"} neighborhood student${Math.round(st) === 1 ? "" : "s"} live here</span>${smLine}`;
   }
+  function dliHexHTML(i) {
+    const p = prog(), r = H[i]; if (!p) return "";
+    const rows = MODES.map(m => { const a = dT(p.school, m, i), b = dT(p.to, m, i); const ap = m === "walk" && EXT[p.school].has(i) ? "≈" : "", bp = m === "walk" && EXT[p.to].has(i) ? "≈" : ""; return `<tr><td>${MODE_LABEL[m]}</td><td>${ap}${fmtHM(a)}</td><td>→</td><td>${bp}${fmtHM(b)}</td><td>${a != null && b != null ? (b - a >= 0 ? "+" : "−") + fmtHM(b - a) : ""}</td></tr>`; }).join("");
+    const w = p.wv[i], t = dMin(p, i, S.mode, S.view);
+    const smLine = S.weight && t != null && w >= 0.02 ? `<br><b>≈ ${w >= 10 ? Math.round(w) : w.toFixed(1)} students × ${Math.round(Math.abs(t))} min = ${fmtSM(Math.abs(w * t))} ${S.view === "delta" ? (t < 0 ? "fewer " : "added ") : ""}student-minutes</b> (${MODE_LABEL[S.mode].toLowerCase()})` : "";
+    return `<b>${D.nbhds[r[6]] || "Portland"}</b><br>${progName(p)} immersion: ${nice(p.school)} → <b>${nice(p.to)}</b><table>${rows}</table><span style="color:var(--muted)">door to door, one way · ${w >= 1 ? `about ${Math.round(w)}` : w >= 0.02 ? "fewer than 1" : "no"} estimated program student${Math.round(w) === 1 ? "" : "s"} live${Math.round(w) === 1 ? "s" : ""} here${[p.school, p.to].some(n => EXT[n].has(i)) ? " · ≈ walk estimated from bike time" : ""}</span>${smLine}`;
+  }
   function showTip(X, Y, html) {
     if (touchTips && isFS()) { cardBody.innerHTML = html; card.hidden = false; tip.hidden = true; return; }
     tip.innerHTML = html; tip.hidden = false; const tw = tip.offsetWidth, th = tip.offsetHeight; tip.style.left = Math.min(X + 14, W - tw - 6) + "px"; tip.style.top = Math.min(Y + 14, Hh - th - 6) + "px"; }
   function click(X, Y) {
+    if (S.pop === "dli") {
+      const s = schoolAt(X, Y), src = s && progs().find(p => p.school === s.name);
+      if (src) { setProg(src.id, false); return; }
+      const i = nearestHex(ux(X), uy(Y)); S.pinHex = i < 0 ? null : i; renderPanel(); draw(); return;
+    }
     const s = schoolAt(X, Y);
     if (s) { select(status(s.name) === "open" ? null : s.name, false); return; }
     const i = nearestHex(ux(X), uy(Y)); if (i < 0) { select(null); return; }
@@ -776,7 +902,7 @@ body.fs-open { overflow: hidden; }
   // ---------- controls ----------
   function seg(id, opts, prop) {
     const el = document.getElementById(id); el.innerHTML = "";
-    opts.forEach(([v, l]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = l; b.setAttribute("aria-pressed", S[prop] === v); b.onclick = () => { S[prop] = v; if (prop === "level" || prop === "tag") { if (S.sel && status(S.sel) === "open") S.sel = null; if (prop === "level") S.sel = null; } refresh(); }; el.appendChild(b); });
+    opts.forEach(([v, l]) => { const b = document.createElement("button"); b.type = "button"; b.textContent = l; b.setAttribute("aria-pressed", S[prop] === v); b.onclick = () => { if (prop === "pop" && S.pop !== v) { S.pinHex = null; S.sel = null; } S[prop] = v; if (prop === "pop" && v === "dli") { pickProg(); if (prog()) fitProg(prog()); } if (prop === "pop" && v === "nbhd") fit(HOME); if (prop === "level" || prop === "tag") { if (S.sel && status(S.sel) === "open") S.sel = null; if (prop === "level") S.sel = null; } refresh(); }; el.appendChild(b); });
   }
   const sel = document.getElementById("c-strat"); STRATS.forEach(s => { const o = document.createElement("option"); o.value = s; o.textContent = STRAT_LABEL[s]; sel.appendChild(o); });
   sel.onchange = () => { S.strat = sel.value; refresh(); };
@@ -786,15 +912,23 @@ body.fs-open { overflow: hidden; }
     seg("c-level", [["k5", "K–5"], ["ms", "Middle 6–8"]], "level");
     seg("c-mode", MODES.map(m => [m, MODE_LABEL[m]]), "mode");
     seg("c-view", [["delta", "Change"], ["before", "Today"], ["after", "After"]], "view");
+    seg("c-pop", [["nbhd", "Neighborhood"], ["dli", "Immersion"]], "pop");
+    pickProg();
+    const ps = document.getElementById("c-prog"), list = progs();
+    ps.hidden = S.pop !== "dli";
+    ps.innerHTML = list.map(p => `<option value="${p.id}">${progName(p)} → ${nice(p.to)}</option>`).join("") || "<option>No program moves</option>";
+    if (S.prog != null) ps.value = S.prog;
     sel.value = S.strat; sel.disabled = false;
-    renderTop(); renderOpts(); drawCmp(); renderLegend(); renderPanel(); renderRank(); renderNbhd(); renderTrade(); renderMid(); draw();
+    renderTop(); renderOpts(); drawCmp(); renderLegend(); renderPanel(); renderRank(); renderDli(); renderNbhd(); renderTrade(); renderMid(); draw();
   }
+  document.getElementById("c-prog").onchange = e => setProg(+e.target.value, true);
 
   function renderLegend() {
     readPal();
     const m = S.mode, el = document.getElementById("legend");
     let h = "";
     const ML = MODE_LABEL[m].toLowerCase().replace("drive / bus", "drive or bus"), LV = S.level === "k5" ? "K–5" : "grade 6–8";
+    if (S.pop === "dli") { renderDliLegend(el, m, ML); return; }
     if (S.weight) {
       const b = weightedBins(S.level, m, S.view), pal = S.view === "delta" ? PAL.up : PAL.abs;
       const t = S.view === "delta" ? `Added ${ML} student-minutes` : `${MODE_LABEL[m]} student-minutes to school, ${S.view === "after" ? "after" : "today"}`;
@@ -819,6 +953,26 @@ body.fs-open { overflow: hidden; }
     bd.className = "badge" + (S.strat !== "pps" ? " alt" : "");
   }
 
+  function renderDliLegend(el, m, ML) {
+    const p = prog(); let h;
+    const pal = S.view === "delta" ? PAL.up : PAL.abs;
+    if (S.weight) {
+      const b = dliWeightedBins(m, S.view);
+      h = `<div class="t">${S.view === "delta" ? `Added ${ML} student-minutes` : `${MODE_LABEL[m]} student-minutes, ${S.view === "after" ? "after" : "today"}`}</div><div class="hint" style="margin:-3px 0 5px">Estimated program students living in each hexagon × their minutes, one way</div><div class="row">${pal.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${fmtSM(v)}</span>`).join("")}<span>${fmtSM(b[7])}+</span></div>`;
+      if (p) h += `<div class="keys"><span>Map total: <b class="num">${Math.round(p[m].sm).toLocaleString()}</b> added student-minutes per day, each way</span></div>`;
+    } else {
+      const b = DBINS[S.view === "delta" ? "delta" : "abs"][m];
+      h = `<div class="t">${S.view === "delta" ? `Added ${ML} time, minutes, for a ${p ? p.lang : ""} immersion family living here` : `${MODE_LABEL[m]} time to the program, minutes (${S.view === "after" ? "after" : "today"})`}</div><div class="row">${pal.map(c => `<div class="sw" style="background:${c}"></div>`).join("")}</div><div class="lbls">${["0", ...b.slice(0, 7)].map(v => `<span>${v}</span>`).join("")}<span>${b[7]}+</span></div>`;
+    }
+    h += `<div class="keys"><span><i style="border:2px solid ${PAL.closed};background:transparent"></i>program today</span><span><i style="background:${PAL.recv}"></i>program after</span>${S.weight ? "<span>blank: no estimated program students</span>" : ""}</div>`;
+    h = h.replace(/<\/div>/, `<button type="button" class="legend-toggle" aria-expanded="${el.classList.contains("open")}">${el.classList.contains("open") ? "Less" : "Key"}</button></div>`);
+    el.innerHTML = h;
+    const tg = el.querySelector(".legend-toggle"); if (tg) tg.onclick = () => { el.classList.toggle("open"); renderLegend(); };
+    const bd = document.getElementById("badge");
+    bd.textContent = p ? `Scenario ${S.tag} · ${progName(p)} immersion → ${nice(p.to)}` : `Scenario ${S.tag} · immersion`;
+    bd.className = "badge";
+  }
+
   // ---------- panel ----------
   function dumbbell(a, b, max) {
     const w = 300, x = v => 6 + Math.min(v, max) / max * (w - 12);
@@ -826,8 +980,24 @@ body.fs-open { overflow: hidden; }
     return `<svg viewBox="0 0 ${w} 26" preserveAspectRatio="none" role="img" aria-label="${fmtMin(a)} to ${fmtMin(b)} minutes"><line x1="6" x2="${w - 6}" y1="13" y2="13" stroke="var(--line)" stroke-width="2"/><line x1="${x(a)}" x2="${x(b)}" y1="13" y2="13" stroke="${up ? "var(--up-4)" : "var(--dn-2)"}" stroke-width="4" stroke-linecap="round"/><circle cx="${x(a)}" cy="13" r="5" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="2"/><circle cx="${x(b)}" cy="13" r="5.5" fill="${up ? "var(--up-4)" : "var(--dn-2)"}" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
   }
   const MAX = { walk: 45, bike: 15, drive: 8 };
+  function dliPanel() {
+    const p = prog(); if (!p) return `<div class="kicker">Immersion</div><h3>No program moves at this grade level in Scenario ${S.tag}</h3>`;
+    const cen = DL.central[`${S.tag}|${p.to}|${p.lang}`];
+    const hs = Object.entries(p.hs).sort((a, b) => b[1] - a[1]).map(([a, n]) => `${a} ${n}`).join(", ");
+    const MX = { walk: 90, bike: 30, drive: 12 };
+    return `<div class="kicker">${p.lang} immersion · ${p.level === "k5" ? "K–5" : "grades 6–8"} · Scenario ${S.tag}</div><h3>${nice(p.school)} → ${nice(p.to)}</h3>
+      <div class="sub"><b class="num">${p.total}</b> students in October 2025: <b class="num">${p.own}</b> from ${nice(p.school)}'s own neighborhood${hs ? `, the rest from these high-school areas: ${hs}` : ""}${p.ood ? `; ${p.ood} from outside PPS or unknown, not mapped` : ""}.</div>
+      <div class="modes">${MODES.map(m => `<div class="mrow"><div class="lab"><b>${MODE_LABEL[m]}</b><span class="num">${fmtHM(p[m].before)} → ${fmtHM(p[m].after)} <b>+${fmtHM(p[m].delta)}</b></span></div>${dumbbell(p[m].before, p[m].after, MX[m])}</div>`).join("")}</div>
+      <div class="statline"><span>Walk over 30 minutes</span><span class="num">${p.walk_over_30[0]} → <b>${p.walk_over_30[1]}</b> students</span></div>
+      <div class="statline"><span>Walk over 1 hour</span><span class="num">${p.walk_over_60[0]} → <b>${p.walk_over_60[1]}</b> students</span></div>
+      <div class="statline"><span>Added ${MODE_LABEL[S.mode].toLowerCase()} student-minutes</span><span class="num"><b>${p[S.mode].sm.toLocaleString()}</b> per day, each way</span></div>
+      ${cen && cen.best !== p.to ? `<p class="hint" style="margin-top:10px">For everyone in the combined ${p.lang} program at ${nice(p.to)}, the most central open ${p.level === "k5" ? "elementary" : "middle"} school by car is ${nice(cen.best)} (average ${cen.best_drive} vs ${cen.chosen_drive} min).</p>` : cen ? `<p class="hint" style="margin-top:10px">${nice(p.to)} is the most central open school by car for the combined program.</p>` : ""}
+      <p class="hint" style="margin-top:10px">${matchMedia("(hover: none)").matches ? "Tap" : "Hover"} anywhere for the trip from that spot, even where few program students live. Averages weight each spot by the estimated students living there.</p>
+      ${S.pinHex != null ? `<div class="statline" style="display:block">${dliHexHTML(S.pinHex)}</div>` : ""}`;
+  }
   function renderPanel() {
     const P = document.getElementById("panel"), k = key();
+    if (S.pop === "dli") { P.innerHTML = dliPanel(); return; }
     if (S.level === "k5" && S.sel) {
       const e = closureRow(S.sel); if (!e) { P.innerHTML = defaultPanel(); return; }
       const others = STRATS.map(s => { const x = (D.closures[`${S.tag}_${s}`] || []).find(z => z.school === S.sel); return x ? `<tr class="${s === S.strat ? "on" : ""}"><td>${STRAT_SHORT[s]}<br><span class="hint">${Object.keys(x.receivers).map(nice).join(", ")}</span></td><td>${sign(x[S.mode].delta)} min</td></tr>` : ""; }).join("");
@@ -884,6 +1054,21 @@ body.fs-open { overflow: hidden; }
     T.querySelectorAll("tbody tr").forEach(tr => { const go = () => { S.pinHex = null; select(tr.dataset.s, true); document.getElementById("mapbox").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); }; tr.onclick = go; tr.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
   }
 
+  function renderDli() {
+    const list = progs(), m = S.mode, all = DL.programs.filter(p => p.tags.includes(S.tag));
+    const n = all.reduce((a, p) => a + p.total, 0), lv = S.level === "k5" ? "K–5" : "grades 6–8";
+    const worst = all.slice().sort((a, b) => b.walk.delta - a.walk.delta)[0];
+    document.getElementById("dli-intro").innerHTML = `The neighborhood numbers above leave out immersion students. Scenario ${S.tag} moves ${all.length} immersion programs with about <b>${n.toLocaleString()}</b> students to new sites; the largest average added walk is ${nice(worst.school)}'s ${worst.level === "ms" ? "middle-school " : ""}${worst.lang} program moving to ${nice(worst.to)}, <b>${fmtHM(worst.walk.before)} → ${fmtHM(worst.walk.after)}</b>. The table shows ${lv} programs. Averages are over each program's students, placed by the neighborhoods and high-school areas PPS reports they come from (see “How this was built”). Click a row to map it.`;
+    const T = document.getElementById("dli");
+    const top = Math.max(...list.map(p => p[m].sm), 1);
+    T.innerHTML = `<thead><tr><th>Program today</th><th>Moves to</th><th class="r">Students</th>${MODES.map(x => `<th>${MODE_LABEL[x]}</th>`).join("")}<th class="r">Walk over 1 hour</th><th>Added student-minutes (${MODE_LABEL[m].toLowerCase()})</th></tr></thead><tbody>` +
+      list.slice().sort((a, b) => b[m].sm - a[m].sm).map(p => `<tr tabindex="0" data-p="${p.id}" class="${S.pop === "dli" && p.id === S.prog ? "sel" : ""}"><td><b>${nice(p.school)}</b><br><span class="ba">${p.lang}</span></td><td>${nice(p.to)}</td><td class="r num">${p.total}<br><span class="ba">${p.own} from its neighborhood</span></td>${MODES.map(x => `<td><div class="delta"><span class="num">+${fmtHM(p[x].delta)}</span></div><div class="ba">${fmtHM(p[x].before)} → ${fmtHM(p[x].after)}</div></td>`).join("")}<td class="r num">${p.walk_over_60[0]} → <b>${p.walk_over_60[1]}</b></td><td><div class="delta"><div class="bar" style="width:${Math.max(p[m].sm, 0) / top * 110}px"></div><span class="num">${p[m].sm.toLocaleString()}</span></div></td></tr>`).join("") + "</tbody>";
+    T.querySelectorAll("tbody tr").forEach(tr => { const go = () => { setProg(+tr.dataset.p, true); document.getElementById("mapbox").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" }); }; tr.onclick = go; tr.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
+    const C = Object.values(DL.central).filter(c => c.level === S.level && DL.central[`${S.tag}|${c.to}|${c.lang}`] === c);
+    document.getElementById("dli-central-intro").textContent = `Each new site gathers one or more programs, plus the students already in that language at the site. For all of them together, this compares the average drive to the chosen site with the most central open ${S.level === "k5" ? "elementary" : "middle"} school in Scenario ${S.tag}, the one with the shortest average drive. It ignores building capacity and whether the school could host the program.`;
+    document.getElementById("dli-central").innerHTML = `<thead><tr><th>New site</th><th>Programs combined</th><th class="r">Students</th><th class="r">Avg drive to new site</th><th>Most central open school</th><th class="r">Avg drive there</th><th class="r">Avg straight-line distance</th></tr></thead><tbody>` +
+      C.map(c => `<tr style="cursor:default"><td><b>${nice(c.to)}</b><br><span class="ba">${c.lang}</span></td><td>${c.sources.map(nice).join(", ")}${c.host_students ? ` + ${nice(c.to)}'s own (~${c.host_students})` : ""}</td><td class="r num">${c.students}</td><td class="r num">${c.chosen_drive} min</td><td>${c.best === c.to ? `<b>${nice(c.to)}</b> (same)` : nice(c.best)}</td><td class="r num">${c.best_drive} min</td><td class="r num">${c.chosen_mi} mi${c.best !== c.to ? ` vs ${c.best_mi}` : ""}</td></tr>`).join("") + "</tbody>";
+  }
   function renderNbhd() {
     const k = key(), lvl = S.level, m = S.mode, agg = {};
     H.forEach(r => {
@@ -966,7 +1151,8 @@ body.fs-open { overflow: hidden; }
       <div class="finding"><div class="big">${a.k5.newly_over_walk_threshold.toLocaleString()} <small>students</small></div><p>K–5 students in Scenario A who would newly live more than a mile's walk from school, PPS's yellow-bus threshold (${b.k5.newly_over_walk_threshold.toLocaleString()} in B).</p></div>
       <div class="finding"><div class="big">${nice(worst.school)} <small>+${worst.walk.delta} min</small></div><p>The largest added walk among K–5 closures (Scenario A ${name}, to ${Object.keys(worst.receivers).map(nice).join(", ")}). The share walking more than a mile goes from ${pct(worst.walk_over_1mi_before)} to ${pct(worst.walk_over_1mi_after)}.</p></div>
       ${nbCard}
-      <div class="finding"><div class="big">+${a.ms.walk.delta} <small>min walk</small></div><p>Middle-school moves are steeper: ~${a.ms.students_moving.toLocaleString()} students in grades 6–8 change schools in Scenario A ${name}. The longest new walks: ${bigMs.map(e => `${nice(e.from)} to ${nice(e.to)}, ${fmtMin(e.walk.before)} to ${fmtMin(e.walk.after)} minutes on foot`).join("; ")}.</p></div>`;
+      <div class="finding"><div class="big">+${a.ms.walk.delta} <small>min walk</small></div><p>Middle-school moves are steeper: ~${a.ms.students_moving.toLocaleString()} students in grades 6–8 change schools in Scenario A ${name}. The longest new walks: ${bigMs.map(e => `${nice(e.from)} to ${nice(e.to)}, ${fmtMin(e.walk.before)} to ${fmtMin(e.walk.after)} minutes on foot`).join("; ")}.</p></div>
+      ${(() => { const ps = DL.programs.filter(p => p.tags.includes("A")), n = ps.reduce((a, p) => a + p.n, 0), avg = f => ps.reduce((a, p) => a + p.walk[f] * p.n, 0) / n, w = ps.slice().sort((a, b) => b.walk.delta - a.walk.delta)[0]; return `<div class="finding"><div class="big">+${Math.round(avg("delta"))} <small>min walk</small></div><p>Average added walk for the ~${ps.reduce((a, p) => a + p.total, 0).toLocaleString()} students in the ${ps.length} immersion programs that move to a new site in Scenario A, from about ${Math.round(avg("before"))} to ${Math.round(avg("after"))} minutes. The largest: ${nice(w.school)}'s ${w.level === "ms" ? "middle-school " : ""}${w.lang} program moving to ${nice(w.to)}, ${fmtHM(w.walk.before)} to ${fmtHM(w.walk.after)} on average.</p></div>`; })()}`;
     const row = (l, f, g) => `<tr><td>${l}</td><td class="num">${f(a)}</td><td class="num">${f(b)}</td></tr>`;
     document.getElementById("compare").innerHTML = `<thead><tr><th>${STRAT_LABEL[st]}</th><th>Scenario A</th><th>Scenario B</th></tr></thead><tbody>
       ${row("Schools or sites closing", x => x === a ? 14 : 11, false)}
