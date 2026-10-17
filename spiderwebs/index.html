@@ -700,7 +700,7 @@ function wlRGB(nm) {
     ctx.fillStyle = C.fg; ctx.fillText(`average: ${(vis * 100).toFixed(0)}%`, px, py + pr + 16 * dpr);
 
     // fringes
-    const fx0 = pad * 3 + box * 2, fx1 = w - pad, fy0 = pad + 10 * dpr, fy1 = topH - 18 * dpr;
+    const fx0 = pad * 3 + box * 2, fx1 = w - pad, fy0 = pad + 10 * dpr, fy1 = topH - 54 * dpr;
     ctx.textAlign = 'left'; ctx.fillStyle = C.muted;
     ctx.fillText('brightness across the overlap of two blur discs', fx0, pad + 4 * dpr);
     const N = 5, steps = 240;
@@ -718,7 +718,15 @@ function wlRGB(nm) {
       j ? ctx.lineTo(x, Y(v)) : ctx.moveTo(x, Y(v));
     }
     ctx.stroke();
-    ctx.fillStyle = C.muted; ctx.fillText('each thin line: one point on the sun · white: what the camera records', fx0, topH - 2 * dpr);
+    const stY = fy1 + 8 * dpr, stH = 24 * dpr, col = wlRGB(+lEl.value);
+    for (let j = 0; j < steps; j++) {
+      const u = -1 + 2 * (j + 0.5) / steps;
+      let v = 0; for (let i = 0; i < n; i++) v += 1 + Math.cos(Math.PI * N * u + phis[i]); v /= n;
+      const b = Math.pow(v / 2, 0.7);
+      ctx.fillStyle = `rgb(${255 * col[0] * b | 0},${255 * col[1] * b | 0},${255 * col[2] * b | 0})`;
+      ctx.fillRect(fx0 + (fx1 - fx0) * j / steps, stY, (fx1 - fx0) / steps + 1, stH);
+    }
+    ctx.fillStyle = C.muted; ctx.fillText('each thin line: one point on the sun · strip: what the camera sees', fx0, topH - 2 * dpr);
 
     // coherence curve
     const gx0 = pad + 34 * dpr, gx1 = w - pad, gy0 = topH + 22 * dpr, gy1 = h - 30 * dpr;
