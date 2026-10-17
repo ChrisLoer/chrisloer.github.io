@@ -167,7 +167,7 @@ a.pill { text-decoration: none; color: var(--fg); }
     </div>
     <div class="qa">
       <h3>What does coherence actually mean here?</h3>
-      <p>Demo 2 below lets you build it up. Set "Points on the sun" to 1 and you get one perfect stripe pattern. Add points one at a time and watch each new point's pattern land slightly shifted. Close drops keep the stripes; far-apart drops wash them out.</p>
+      <p>The coherence demo below lets you build it up. Set "Points on the sun" to 1 and you get one perfect stripe pattern. Add points one at a time and watch each new point's pattern land slightly shifted. Close drops keep the stripes; far-apart drops wash them out.</p>
       <a class="pill" href="#coherence">Go to the coherence demo</a>
     </div>
   </section>
@@ -187,11 +187,11 @@ a.pill { text-decoration: none; color: var(--fg); }
 
   <section class="demo" id="droplet">
     <div class="demo-text">
-      <div class="eyebrow">Demo 1 · One droplet</div>
-      <h2>What one droplet does to light</h2>
+      <div class="eyebrow">Demo 1 · One droplet, as rays</div>
+      <h2>What one droplet does to light, as rays</h2>
       <p>Light comes in from the left as a flat wave. The dots mark wave crests, one wavelength apart, drawn to true scale for a 12 µm droplet. Light slows down inside the droplet, so the crests bunch up and the wavefront bends. The light that passes through comes to a rough focus just behind the drop. Seen from far away, that focus is a single bright pinpoint, the glint.</p>
       <p>A droplet does not scramble the light. The same wave in always gives the same wave out, with every crest in a fixed place. Two droplets lit by the same wave therefore give two glints whose crests stay in step. Any loss of coherence has to come from the light that arrives, not from the droplets.</p>
-      <p>Light also bends around the drop's edge (diffraction). Zawischa considered that the main source, and so does Dick. For the stripes it makes no difference: either way, each drop sends out a small, steady point of light.</p>
+      <p>Light also bends around the drop's edge (diffraction). Zawischa considered that the main source, and so does Dick. Rays can't show that, so the next demo solves the full wave problem for the same drop.</p>
     </div>
     <div class="demo-body">
       <canvas id="dropCanvas" class="demo-canvas" aria-label="Ray and wavefront diagram of light passing through a droplet"></canvas>
@@ -206,9 +206,50 @@ a.pill { text-decoration: none; color: var(--fg); }
     <p class="demo-note">Line brightness follows the Fresnel equations. Only about 2 to 4% of the light reflects off the surface, and the rainbow path carries a few percent more. Dick's idea is that those two paths interfere with each other. They do, and that is how glories and supernumerary rainbows form. But a 12 µm drop's own fringes are about 0.05 rad wide, so only one or two fit across a camera lens. They also show up in a lone drop's disc, which the photos don't show.</p>
   </section>
 
+  <section class="demo" id="dropwave">
+    <div class="demo-text">
+      <div class="eyebrow">Demo 2 · One droplet, as a wave</div>
+      <h2>Through the drop and around its edge, together</h2>
+      <p>Rays can't show light bending around an edge. This view solves the full wave problem for a slice through a 12 µm drop, so refraction, reflection and diffraction around the edge all appear at once. Look for the bright focus just behind the drop, and the light bending into the shadow beside it.</p>
+      <p>"Only the light the drop sends out" subtracts the sunlight that would have passed by anyway. What's left is a single outgoing wave, mostly in a forward beam, and it stays locked in step with the incoming light. Through and around are two parts of that one wave, not two separate sources.</p>
+    </div>
+    <div class="demo-body">
+      <canvas id="mieCanvas" class="demo-canvas" aria-label="Wave field around a single droplet"></canvas>
+      <div class="demo-controls">
+        <div class="seg" role="radiogroup" aria-label="View">
+          <label><input type="radio" name="mmode" value="bright" checked> Brightness</label>
+          <label><input type="radio" name="mmode" value="wave"> Waves</label>
+          <label><input type="radio" name="mmode" value="scat"> Only the light the drop sends out</label>
+        </div>
+        <div class="ctl"><label for="mn">Refractive index <output id="mn_o"></output></label><input id="mn" type="range" min="1.2" max="1.7" step="0.01" value="1.40"></div>
+        <div class="ctl"><label for="md">Drop diameter <output id="md_o"></output></label><input id="md" type="range" min="4" max="24" step="0.5" value="12"></div>
+        <button type="button" class="pill" id="mPlay">Pause</button>
+      </div>
+    </div>
+    <p class="demo-note">Computed with the exact series solution for light scattering off a long round cylinder (two-dimensional Mie scattering) at 550 nm. A spherical drop focuses a little more strongly, but the picture is the same. The focused spot just behind a small sphere is known as a photonic nanojet.</p>
+  </section>
+
+  <section class="demo" id="dropdir">
+    <div class="demo-text">
+      <div class="eyebrow">Demo 3 · Brightness by direction</div>
+      <h2>Why a drop looks brighter from some directions</h2>
+      <p>Light bending around a drop goes mostly into a narrow forward beam, about wavelength ÷ diameter wide: roughly 2.5° for a 12 µm drop. The plot shows how bright one drop looks from each direction, on a log scale. The shaded window is the range of directions the camera lens collects.</p>
+      <p>The disc below shows that slice of the beam spread across the camera's blur disc. When the lens sits on the edge of the beam, one side of the disc is brighter than the other. Neighboring drops are seen from nearly the same direction, so they brighten and dim together, which changes how bright the stripes are but not where they fall.</p>
+    </div>
+    <div class="demo-body">
+      <canvas id="dirCanvas" class="demo-canvas tall" aria-label="Brightness of a drop versus viewing direction, with the camera lens window and the resulting blur disc"></canvas>
+      <div class="demo-controls">
+        <div class="ctl"><label for="dd">Drop diameter <output id="dd_o"></output></label><input id="dd" type="range" min="4" max="30" step="0.5" value="12"></div>
+        <div class="ctl"><label for="dv">Camera direction, off the sun <output id="dv_o"></output></label><input id="dv" type="range" min="0" max="15" step="0.1" value="0"></div>
+        <div class="ctl"><label for="dna">Lens aperture (NA) <output id="dna_o"></output></label><input id="dna" type="range" min="0.01" max="0.15" step="0.001" value="0.05"></div>
+        <div class="readouts" id="dirRead"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="demo" id="coherence">
     <div class="demo-text">
-      <div class="eyebrow">Demo 2 · Coherence</div>
+      <div class="eyebrow">Demo 4 · Coherence</div>
       <h2>Why sunlight interferes, but only over short distances</h2>
       <p>Interference needs the light at two places to keep a steady timing relationship, so that crests from one keep landing on crests or troughs from the other. That steadiness is called coherence.</p>
       <p>Every point on the sun shines on its own, out of step with every other point. Light from one point on the sun arrives as a flat wave, tilted slightly by where that point sits on the disc. A single tilted wave hitting two droplets gives a perfectly steady fringe pattern, shifted sideways by an amount that depends on the tilt and on how far apart the droplets are.</p>
@@ -230,7 +271,7 @@ a.pill { text-decoration: none; color: var(--fg); }
 
   <section class="demo" id="stripes">
     <div class="demo-text">
-      <div class="eyebrow">Demo 3 · Two glints, one sensor</div>
+      <div class="eyebrow">Demo 5 · Two glints, one sensor</div>
       <h2>How overlapping blur discs make stripes</h2>
       <p>Here the camera lens is on the left and the light runs to the right. Each glint's light leaves the lens as a cone that narrows to a sharp image point at the focus. The sensor sits in front of the focus, so each glint lands as a blurry disc. Where two cones overlap, their waves cross at a slight angle. Crests meet crests along some lines and troughs along others, which makes straight bright and dark bands. Drag the sensor line to see the pattern it records.</p>
       <p>Turn coherence down and the two waves drift in and out of step. The bands then wander, and the time-averaged strip at the bottom fades to flat. Switch to white light and the bands split into colors, because red light has wider bands than blue.</p>
@@ -843,16 +884,8 @@ function wlRGB(nm) {
         const b = Math.max(0, Math.min(1, 0.5 + 0.5 * v / Math.sqrt(cnt) / 1.6));
         D[i] = 159 * b; D[i + 1] = 214 * b; D[i + 2] = 230 * b;
       }
-      for (let y = 0; y < g.fh; y++) {
-        const cnt = fieldAt(g, g.xs, y, g.lam, tmp);
-        if (!cnt) continue;
-        let re = 0, im = 0, inc = 0;
-        for (let j = 0; j < g.n; j++) if (tmp[j * 3]) { const A = tmp[j * 3], p = tmp[j * 3 + 1] + psi[j]; re += A * Math.cos(p); im += A * Math.sin(p); inc += A * A; }
-        const b = 0.5 * (re * re + im * im) / (inc / cnt);
-        prof1[y * 3] = b * 0.62; prof1[y * 3 + 1] = b * 0.84; prof1[y * 3 + 2] = b * 0.9;
-      }
-      if (!prof || prof.length !== prof1.length) prof = prof1;
-      else for (let i = 0; i < prof.length; i++) prof[i] = 0.93 * prof[i] + 0.07 * prof1[i];
+      for (let y = 0; y < g.fh; y++) { const c = brightness(g, g.xs, y, gam, false); if (c) { prof1[y * 3] = c[0]; prof1[y * 3 + 1] = c[1]; prof1[y * 3 + 2] = c[2]; } }
+      prof = prof1;
     } else {
       const white = m === 'white';
       for (let y = 0; y < g.fh; y++) for (let x = 0; x < g.fw; x++) {
@@ -911,6 +944,246 @@ function wlRGB(nm) {
   new ResizeObserver(() => kick()).observe(canvas);
   kick();
 }
+
+/* ---------- Exact wave solution for one drop (2D Mie scattering by a long cylinder) ---------- */
+const Mie = (() => {
+  function j0(x) {
+    const ax = Math.abs(x);
+    if (ax < 8) {
+      const y = x * x;
+      const a1 = 57568490574.0 + y * (-13362590354.0 + y * (651619640.7 + y * (-11214424.18 + y * (77392.33017 + y * (-184.9052456)))));
+      const a2 = 57568490411.0 + y * (1029532985.0 + y * (9494680.718 + y * (59272.64853 + y * (267.8532712 + y))));
+      return a1 / a2;
+    }
+    const z = 8 / ax, y = z * z, xx = ax - 0.785398164;
+    const a1 = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6)));
+    const a2 = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * 0.934935152e-7)));
+    return Math.sqrt(0.636619772 / ax) * (Math.cos(xx) * a1 - z * Math.sin(xx) * a2);
+  }
+  function y0(x) {
+    if (x < 8) {
+      const y = x * x;
+      const a1 = -2957821389.0 + y * (7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
+      const a2 = 40076544269.0 + y * (745249964.8 + y * (7189466.438 + y * (47447.26470 + y * (226.1030244 + y))));
+      return a1 / a2 + 0.636619772 * j0(x) * Math.log(x);
+    }
+    const z = 8 / x, y = z * z, xx = x - 0.785398164;
+    const a1 = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6)));
+    const a2 = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * 0.934935152e-7)));
+    return Math.sqrt(0.636619772 / x) * (Math.sin(xx) * a1 + z * Math.cos(xx) * a2);
+  }
+  function y1(x) {
+    if (x < 8) {
+      const y = x * x;
+      const a1 = x * (-0.4900604943e13 + y * (0.1275274390e13 + y * (-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
+      const a2 = 0.2499580570e14 + y * (0.4244419664e12 + y * (0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
+      return a1 / a2 + 0.636619772 * (j1(x) * Math.log(x) - 1 / x);
+    }
+    const z = 8 / x, y = z * z, xx = x - 2.356194491;
+    const a1 = 1 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
+    const a2 = 0.04687499995 + y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+    return Math.sqrt(0.636619772 / x) * (Math.sin(xx) * a1 + z * Math.cos(xx) * a2);
+  }
+  function jArr(z, N, out) {
+    if (z < 1e-9) { out.fill(0); out[0] = 1; return out; }
+    const top = Math.max(N, z);
+    const M = 2 * Math.floor((top + 20 + Math.sqrt(40 * top)) / 2);
+    let a = 0, b = 1e-30, s = 2 * b;
+    for (let k = M; k >= 1; k--) {
+      const c = (2 * k / z) * b - a;
+      a = b; b = c;
+      const i = k - 1;
+      if (i <= N) out[i] = b;
+      if (i === 0) s += b; else if (i % 2 === 0) s += 2 * b;
+      if (Math.abs(b) > 1e200) { a *= 1e-200; b *= 1e-200; s *= 1e-200; for (let q = i; q <= N; q++) out[q] *= 1e-200; }
+    }
+    for (let q = 0; q <= N; q++) out[q] /= s;
+    return out;
+  }
+  function yArr(z, N, out) {
+    out[0] = y0(z); if (N >= 1) out[1] = y1(z);
+    for (let n = 1; n < N; n++) out[n + 1] = (2 * n / z) * out[n] - out[n - 1];
+    return out;
+  }
+  function solve(m, D, lam) {
+    const k = 2 * Math.PI / lam, R = D / 2, x = k * R;
+    const N = Math.ceil(m * x + 4 * Math.cbrt(m * x) + 4);
+    const J = jArr(x, N + 1, new Float64Array(N + 2)), Y = yArr(x, N + 1, new Float64Array(N + 2));
+    const Jm = jArr(m * x, N + 1, new Float64Array(N + 2));
+    const d = (A, n, z) => n === 0 ? -A[1] : A[n - 1] - n / z * A[n];
+    const Br = new Float64Array(N + 1), Bi = new Float64Array(N + 1), Cr = new Float64Array(N + 1), Ci = new Float64Array(N + 1);
+    const br = new Float64Array(N + 1), bi = new Float64Array(N + 1);
+    for (let n = 0; n <= N; n++) {
+      const Jp = d(J, n, x), Yp = d(Y, n, x), Jmp = d(Jm, n, m * x);
+      const A = m * Jmp * J[n] - Jm[n] * Jp;
+      const Dr = Jm[n] * Jp - m * Jmp * J[n], Di = Jm[n] * Yp - m * Jmp * Y[n];
+      const den = Dr * Dr + Di * Di;
+      const bR = A * Dr / den, bI = -A * Di / den;
+      const cR = (J[n] + bR * J[n] - bI * Y[n]) / Jm[n], cI = (bR * Y[n] + bI * J[n]) / Jm[n];
+      const e = n === 0 ? 1 : 2, q = n % 4;
+      const ir = [1, 0, -1, 0][q], ii = [0, 1, 0, -1][q];
+      br[n] = e * bR; bi[n] = e * bI;
+      Br[n] = e * (bR * ir - bI * ii); Bi[n] = e * (bR * ii + bI * ir);
+      Cr[n] = e * (cR * ir - cI * ii); Ci[n] = e * (cR * ii + cI * ir);
+    }
+    return { k, R, N, m, Br, Bi, Cr, Ci, br, bi };
+  }
+  function field(s, X0, X1, Y0, Y1, W, H) {
+    const tot = new Float32Array(W * H * 2), sca = new Float32Array(W * H * 2);
+    const jb = new Float64Array(s.N + 1), yb = new Float64Array(s.N + 1);
+    for (let py = 0; py < H; py++) {
+      const yy = Y1 - (py + 0.5) * (Y1 - Y0) / H;
+      for (let px = 0; px < W; px++) {
+        const xx = X0 + (px + 0.5) * (X1 - X0) / W, r = Math.hypot(xx, yy), ct = r > 0 ? xx / r : 1;
+        let c0 = 1, c1 = ct, er = 0, ei = 0;
+        const ir = Math.cos(s.k * xx), ii = Math.sin(s.k * xx);
+        let tr, ti, sr, si;
+        if (r < s.R) {
+          jArr(s.m * s.k * r, s.N, jb);
+          for (let n = 0; n <= s.N; n++) {
+            const cn = n === 0 ? 1 : n === 1 ? ct : 2 * ct * c1 - c0;
+            if (n >= 2) { c0 = c1; c1 = cn; }
+            er += s.Cr[n] * jb[n] * cn; ei += s.Ci[n] * jb[n] * cn;
+          }
+          tr = er; ti = ei; sr = er - ir; si = ei - ii;
+        } else {
+          const z = s.k * r;
+          jArr(z, s.N, jb); yArr(z, s.N, yb);
+          for (let n = 0; n <= s.N; n++) {
+            const cn = n === 0 ? 1 : n === 1 ? ct : 2 * ct * c1 - c0;
+            if (n >= 2) { c0 = c1; c1 = cn; }
+            er += (s.Br[n] * jb[n] - s.Bi[n] * yb[n]) * cn;
+            ei += (s.Br[n] * yb[n] + s.Bi[n] * jb[n]) * cn;
+          }
+          sr = er; si = ei; tr = ir + er; ti = ii + ei;
+        }
+        const o = (py * W + px) * 2;
+        tot[o] = tr; tot[o + 1] = ti; sca[o] = sr; sca[o + 1] = si;
+      }
+    }
+    return { tot, sca };
+  }
+  function farIntensity(s, deg) {
+    const th = deg * Math.PI / 180;
+    let re = 0, im = 0;
+    for (let n = 0; n <= s.N; n++) { const c = Math.cos(n * th); re += s.br[n] * c; im += s.bi[n] * c; }
+    return re * re + im * im;
+  }
+  return { solve, field, farIntensity };
+})();
+
+/* ---------- Demo: one droplet as a wave ---------- */
+{
+  const canvas = document.getElementById('mieCanvas');
+  const off = document.createElement('canvas'), octx = off.getContext('2d');
+  const W = 640, H = 320, X0 = -16, X1 = 44, Y0 = -15, Y1 = 15;
+  off.width = W; off.height = H;
+  const img = octx.createImageData(W, H);
+  let sol = null, fld = null, dirty = true, t = 0, last = 0, raf = 0;
+  const nEl = bind('mn', v => v.toFixed(2), () => { dirty = true; kick(); });
+  const dEl = bind('md', v => v + ' µm', () => { dirty = true; kick(); });
+  const modes = [...document.querySelectorAll('input[name=mmode]')];
+  modes.forEach(m => m.addEventListener('change', () => kick()));
+  const btn = document.getElementById('mPlay');
+  let playing = !reduceMotion;
+  btn.textContent = playing ? 'Pause' : 'Play';
+  btn.addEventListener('click', () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; kick(); });
+  const mode = () => modes.find(m => m.checked).value;
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  function frame(time) {
+    raf = 0;
+    if (dirty) { sol = Mie.solve(+nEl.value, +dEl.value, 0.55); fld = Mie.field(sol, X0, X1, Y0, Y1, W, H); dirty = false; }
+    const m = mode();
+    if (playing && m !== 'bright') { if (last) t += (time - last) * 0.004; }
+    last = playing ? time : 0;
+    const c = Math.cos(t), s = Math.sin(t), D = img.data, src = m === 'scat' ? fld.sca : fld.tot;
+    for (let i = 0, p = 0; i < W * H; i++, p += 4) {
+      const re = src[2 * i], im = src[2 * i + 1];
+      let r, g, b;
+      if (m === 'bright') {
+        const v = 1 - Math.exp(-0.45 * (re * re + im * im));
+        r = 255 * Math.pow(v, 0.8); g = 236 * Math.pow(v, 0.9); b = 200 * v;
+      } else {
+        const v = Math.max(-1, Math.min(1, (re * c + im * s) / (m === 'scat' ? 1.4 : 1.8)));
+        const k = 0.5 + 0.5 * v;
+        r = 159 * k; g = 214 * k; b = 230 * k;
+      }
+      D[p] = r; D[p + 1] = g; D[p + 2] = b; D[p + 3] = 255;
+    }
+    octx.putImageData(img, 0, 0);
+    const { ctx, w, h, dpr } = fit(canvas);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(off, 0, 0, w, h);
+    const sx = w / (X1 - X0), cx = (0 - X0) * sx, cy = h / 2, rr = sol.R * sx;
+    ctx.strokeStyle = 'rgba(240,196,138,0.8)'; ctx.lineWidth = 1.2 * dpr; ctx.setLineDash([4 * dpr, 4 * dpr]);
+    ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = `${11 * dpr}px ${FONT}`; ctx.fillStyle = C.fg; ctx.textAlign = 'left';
+    ctx.fillText('sunlight in →', 8 * dpr, 16 * dpr);
+    ctx.fillText({ bright: 'brightness', wave: 'waves, one instant', scat: 'only the light the drop sends out' }[m], 8 * dpr, h - 10 * dpr);
+    ctx.textAlign = 'right'; ctx.fillText(`${(X1 - X0)} µm across`, w - 8 * dpr, h - 10 * dpr);
+    if (playing && m !== 'bright') raf = requestAnimationFrame(frame);
+  }
+  new ResizeObserver(() => kick()).observe(canvas);
+  kick();
+}
+
+/* ---------- Demo: brightness by direction ---------- */
+{
+  const canvas = document.getElementById('dirCanvas');
+  const dEl = bind('dd', v => v + ' µm', () => { sol = null; draw(); });
+  const vEl = bind('dv', v => v.toFixed(1) + '°', () => draw());
+  const aEl = bind('dna', v => v.toFixed(3), () => draw());
+  const read = document.getElementById('dirRead');
+  let sol = null;
+  const A0 = -25, A1 = 25;
+  function draw() {
+    if (!sol) sol = Mie.solve(1.4, +dEl.value, 0.55);
+    const { ctx, w, h, dpr } = fit(canvas);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    ctx.font = `${11 * dpr}px ${FONT}`;
+    const pad = 14 * dpr, px0 = pad + 40 * dpr, px1 = w - pad, py0 = pad + 18 * dpr, py1 = h * 0.6;
+    const X = a => px0 + (px1 - px0) * (a - A0) / (A1 - A0);
+    const I0 = Mie.farIntensity(sol, 0), LO = -4;
+    const Yv = I => { const l = Math.max(LO, Math.log10(Math.max(1e-12, I / I0))); return py1 - (l - LO) / -LO * (py1 - py0); };
+    const view = +vEl.value, half = Math.asin(+aEl.value) * 180 / Math.PI;
+    ctx.fillStyle = 'rgba(240,196,138,0.16)'; ctx.fillRect(X(view - half), py0, X(view + half) - X(view - half), py1 - py0);
+    ctx.fillStyle = C.warm; ctx.textAlign = 'center'; ctx.fillText('camera lens', X(view), py0 - 4 * dpr);
+    ctx.strokeStyle = C.line; ctx.lineWidth = dpr; ctx.beginPath();
+    ctx.moveTo(px0, py1); ctx.lineTo(px1, py1); ctx.moveTo(px0, py0); ctx.lineTo(px0, py1); ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.textAlign = 'right';
+    for (let l = 0; l >= LO; l -= 1) ctx.fillText(l === 0 ? '1' : '10' + ['', '⁻¹', '⁻²', '⁻³', '⁻⁴'][-l], px0 - 6 * dpr, py1 - (l - LO) / -LO * (py1 - py0) + 4 * dpr);
+    ctx.textAlign = 'center';
+    for (let a = -20; a <= 20; a += 10) ctx.fillText((a > 0 ? '+' : '') + a + '°', X(a), py1 + 16 * dpr);
+    ctx.fillText('direction, measured from straight through toward the sun', (px0 + px1) / 2, py1 + 32 * dpr);
+    ctx.textAlign = 'left'; ctx.fillText('how bright one drop looks from each direction', px0 + 6 * dpr, pad + 4 * dpr);
+    ctx.strokeStyle = C.accent; ctx.lineWidth = 2 * dpr; ctx.beginPath();
+    for (let i = 0; i <= 600; i++) { const a = A0 + (A1 - A0) * i / 600, yv = Yv(Mie.farIntensity(sol, a)); i ? ctx.lineTo(X(a), yv) : ctx.moveTo(X(a), yv); }
+    ctx.stroke();
+    const S = 120, prof = [], ref = [];
+    for (let i = 0; i < S; i++) { const u = -1 + 2 * (i + 0.5) / S; prof.push(Mie.farIntensity(sol, view + u * half)); ref.push(Mie.farIntensity(sol, u * half)); }
+    const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+    const pmax = Math.max(...prof);
+    const dr = (h - py1 - 60 * dpr) / 2, dcx = pad + 40 * dpr + dr, dcy = py1 + 48 * dpr + dr;
+    ctx.save(); ctx.beginPath(); ctx.arc(dcx, dcy, dr, 0, Math.PI * 2); ctx.clip();
+    for (let i = 0; i < S; i++) {
+      const b = Math.pow(prof[i] / pmax, 0.6);
+      ctx.fillStyle = `rgb(${255 * b | 0},${240 * b | 0},${215 * b | 0})`;
+      ctx.fillRect(dcx - dr + 2 * dr * i / S, dcy - dr, 2 * dr / S + 1, 2 * dr);
+    }
+    ctx.restore();
+    ctx.fillStyle = C.fg; ctx.textAlign = 'left';
+    ctx.fillText('the drop’s blur disc, as the camera records it', dcx + dr + 16 * dpr, dcy - 8 * dpr);
+    ctx.fillStyle = C.muted;
+    ctx.fillText('left edge of the lens ←→ right edge of the lens', dcx + dr + 16 * dpr, dcy + 12 * dpr);
+    const width = 0.55 / +dEl.value * 180 / Math.PI;
+    read.innerHTML = `<span>Forward beam width ≈ λ/D <b>${width.toFixed(1)}°</b></span>` +
+      `<span>Brightness vs straight on <b>${Math.round(100 * mean(prof) / mean(ref))}%</b></span>` +
+      `<span>Lens collects <b>±${half.toFixed(1)}°</b></span>`;
+  }
+  new ResizeObserver(() => draw()).observe(canvas);
+  draw();
+}
+
 })();
 </script>
 <script data-goatcounter="https://chrisloer.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
